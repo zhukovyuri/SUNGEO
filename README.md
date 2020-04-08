@@ -65,11 +65,11 @@ data(gpw4_deu2010)
 
 # Interpolate
 out_2 <- poly2poly_ap(poly_from = clea_deu2009,
-                        poly_to = hex_05_deu,
-                        poly_to_id = "HEX_ID",
-                        varz = "to1",
-                        methodz = "pw",
-                        pop_raster = gpw4_deu2010)
+                      poly_to = hex_05_deu,
+                      poly_to_id = "HEX_ID",
+                      varz = "to1",
+                      methodz = "pw",
+                      pop_raster = gpw4_deu2010)
 
 # Visualize voter turnout at grid cell level
 plot(out_2["to1_pw"])
@@ -83,8 +83,8 @@ data(clea_deu2009_pt)
 
 # Interpolate
 out_3 <- point2poly_krig(pointz = clea_deu2009_pt,
-                        polyz = hex_05_deu,
-                        varz = "to1")
+                         polyz = hex_05_deu,
+                         varz = "to1")
 
 # Visualize predicted voter turnout values
 plot(out_3["to1_kr"])
@@ -98,10 +98,10 @@ Example: point-to-polygon interpolation using tessellation method and area weigh
 ```
 # Interpolate
 out_4 <- point2poly_tess(pointz = clea_deu2009_pt,
-                            polyz = hex_05_deu,
-                            poly_id = "HEX_ID",
-                            varz = "to1"
-                            return_tess = TRUE)
+                         polyz = hex_05_deu,
+                         poly_id = "HEX_ID",
+                         varz = "to1",
+                         return_tess = TRUE)
 
 # Visualize voter turnout at grid cell level 
 plot(out_4$result["to1_aw"]))
