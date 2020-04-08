@@ -2,7 +2,7 @@
 % Please edit documentation in R/point2poly_simp.R
 \name{point2poly_simp}
 \alias{point2poly_simp}
-\title{Point-to-polygon interpolation, simple overlay}
+\title{Point-to-polygon interpolation, simple overlay method}
 \usage{
 point2poly_simp(pointz, polyz, varz, funz = function(x) {     sum(x,
   na.rm = T) }, na_val = NA)

@@ -1,4 +1,4 @@
-#' Point-to-polygon interpolation, simple overlay
+#' Point-to-polygon interpolation, simple overlay method
 #'
 #' Function for assigning values from a source point layer to a destination polygon layer, using simple point-in-polygon overlays
 #'
