@@ -1,6 +1,6 @@
 Package: SUNGEO
 Type: Package
-Title: Sub-National Geospatial Data Archive System (SUNGEO): Geoprocessing Library
+Title: SUNGEO / Sub-National Geospatial Data Archive System: Geoprocessing Toolkit
 Version: 0.1.0
 Author: Yuri M. Zhukov
 Maintainer: Yuri M. Zhukov <zhukov@umich.edu>

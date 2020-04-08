@@ -1,6 +1,6 @@
-#' Point-to-polygon interpolation, Ordinary Kriging
+#' Point-to-polygon interpolation, ordinary kriging method
 #'
-#' Function for interpolating values from a source points layer to an overlapping destination polygon layer, using Ordinary Kriging with automatic variogram fitting
+#' Function for interpolating values from a source points layer to an overlapping destination polygon layer, using ordinary kriging with automatic variogram fitting
 #'
 #' @param pointz Source points layer. \code{sf} object.
 #' @param polyz Destination polygon layer. Must have identical CRS to \code{pointz}. \code{sf} object.

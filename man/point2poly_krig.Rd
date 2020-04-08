@@ -2,7 +2,7 @@
 % Please edit documentation in R/point2poly_krig.R
 \name{point2poly_krig}
 \alias{point2poly_krig}
-\title{Point-to-polygon interpolation, Ordinary Kriging}
+\title{Point-to-polygon interpolation, ordinary kriging method}
 \usage{
 point2poly_krig(pointz, polyz, polyz2 = NULL, varz = NULL,
   cellsize = 25000, messagez = "")
@@ -28,7 +28,7 @@ point2poly_krig(pointz, polyz, polyz2 = NULL, varz = NULL,
 }
 }
 \description{
-Function for interpolating values from a source points layer to an overlapping destination polygon layer, using Ordinary Kriging with automatic variogram fitting
+Function for interpolating values from a source points layer to an overlapping destination polygon layer, using ordinary kriging with automatic variogram fitting
 }
 \details{
 This function performs Ordinary Kriging, autmatically selecting a variogram model with the smallest residual sum of squares with the sample variogram.
