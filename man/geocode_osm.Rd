@@ -40,14 +40,14 @@ Function to find geographic coordinates of addresses and place names, using Open
 \examples{
 # Geocode an address (top match only)
 \dontrun{
-geocode_osm("Ann Arbor")
+geocode_osm("Michigan Stadium")
 }
 # Return detailed results for top match
 \dontrun{
-geocode_osm("Ann Arbor", details=TRUE)
+geocode_osm("Michigan Stadium", details=TRUE)
 }
 # Return detailed results for all matches
 \dontrun{
-geocode_osm("Ann Arbor", details=TRUE, return_all = TRUE)
+geocode_osm("Michigan Stadium", details=TRUE, return_all = TRUE)
 }
 }
