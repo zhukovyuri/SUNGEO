@@ -7,6 +7,7 @@ Dependencies: `sf`, `data.table`, `tidyverse`
 
 * `fix_geom` / Function to check and fix broken geometries in simple features polygon objects
 * `geo2planar` / Automatic planar coordinate reference system (CRS) selection
+* `geocode_osm` / Geocode addresses with OpenStreetMap
 * `point2poly_krig` / Point-to-polygon interpolation, ordinary kriging method
 * `point2poly_simp` / Point-to-polygon interpolation, simple overlay method
 * `point2poly_tess` / Point-to-polygon interpolation, tessellation method
@@ -32,6 +33,20 @@ Read help files:
 ```
 ?poly2poly_ap
 ?geo2planar
+```
+
+Example: geocode an address
+
+```
+# Get geographic coordinates for the Big House (top match only)
+geocode_osm("Michigan Stadium")
+
+# Return detailed results for top match
+geocode_osm("Michigan Stadium", details=TRUE)
+
+# Return detailed results for all matches
+geocode_osm("Michigan Stadium", details=TRUE, return_all = TRUE)
+
 ```
 
 Example: area-weighted polygon-to-polygon interpolation
