@@ -15,6 +15,8 @@ geocode_osm(query, match_num = 1, return_all = FALSE,
 \item{return_all}{Should all matches be returned? Overrides \code{match_num} if \code{TRUE}. Default is \code{FALSE}. Logical.}
 
 \item{details}{Should detailed results be returned? Default is \code{FALSE}. Logical.}
+
+\item{user_agent}{Valid User-Agent identifying the application for OSM-Nominatum. Character string.}
 }
 \value{
 A \code{data.frame} object. If \code{details=FALSE}, contains fields
@@ -28,10 +30,10 @@ If \code{details=TRUE}, contains additional fields
 \itemize{
  \item{"osm_type". }{OpenStreetMap ID. Character string.}
  \item{"importance". }{Relevance of match to query, from 0 (worst) to 1 (best). Numeric.}
- \item{"bbox_ymin". }{Minimum vertical coordinate of bunding box. Numeric.}
- \item{"bbox_ymax". }{Maximum vertical coordinate of bunding box. Numeric.}
- \item{"bbox_xmin". }{Minimum horizontal coordinate of bunding box. Numeric.}
- \item{"bbox_xmax". }{Maximum horizontal coordinate of bunding box. Numeric.}
+ \item{"bbox_ymin". }{Minimum vertical coordinate of bounding box. Numeric.}
+ \item{"bbox_ymax". }{Maximum vertical coordinate of bounding box. Numeric.}
+ \item{"bbox_xmin". }{Minimum horizontal coordinate of bounding box. Numeric.}
+ \item{"bbox_xmax". }{Maximum horizontal coordinate of bounding box. Numeric.}
  }
 }
 \description{

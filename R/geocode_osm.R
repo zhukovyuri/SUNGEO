@@ -6,6 +6,7 @@
 #' @param match_num If query matches multiple locations, which match to return? Default is 1 (highest-ranking match, by relevance). Numeric.
 #' @param return_all Should all matches be returned? Overrides \code{match_num} if \code{TRUE}. Default is \code{FALSE}. Logical.
 #' @param details Should detailed results be returned? Default is \code{FALSE}. Logical.
+#' @param user_agent Valid User-Agent identifying the application for OSM-Nominatum. Character string.
 #' @return A \code{data.frame} object. If \code{details=FALSE}, contains fields
 #' \itemize{
 ##'  \item{"osm_id". }{OpenStreetMap ID. Character string.}
@@ -17,10 +18,10 @@
 #' \itemize{
 ##'  \item{"osm_type". }{OpenStreetMap ID. Character string.}
 ##'  \item{"importance". }{Relevance of match to query, from 0 (worst) to 1 (best). Numeric.}
-##'  \item{"bbox_ymin". }{Minimum vertical coordinate of bunding box. Numeric.}
-##'  \item{"bbox_ymax". }{Maximum vertical coordinate of bunding box. Numeric.}
-##'  \item{"bbox_xmin". }{Minimum horizontal coordinate of bunding box. Numeric.}
-##'  \item{"bbox_xmax". }{Maximum horizontal coordinate of bunding box. Numeric.}
+##'  \item{"bbox_ymin". }{Minimum vertical coordinate of bounding box. Numeric.}
+##'  \item{"bbox_ymax". }{Maximum vertical coordinate of bounding box. Numeric.}
+##'  \item{"bbox_xmin". }{Minimum horizontal coordinate of bounding box. Numeric.}
+##'  \item{"bbox_xmax". }{Maximum horizontal coordinate of bounding box. Numeric.}
 ##'  }
 #' @export
 #' @import tidyverse RCurl jsonlite
