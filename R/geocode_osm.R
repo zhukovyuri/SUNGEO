@@ -7,8 +7,9 @@
 #' @param return_all Should all matches be returned? Overrides \code{match_num} if \code{TRUE}. Default is \code{FALSE}. Logical.
 #' @param details Should detailed results be returned? Default is \code{FALSE}. Logical.
 #' @param user_agent Valid User-Agent identifying the application for OSM-Nominatum. Character string.
-#' @return A \code{data.frame} object. If \code{details=FALSE}, contains fields
+#' @return A \code{data.table} object. If \code{details=FALSE}, contains fields
 #' \itemize{
+##'  \item{"query". }{User-supplied address query(ies). Character string.}
 ##'  \item{"osm_id". }{OpenStreetMap ID. Character string.}
 ##'  \item{"address". }{OpenStreetMap address. Character string.}
 ##'  \item{"longitude". }{Horizontal coordinate. Numeric.}
@@ -17,15 +18,16 @@
 ##' If \code{details=TRUE}, contains additional fields
 #' \itemize{
 ##'  \item{"osm_type". }{OpenStreetMap ID. Character string.}
-##'  \item{"importance". }{Relevance of match to query, from 0 (worst) to 1 (best). Numeric.}
+##'  \item{"importance". }{Relevance of Nominatum match to query, from 0 (worst) to 1 (best). Numeric.}
 ##'  \item{"bbox_ymin". }{Minimum vertical coordinate of bounding box. Numeric.}
 ##'  \item{"bbox_ymax". }{Maximum vertical coordinate of bounding box. Numeric.}
 ##'  \item{"bbox_xmin". }{Minimum horizontal coordinate of bounding box. Numeric.}
 ##'  \item{"bbox_xmax". }{Maximum horizontal coordinate of bounding box. Numeric.}
 ##'  }
 #' @export
-#' @import tidyverse RCurl jsonlite
+#' @import data.table tidyverse RCurl jsonlite
 #' @importFrom data.table last first between
+#' @importFrom rvest html_session
 #' @examples
 #' # Geocode an address (top match only)
 #' \dontrun{
@@ -42,19 +44,39 @@
 
 geocode_osm <- function(
   query,
-  match_num=1,
-  return_all=FALSE,
-  details=FALSE,
-  user_agent="contact info"
+  match_num = 1,
+  return_all = FALSE,
+  details = FALSE,
+  user_agent = NULL
 ){
+
+  # Error handling
+  downloadFail <- FALSE
+  tryCatch({
 
   # Create empty objects
   osm_id=NA_character_; osm_type = NA_character_; address=NA_character_; longitude=NA_real_; latitude=NA_real_; importance=NA_real_; bbx=data.frame(bbox_ymin=NA_real_,bbox_ymax=NA_real_,bbox_xmin=NA_real_,bbox_xmax=NA_real_,stringsAsFactors = FALSE)
+
+  # User-Agent
+  if(length(user_agent)==0){user_agent <- rvest::html_session("https://httpbin.org/user-agent") %>%
+    (function(.){.["response"][[1]]["request"][[1]]["options"][[1]]["useragent"][[1]]})}
 
   # Send query to OSM Nominatum API
   root_url <- "https://nominatim.openstreetmap.org/search?q="
   sufx_url <- "&format=json&polygon=1&addressdetails=1"
   doc <- paste0(root_url, query, sufx_url) %>% URLencode() %>% RCurl::getURL(httpheader = c('User-Agent' = user_agent))
+
+  }, warning = function(w) {
+    downloadFail <<- TRUE
+  }, error = function(e) {
+    message("Cannot access OSM server. Please check your internet connection and try again.")
+    downloadFail <<- TRUE
+  }, finally = {
+  })
+  if(downloadFail){
+    cat("Cannot access OSM server. Please check your internet connection and try again.")
+    return()
+  } else {
 
   # Parse results
   if(nchar(doc)>2){
@@ -72,7 +94,8 @@ geocode_osm <- function(
   }
 
   # Output
-  out <- data.frame(osm_id=osm_id,
+  out <- data.frame(query=query,
+                    osm_id=osm_id,
                     osm_type=osm_type,
                     importance=importance,
                     address=address,
@@ -80,5 +103,7 @@ geocode_osm <- function(
                     latitude=latitude,
                     stringsAsFactors = FALSE) %>% cbind(bbx)
   if(!details){out <- out %>% dplyr::mutate(osm_type=NULL,importance=NULL) %>% dplyr::select(-dplyr::starts_with("bbox"))}
-  return(out)
+  return(out %>% as.data.table())
+
+  }
 }

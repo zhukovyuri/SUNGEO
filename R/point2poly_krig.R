@@ -51,7 +51,7 @@ point2poly_krig <- function(pointz,polyz,polyz2=NULL,varz=NULL,cellsize=25000,me
   if(length(polyz2)==0){polyz2 <- polyz_u}
 
   # Find optimal planar projection for map
-  pointz_tr <- geo2planar(
+  pointz_tr <- crs_select(
     polyz = polyz2 %>% fix_geom(),
     sf_layer = pointz %>% st_transform(st_crs(polyz)) %>% fix_geom()
   )

@@ -5,9 +5,11 @@ Version 0.1.0 (April 8, 2020)
 
 Dependencies: `sf`, `data.table`, `tidyverse`
 
+* `clean_geonames` / Function to clean GeoNames gazetteer files
+* `crs_select` / Automatic planar coordinate reference system (CRS) selection
 * `fix_geom` / Function to check and fix broken geometries in simple features polygon objects
-* `geo2planar` / Automatic planar coordinate reference system (CRS) selection
 * `geocode_osm` / Geocode addresses with OpenStreetMap
+* `geocode_gn` / Geocode addresses with GeoNames
 * `point2poly_krig` / Point-to-polygon interpolation, ordinary kriging method
 * `point2poly_simp` / Point-to-polygon interpolation, simple overlay method
 * `point2poly_tess` / Point-to-polygon interpolation, tessellation method

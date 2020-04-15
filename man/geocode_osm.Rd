@@ -5,7 +5,7 @@
 \title{Geocode addresses with OpenStreetMap}
 \usage{
 geocode_osm(query, match_num = 1, return_all = FALSE,
-  details = FALSE, user_agent = "contact info")
+  details = FALSE, user_agent = NULL)
 }
 \arguments{
 \item{query}{Address or place name to be geocoded. Character string.}
@@ -19,8 +19,9 @@ geocode_osm(query, match_num = 1, return_all = FALSE,
 \item{user_agent}{Valid User-Agent identifying the application for OSM-Nominatum. Character string.}
 }
 \value{
-A \code{data.frame} object. If \code{details=FALSE}, contains fields
+A \code{data.table} object. If \code{details=FALSE}, contains fields
 \itemize{
+ \item{"query". }{User-supplied address query(ies). Character string.}
  \item{"osm_id". }{OpenStreetMap ID. Character string.}
  \item{"address". }{OpenStreetMap address. Character string.}
  \item{"longitude". }{Horizontal coordinate. Numeric.}
@@ -29,7 +30,7 @@ A \code{data.frame} object. If \code{details=FALSE}, contains fields
 If \code{details=TRUE}, contains additional fields
 \itemize{
  \item{"osm_type". }{OpenStreetMap ID. Character string.}
- \item{"importance". }{Relevance of match to query, from 0 (worst) to 1 (best). Numeric.}
+ \item{"importance". }{Relevance of Nominatum match to query, from 0 (worst) to 1 (best). Numeric.}
  \item{"bbox_ymin". }{Minimum vertical coordinate of bounding box. Numeric.}
  \item{"bbox_ymax". }{Maximum vertical coordinate of bounding box. Numeric.}
  \item{"bbox_xmin". }{Minimum horizontal coordinate of bounding box. Numeric.}

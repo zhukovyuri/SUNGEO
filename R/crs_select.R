@@ -1,6 +1,6 @@
 #' Automatic planar coordinate reference system (CRS) selection
 #'
-#' Function to automatically convert simple features with geodetic coordinates (longitude, latitude) to planar coordinates.
+#' Function to automatically convert simple features with geodetic coordinates (longitude, latitude / WGS 1984, EPSG:4326) to planar coordinates.
 #'
 #' @param polyz Polygon layer definiting the study region. \code{sf} object.
 #' @param sf_layer Layer to be reprojected, if different from \code{polyz}. \code{sf} object.
@@ -13,14 +13,13 @@
 #' @export
 #' @import sf data.table tidyverse
 #' @examples
-#' # Find a planar projection for a hexagonal grid of Germany
+#' # Find a planar projection for an unprojected (WSG 1984) hexagonal grid of Germany
 #' \dontrun{
 #' data(hex_05_deu)
-#' hex_tr <- geo2planar(hex_05_deu)
+#' hex_tr <- crs_select(hex_05_deu)
 #' }
 
-
-geo2planar <- function(polyz,sf_layer=polyz){
+crs_select <- function(polyz,sf_layer=polyz){
 
   # Convert to single polygon
   polyz_u <- polyz %>% st_union()
