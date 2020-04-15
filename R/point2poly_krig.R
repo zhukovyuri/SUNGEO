@@ -16,7 +16,6 @@
 #' @details This function performs Ordinary Kriging, autmatically selecting a variogram model with the smallest residual sum of squares with the sample variogram.
 #'
 #' Unlike other available point-to-polygon interpolation techniques, this function currently only accepts numeric variables in \code{varz} and does not support interpolation of character strings.
-#' @export
 #' @import sf maptools data.table tidyverse automap
 #' @importFrom stats as.dist
 #' @importFrom raster extract pointDistance raster projectRaster
@@ -41,6 +40,7 @@
 #'                          polyz = hex_05_deu,
 #'                          varz = c("to1","pvs1_margin"))
 #' }
+#' @export
 
 point2poly_krig <- function(pointz,polyz,polyz2=NULL,varz=NULL,cellsize=25000,messagez=""){
 
@@ -51,10 +51,12 @@ point2poly_krig <- function(pointz,polyz,polyz2=NULL,varz=NULL,cellsize=25000,me
   if(length(polyz2)==0){polyz2 <- polyz_u}
 
   # Find optimal planar projection for map
-  pointz_tr <- crs_select(
-    polyz = polyz2 %>% fix_geom(),
-    sf_layer = pointz %>% st_transform(st_crs(polyz)) %>% fix_geom()
-  )
+  suppressWarnings({
+    pointz_tr <- crs_select(
+      polyz = polyz2 %>% fix_geom(),
+      sf_layer = pointz %>% st_transform(st_crs(polyz)) %>% fix_geom()
+    )
+  })
   pointz_tr_ <- pointz_tr[["sf"]]
   epsg <- pointz_tr[["epsg_best"]]
 

@@ -10,7 +10,6 @@
 ##'  \item{"epsg_best". }{EPSG code of the projection. Character string.}
 ##'  }
 #' @details Optimal map projection for the object \code{sf_layer} is defined as one that maximizes areal overlap between the study area and the spatial extent of planar coordinate reference systems and transformations in the EPSG Geodetic Parameter Dataset (polygons version 9.8, 2019-09-19).
-#' @export
 #' @import sf data.table tidyverse
 #' @examples
 #' # Find a planar projection for an unprojected (WSG 1984) hexagonal grid of Germany
@@ -18,6 +17,7 @@
 #' data(hex_05_deu)
 #' hex_tr <- crs_select(hex_05_deu)
 #' }
+#' @export
 
 crs_select <- function(polyz,sf_layer=polyz){
 
@@ -25,9 +25,11 @@ crs_select <- function(polyz,sf_layer=polyz){
   polyz_u <- polyz %>% st_union()
 
   # Find EPSG polygons that overlap with sf_layer
-  epsg_candidates <- suppressMessages(
-    list(sf_layer %>% st_centroid(),sf_layer)[c(grepl("POLYGON",sf_layer %>% st_geometry_type() %>% (function(.){.[1]})),!grepl("POLYGON",sf_layer %>% st_geometry_type() %>% (function(.){.[1]})))][[1]] %>% st_within(.,epsg_poly %>% st_transform(st_crs(sf_layer))) %>% as.data.table()
-  )
+  suppressWarnings({
+    epsg_candidates <- suppressMessages(
+      list(sf_layer %>% st_centroid(),sf_layer)[c(grepl("POLYGON",sf_layer %>% st_geometry_type() %>% (function(.){.[1]})),!grepl("POLYGON",sf_layer %>% st_geometry_type() %>% (function(.){.[1]})))][[1]] %>% st_within(.,epsg_poly %>% st_transform(st_crs(sf_layer))) %>% as.data.table()
+    )
+  })
   epsg_candidates <- epsg_candidates[,col.id] %>% table() %>% sort(decreasing=F) %>% names() %>% as.numeric()
 
   # Area overlap between polyz and EPSG region
@@ -55,8 +57,12 @@ crs_select <- function(polyz,sf_layer=polyz){
   crs_bad <- TRUE; x0 <- 1
   while(crs_bad&x0<=length(epsg_best)){
     epsg_best_ <- epsg_best[x0]
-    sf_layer_tr <- sf_layer %>% st_transform(crs=epsg_best[x0])
-    crs_bad <- (sf_layer %>% st_transform(crs=epsg_best[x0]) %>% st_bbox() %>% as.numeric() %>% is.na() %>% mean())==1 | st_is_longlat(sf_layer_tr)
+    suppressWarnings({
+      sf_layer_tr <- sf_layer %>% st_transform(crs=epsg_best[x0])
+    })
+    suppressWarnings({
+      crs_bad <- (sf_layer %>% st_transform(crs=epsg_best[x0]) %>% st_bbox() %>% as.numeric() %>% is.na() %>% mean())==1 | st_is_longlat(sf_layer_tr)
+    })
     x0 <- x0+1
   }
 

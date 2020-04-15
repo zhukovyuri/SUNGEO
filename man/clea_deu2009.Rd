@@ -4,12 +4,12 @@
 \name{clea_deu2009}
 \alias{clea_deu2009}
 \title{Constituency level results for lower chamber legislative elections, Germany 2009.}
-\format{Simple feature collection with 16 features and 10 fields
-geometry type:  MULTIPOLYGON
-dimension:      XY
-bbox:           xmin: 5.867281 ymin: 47.27096 xmax: 15.04388 ymax: 55.05902
-epsg (SRID):    4326
-proj4string:    +proj=longlat +datum=WGS84 +no_defs
+\format{Simple feature collection with 16 features and 10 fields.
+geometry type:  MULTIPOLYGON.
+dimension:      XY.
+bbox:           xmin: 5.867281 ymin: 47.27096 xmax: 15.04388 ymax: 55.05902.
+epsg (SRID):    4326.
+proj4string:    +proj=longlat +datum=WGS84 +no_defs.
 \describe{
   \item{cst }{Constituency number. Numeric.}
   \item{cst_n }{Constituency name. Character.}

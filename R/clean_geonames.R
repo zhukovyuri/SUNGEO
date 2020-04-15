@@ -5,10 +5,10 @@
 #' @param gn Raw GeoNames data file. \code{data.frame} or \code{data.table} object.
 #' @param ppl Keep only populated place names? Logical.
 #' @return Returns a \code{data.table} with properly-formatted GeoNames information.
-#' @export
 #' @import tidyverse data.table
 #' @importFrom data.table last first between
 #' @details Function used internally by \code{geocode_gn}
+#' @export
 
 clean_geonames <- function(gn,ppl=FALSE){
 

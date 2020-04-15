@@ -6,7 +6,7 @@
 #' @param match_num If query matches multiple locations, which match to return? Default is 1 (highest-ranking match, by relevance). Numeric.
 #' @param return_all Should all matches be returned? Overrides \code{match_num} if \code{TRUE}. Default is \code{FALSE}. Logical.
 #' @param details Should detailed results be returned? Default is \code{FALSE}. Logical.
-#' @param user_agent Valid User-Agent identifying the application for OSM-Nominatum. Character string.
+#' @param user_agent Valid User-Agent identifying the application for OSM-Nominatum. If none supplied, function will attempt to auto-detect. Character string.
 #' @return A \code{data.table} object. If \code{details=FALSE}, contains fields
 #' \itemize{
 ##'  \item{"query". }{User-supplied address query(ies). Character string.}
@@ -24,7 +24,7 @@
 ##'  \item{"bbox_xmin". }{Minimum horizontal coordinate of bounding box. Numeric.}
 ##'  \item{"bbox_xmax". }{Maximum horizontal coordinate of bounding box. Numeric.}
 ##'  }
-#' @export
+#' @details Note that Nominatim Usage Policy stipulates an absolute maximum of 1 request per second (\url{https://operations.osmfoundation.org/policies/nominatim/}). For batch geocoding of multiple addresses, please use \code{\link[SUNGEO]{geocode_osm_batch}} or \code{\link[SUNGEO]{geocode_gn}}.
 #' @import data.table tidyverse RCurl jsonlite
 #' @importFrom data.table last first between
 #' @importFrom rvest html_session
@@ -41,6 +41,7 @@
 #' \dontrun{
 #' geocode_osm("Michigan Stadium", details=TRUE, return_all = TRUE)
 #' }
+#' @export
 
 geocode_osm <- function(
   query,
@@ -49,6 +50,9 @@ geocode_osm <- function(
   details = FALSE,
   user_agent = NULL
 ){
+
+  # Batch geocoding warning
+  if(length(query)>1){query <- query[1]; warning("Returning first result only. Please use geocode_osm_batch() or geocode_gn() to geocode multiple addresses.")}
 
   # Error handling
   downloadFail <- FALSE

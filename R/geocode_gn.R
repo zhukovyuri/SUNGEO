@@ -1,4 +1,4 @@
-#' Geocode addresses with GeoNames
+#' Batch geocode addresses with GeoNames
 #'
 #' Function to find geographic coordinates of addresses and place names, using GeoNames gazetteer data.
 #'
@@ -9,7 +9,7 @@
 #' @param match_all Attempt to match all queries? Default is \code{FALSE}. Logical.
 #' @param details Should detailed results be returned? Default is \code{FALSE}. Logical.
 #' @param ncores Number of cores to use for parallel socket cluster. Default is 1. Numeric.
-#' @param verbose Print status messages and progress bar? Default is \code{FALSE}. Logical.
+#' @param verbose Print status messages and progress? Default is \code{TRUE}. Logical.
 #' @return A \code{data.table} object. If \code{details=FALSE}, contains fields
 #' \itemize{
 ##'  \item{"query". }{User-supplied address query(ies). Character string.}
@@ -26,7 +26,6 @@
 ##'  \item{"str_meth". }{String distance metric. Character string.}
 ##'  \item{"match_type". }{Type of match. Character string.}
 ##'  }
-#' @export
 #' @import tidyverse data.table countrycode stringdist parallel
 #' @importFrom data.table last first between
 #' @importFrom rvest html_session
@@ -52,6 +51,7 @@
 #' geocode_gn(query = c("Chisinau","Buiucani, Chisinau","Chisinau centru"),
 #'            country_name = "Moldova", details = TRUE, verbose = TRUE)
 #' }
+#' @export
 
 geocode_gn <- function(query,
                        country_name=NULL,
@@ -60,7 +60,7 @@ geocode_gn <- function(query,
                        match_all=FALSE,
                        details=FALSE,
                        ncores=1,
-                       verbose=FALSE){
+                       verbose=TRUE){
 
   # Country codes
   if(length(country_name)==0&length(country_iso3)==0){stop("Please supply country code or name.")}

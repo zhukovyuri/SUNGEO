@@ -4,12 +4,12 @@
 \name{hex_05_deu}
 \alias{hex_05_deu}
 \title{Hexagonal grid for Germany.}
-\format{Simple feature collection with 257 features and 3 fields
-geometry type:  POLYGON
-dimension:      XY
-bbox:           xmin: 5.375001 ymin: 46.76568 xmax: 15.375 ymax: 55.13726
-epsg (SRID):    4326
-proj4string:    +proj=longlat +datum=WGS84 +no_defs
+\format{Simple feature collection with 257 features and 3 fields.
+geometry type:  POLYGON.
+dimension:      XY.
+bbox:           xmin: 5.375001 ymin: 46.76568 xmax: 15.375 ymax: 55.13726.
+epsg (SRID):    4326.
+proj4string:    +proj=longlat +datum=WGS84 +no_defs.
 \describe{
   \item{HEX_ID }{Unique cell identifier. Character.}
   \item{HEX_X }{Longitude of cell centroid. Numeric.}

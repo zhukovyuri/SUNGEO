@@ -9,7 +9,6 @@
 #' @param na_val Value to be assigned to missing values. Defaul is \code{NA}. Logical or list.
 #' @return Returns a \code{sf} polygon object, with variables from \code{pointz} assigned to the geometries of \code{polyz}.
 #' @details Assignment procedures are the same for numeric and character string variables. All variables supplied in \code{varz} are passed directly to the function specified in \code{funz}. If different sets of variables are to be aggregated with different functions, both \code{varz} and \code{funz} should be specified as lists (see examples below).
-#' @export
 #' @import sf maptools data.table tidyverse
 #' @importFrom stats as.dist
 #' @importFrom raster extract pointDistance raster
@@ -49,6 +48,7 @@
 #'                            function(x){paste0(unique(na.omit(x)),collapse=" | ") }),
 #'                          na_val = list(NA_real_,0,NA_character_))
 #' }
+#' @export
 
 point2poly_simp <- function(pointz,polyz,varz,funz=function(x){sum(x,na.rm=T)},na_val=NA){
 

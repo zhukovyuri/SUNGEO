@@ -2,11 +2,11 @@
 % Please edit documentation in R/geocode_gn.R
 \name{geocode_gn}
 \alias{geocode_gn}
-\title{Geocode addresses with GeoNames}
+\title{Batch geocode addresses with GeoNames}
 \usage{
 geocode_gn(query, country_name = NULL, country_iso3 = NULL,
   str_meth = "cosine", match_all = FALSE, details = FALSE,
-  ncores = 1, verbose = FALSE)
+  ncores = 1, verbose = TRUE)
 }
 \arguments{
 \item{query}{Address(es) or place name(s) to be geocoded. Character string or vector.}
@@ -23,7 +23,7 @@ geocode_gn(query, country_name = NULL, country_iso3 = NULL,
 
 \item{ncores}{Number of cores to use for parallel socket cluster. Default is 1. Numeric.}
 
-\item{verbose}{Print status messages and progress bar? Default is \code{FALSE}. Logical.}
+\item{verbose}{Print status messages and progress? Default is \code{TRUE}. Logical.}
 }
 \value{
 A \code{data.table} object. If \code{details=FALSE}, contains fields

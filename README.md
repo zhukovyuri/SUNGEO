@@ -8,8 +8,10 @@ Dependencies: `sf`, `data.table`, `tidyverse`
 * `clean_geonames` / Function to clean GeoNames gazetteer files
 * `crs_select` / Automatic planar coordinate reference system (CRS) selection
 * `fix_geom` / Function to check and fix broken geometries in simple features polygon objects
+* `geocode_gn` / Batch geocode addresses with GeoNames
 * `geocode_osm` / Geocode addresses with OpenStreetMap
-* `geocode_gn` / Geocode addresses with GeoNames
+* `geocode_osm_batch` / Batch geocode addresses with OpenStreetMap
+* `line2poly` / Line-in-polygon analysis
 * `point2poly_krig` / Point-to-polygon interpolation, ordinary kriging method
 * `point2poly_simp` / Point-to-polygon interpolation, simple overlay method
 * `point2poly_tess` / Point-to-polygon interpolation, tessellation method
@@ -37,7 +39,7 @@ Read help files:
 ?geo2planar
 ```
 
-Example: geocode an address
+Example: geocode an address with OpenStreetMap
 
 ```
 # Get geographic coordinates for the Big House (top match only)
@@ -49,6 +51,36 @@ geocode_osm("Michigan Stadium", details=TRUE)
 # Return detailed results for all matches
 geocode_osm("Michigan Stadium", details=TRUE, return_all = TRUE)
 
+```
+
+Example: geocode multiple addresses
+
+```
+# Geocode multiple addresses (top matches only)
+geocode_osm_batch(c("Ann Arbor","East Lansing","Columbus"))
+
+# ... with progress reports
+geocode_osm_batch(c("Ann Arbor","East Lansing","Columbus"), 
+                  verbose = TRUE)
+
+# Return detailed results for all matches
+geocode_osm_batch(c("Ann Arbor","East Lansing","Columbus"),
+                  details = TRUE, return_all = TRUE)
+
+```
+
+Example: geocode addresses with GeoNames
+
+```
+# Geocode an address
+geocode_gn("Chisinau", country_name = "Moldova")
+
+# Return detailed results
+geocode_gn("Chisinau", country_name = "Moldova", details = TRUE)
+
+# Return detailed results for multiple addresses, with progress reports
+geocode_gn(query = c("Chisinau","Buiucani, Chisinau","Chisinau centru"),
+           country_name = "Moldova", details = TRUE, verbose = TRUE)
 ```
 
 Example: area-weighted polygon-to-polygon interpolation
@@ -125,6 +157,40 @@ plot(out_4$result["to1_aw"]))
 
 # Visualize Voronoi polygons used in estimation
 plot(out_4$tess["to1"])
+```
+
+Example: line-in-polygon analysis
+
+```
+# Load road data and extract highways
+data(dcwroad_deu1992)
+highways <- dcwroad_deu1992[dcwroad_deu1992$MED_DESCRI%in%"With Median",]
+
+# Basic map overlay
+plot(hex_05_deu$geometry)
+plot(highways$geometry, add=TRUE, col = "blue", lwd=2)
+
+# Calculate road lengths, densities and distances from each polygon to nearest highway
+out_1 <- line2poly(linez = highways,
+                   polyz = hex_05_deu,
+                   poly_id = "HEX_ID")
+                   
+# Visualize results
+plot(out_1["line_length"])
+plot(out_1["line_density"])
+plot(out_1["line_distance"])
+
+# Replace missing road lengths and densities with 0's, rename variables
+out_2 <- line2poly(linez = highways,
+                   polyz = hex_05_deu,
+                   poly_id = "HEX_ID",
+                   outvar_name = "road",
+                   na_val = 0)
+
+# Visualize results
+plot(out_2["road_length"])
+plot(out_2["road_density"])
+plot(out_2["road_distance"])
 ```
 
 Example: Automatically find a planar CRS for a GIS dataset

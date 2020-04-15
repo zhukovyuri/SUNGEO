@@ -29,7 +29,6 @@
 ##'  \item{"all_overlap". }{For each variable in \code{char_varz}, the features in \code{poly_to} are assigned all values from overlapping \code{poly_from} features, ranked by area and/or population weights (largest-to-smallest) of intersections.}
 ##' }
 #' It is possible to pass multiple arguments to \code{char_assign} (e.g. \code{char_assign=c("biggest_overlap","all_overlap")}), in which case the function will calculate both, and append the resulting columns to the output.
-#' @export
 #' @import sf maptools data.table tidyverse
 #' @importFrom stats as.dist
 #' @importFrom raster extract pointDistance raster projectRaster
@@ -82,7 +81,7 @@
 #'                          methodz = c("aw","pw"),
 #'                          pop_raster = gpw4_deu2010)
 #' }
-
+#' @export
 
 
 poly2poly_ap <- function(
