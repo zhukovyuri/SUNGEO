@@ -182,7 +182,7 @@ geocode_gn <- function(query,
     gn_best[, c("gn_pt","gn_fz","gn_perfect","ix"):=NULL]
     gn_best[match_type=="perfect",strdist := 0]
     gn_best[match_type=="perfect",str_meth := "identity"]
-    gn_best <- gn_best %>% dplyr::select(query,geonameid,country_iso3,country_name,address,everything())
+    gn_best <- gn_best %>% dplyr::select(query,geonameid,country_iso3,country_name,address,dplyr::everything())
 
     # Grab missing from reverse matrix
     if(match_all){
@@ -199,7 +199,7 @@ geocode_gn <- function(query,
       }}
 
     # Output
-    if(!details){gn_best <- gn_best %>% select(query,geonameid,address,longitude,latitude)}
+    if(!details){gn_best <- gn_best %>% dplyr::select(query,geonameid,address,longitude,latitude)}
     return(gn_best)
   }
 

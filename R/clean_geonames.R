@@ -40,12 +40,11 @@ clean_geonames <- function(gn,ppl=FALSE){
   names(geonames_t) <- c("geonameid","name","asciiname","alternatenames","latitude","longitude","feature_class","feature_code","country_code","cc2","admin1_code","admin2_code","admin3_code","admin4_code","population","elevation","dem","timezone","modification_date")
   classez <- c("numeric","character","character","character","numeric","numeric","character","character","character","character","numeric","numeric","numeric","numeric","numeric","numeric","numeric","character","character")
   geonames_t <- suppressWarnings(
-    geonames_t %>% mutate_if(classez%in%"numeric",as.character)  %>% mutate_if(classez%in%"numeric",as.numeric)
+    geonames_t %>% dplyr::mutate_if(classez%in%"numeric",as.character)  %>% dplyr::mutate_if(classez%in%"numeric",as.numeric)
     )
   geonames_t <- suppressWarnings(
-    geonames_t %>% mutate_if(classez%in%"character",as.character)
-                                 )
-
+    geonames_t %>% dplyr::mutate_if(classez%in%"character",as.character)
+  )
 
   # Output
   geonames <- geonames_t %>% as.data.table()
