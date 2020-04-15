@@ -1,7 +1,9 @@
 # `SUNGEO` / Sub-National Geospatial Data Archive System: Geoprocessing Toolkit
 R package for integrating spatially-misaligned GIS datasets.
 
-Version 0.1.0 (April 8, 2020)
+Version 0.1.0 (April 15, 2020)
+
+Very preliminary. Feedback, bug reports welcome: zhukov-at-umich-dot-edu
 
 Dependencies: `sf`, `data.table`, `tidyverse`
 
@@ -16,8 +18,6 @@ Dependencies: `sf`, `data.table`, `tidyverse`
 * `point2poly_simp` / Point-to-polygon interpolation, simple overlay method
 * `point2poly_tess` / Point-to-polygon interpolation, tessellation method
 * `poly2poly_ap` / Area/population weighted polygon-to-polygon interpolation
-
-Very preliminary. Feedback, bug reports welcome: zhukov-at-umich-dot-edu
 
 To install in R:
 
@@ -162,7 +162,7 @@ plot(out_4$tess["to1"])
 Example: line-in-polygon analysis
 
 ```
-# Load road data and extract highways
+# Load road data (from Digital Chart of the World) and extract highways
 data(dcwroad_deu1992)
 highways <- dcwroad_deu1992[dcwroad_deu1992$MED_DESCRI%in%"With Median",]
 
@@ -171,26 +171,26 @@ plot(hex_05_deu$geometry)
 plot(highways$geometry, add=TRUE, col = "blue", lwd=2)
 
 # Calculate road lengths, densities and distances from each polygon to nearest highway
-out_1 <- line2poly(linez = highways,
+out_5 <- line2poly(linez = highways,
                    polyz = hex_05_deu,
                    poly_id = "HEX_ID")
                    
 # Visualize results
-plot(out_1["line_length"])
-plot(out_1["line_density"])
-plot(out_1["line_distance"])
+plot(out_5["line_length"])
+plot(out_5["line_density"])
+plot(out_5["line_distance"])
 
 # Replace missing road lengths and densities with 0's, rename variables
-out_2 <- line2poly(linez = highways,
+out_6 <- line2poly(linez = highways,
                    polyz = hex_05_deu,
                    poly_id = "HEX_ID",
                    outvar_name = "road",
                    na_val = 0)
 
 # Visualize results
-plot(out_2["road_length"])
-plot(out_2["road_density"])
-plot(out_2["road_distance"])
+plot(out_6["road_length"])
+plot(out_6["road_density"])
+plot(out_6["road_distance"])
 ```
 
 Example: Automatically find a planar CRS for a GIS dataset
