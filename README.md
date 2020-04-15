@@ -131,7 +131,7 @@ Example: Automatically find a planar CRS for a GIS dataset
 
 ```
 # Find a suitable CRS and re-project
-clea_tr <- geo2planar(clea_deu2009)
+clea_tr <- crs_select(clea_deu2009)
 
 # EPSG code of transformed data
 clea_tr$epsg_best
