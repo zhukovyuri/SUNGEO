@@ -108,7 +108,9 @@ point2poly_tess <- function(
   if("pw"%in%methodz & length(pop_raster)==0){stop("No population raster provided.")}
 
   # Create union layer
-  polyz_u <- polyz %>% rmapshaper::ms_dissolve() %>% fix_geom()
+  suppressWarnings({
+    polyz_u <- polyz %>% rmapshaper::ms_dissolve() %>% fix_geom() %>% dplyr::select(-1)
+  })
 
   # Jitter and crop by polygon
   suppressWarnings({

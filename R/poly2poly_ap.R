@@ -94,7 +94,7 @@ poly2poly_ap <- function(
   char_varz=NULL,
   char_assign="biggest_overlap",
   funz=function(x,w){weighted.mean(x,w,na.rm=T)}
-  ){
+){
 
   # Put variables and functions into list
   if(length(varz)>0){
@@ -118,10 +118,11 @@ poly2poly_ap <- function(
   }
 
   # Intersection
-  int_1 <- suppressMessages(
-    st_intersection(poly_from,poly_to) %>% st_buffer(dist=0)
-  )
-
+  suppressWarnings({
+    int_1 <- suppressMessages(
+      st_intersection(poly_from,poly_to) %>% st_buffer(dist=0)
+    )
+  })
   # # Fix geometry types
   # if(int_1 %>% st_geometry_type() %>% grepl("GEOMETRY",.) %>% sum() > 0){
   #   int_1 <- int_1[!(int_1 %>% st_geometry_type() %>% grepl("GEOMETRY",.)),]
@@ -169,10 +170,10 @@ poly2poly_ap <- function(
     if("biggest_overlap"%in%char_assign){
       int_1_w <- lapply(seq_along(char_varz),function(j0){
         if("aw"%in%methodz){
-          int_1_w <- int_1_w0 %>% merge(int_1_dt[,list(w = get(char_varz[j0])[which.max(AREA_W)]),by=poly_to_id] %>% data.table::setnames("w",paste0(char_varz[j0],"_aw")),by=poly_to_id)
+          int_1_w <- int_1_w0 %>% merge(int_1_dt[,list(w = get(char_varz[j0])[which.max(AREA_W)]),by=poly_to_id] %>% data.table::setnames("w",paste0(char_varz[j0],"_aw")),by=poly_to_id,suffixes=c("","_sngz"))
         }
         if("pw"%in%methodz){
-          int_1_w <- int_1_w %>% merge(int_1_dt[,list(w = get(char_varz[j0])[which.max(POP_W)]),by=poly_to_id] %>% data.table::setnames("w",paste0(char_varz[j0],"_pw")),by=poly_to_id)
+          int_1_w <- int_1_w %>% merge(int_1_dt[,list(w = get(char_varz[j0])[which.max(POP_W)]),by=poly_to_id] %>% data.table::setnames("w",paste0(char_varz[j0],"_pw")),by=poly_to_id,suffixes=c("","_sngz"))
         }
         if(j0>1){int_1_w <- int_1_w %>% dplyr::select(-poly_to_id)}
         int_1_w
@@ -182,16 +183,16 @@ poly2poly_ap <- function(
     if("all_overlap"%in%char_assign){
       int_1_w <- lapply(seq_along(char_varz),function(j0){
         if("aw"%in%methodz){
-          int_1_w <- int_1_w0 %>% merge(int_1_dt[order(AREA_W) %>% rev(),list(w = get(char_varz[j0]) %>% unlist() %>% unique() %>% paste0(collapse=" | ")),by=poly_to_id] %>% data.table::setnames("w",paste0(char_varz[j0],"_all_aw")),by=poly_to_id)
+          int_1_w <- int_1_w0 %>% merge(int_1_dt[order(AREA_W) %>% rev(),list(w = get(char_varz[j0]) %>% unlist() %>% unique() %>% paste0(collapse=" | ")),by=poly_to_id] %>% data.table::setnames("w",paste0(char_varz[j0],"_all_aw")),by=poly_to_id,suffixes=c("","_sngz"))
         }
         if("pw"%in%methodz){
-          int_1_w <- int_1_w %>% merge(int_1_dt[order(POP_W) %>% rev(),list(w = get(char_varz[j0]) %>% unlist() %>% unique() %>% paste0(collapse=" | ")),by=poly_to_id] %>% data.table::setnames("w",paste0(char_varz[j0],"_all_pw")),by=poly_to_id)
+          int_1_w <- int_1_w %>% merge(int_1_dt[order(POP_W) %>% rev(),list(w = get(char_varz[j0]) %>% unlist() %>% unique() %>% paste0(collapse=" | ")),by=poly_to_id] %>% data.table::setnames("w",paste0(char_varz[j0],"_all_pw")),by=poly_to_id,suffixes=c("","_sngz"))
         }
         if(j0>1){int_1_w <- int_1_w %>% dplyr::select(-poly_to_id)}
         int_1_w
       }) %>% dplyr::bind_cols()
     }
-    int_1_w <- int_1_w1 %>% merge(int_1_w,by=poly_to_id)
+    int_1_w <- int_1_w1 %>% merge(int_1_w,by=poly_to_id,suffixes=c("","_sngz"))
   }
 
   # Numeric variables
@@ -201,10 +202,10 @@ poly2poly_ap <- function(
         lapply(seq_along(varz),function(v0){
           valz_agg_2 <- lapply(seq_along(varz[[v0]]),function(j0){
             if("aw"%in%methodz){
-              int_1_w0 <- int_1_w0 %>% merge(int_1_dt[,list(w = funz[[v0]](x=get(varz[[v0]][j0]),w=AREA_W)),by=poly_to_id] %>% data.table::setnames("w",paste0(varz[[v0]][j0],"_aw")),by=poly_to_id)
+              int_1_w0 <- int_1_w0 %>% merge(int_1_dt[,list(w = funz[[v0]](x=get(varz[[v0]][j0]),w=AREA_W)),by=poly_to_id] %>% data.table::setnames("w",paste0(varz[[v0]][j0],"_aw")),by=poly_to_id,suffixes=c("","_sngz"))
             }
             if("pw"%in%methodz){
-              int_1_w0 <- int_1_w0 %>% merge(int_1_dt[,list(w = funz[[v0]](get(varz[[v0]][j0]),w=POP_W)),by=poly_to_id] %>% data.table::setnames("w",paste0(varz[[v0]][j0],"_pw")),by=poly_to_id)
+              int_1_w0 <- int_1_w0 %>% merge(int_1_dt[,list(w = funz[[v0]](get(varz[[v0]][j0]),w=POP_W)),by=poly_to_id] %>% data.table::setnames("w",paste0(varz[[v0]][j0],"_pw")),by=poly_to_id,suffixes=c("","_sngz"))
             }
             if(j0>1){int_1_w0 <- int_1_w0 %>% dplyr::select(-poly_to_id)}
             int_1_w0
@@ -212,12 +213,13 @@ poly2poly_ap <- function(
           if(v0>1){valz_agg_2 <- valz_agg_2 %>% dplyr::select(-poly_to_id)}
           valz_agg_2
         }) %>% dplyr::bind_cols()
-      },by=poly_to_id)
+      },by=poly_to_id,suffixes=c("","_sngz"))
   }
   int_1_w
 
   # Merge with sf
-  polyz_ <- merge(poly_to %>% as.data.table(),int_1_w %>% as.data.table(),by=poly_to_id) %>% st_as_sf()
+  polyz_ <- merge(poly_to %>% as.data.table(),int_1_w %>% as.data.table(),by=poly_to_id,suffixes=c("","_sngz")) %>% select(-grep("_sngz$",names(.))) %>% st_as_sf()
+
 
   # Output
   return(polyz_)
