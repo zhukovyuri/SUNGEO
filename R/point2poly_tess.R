@@ -7,7 +7,7 @@
 #' @param poly_id Name of unique ID column for destination polygon layer. Character string.
 #' @param methodz Area interpolation method(s). Could be either of "aw" (areal weighting, default) and/or "pw" (population weighting). See "details". Character string or vector of character strings.
 #' @param pop_raster Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} object.
-#' @param varz Names of numeric variable(s) to be interpolated from source polygon layer to destination polygons. Character string or vector of character strings.
+#' @param varz Names of numeric variable(s) to be interpolated from source polygon layer to destination polygons. Character string or list of character strings.
 #' @param funz Aggregation function to be applied to variables specified in \code{varz}. Must take as an input a numeric vector \code{x} and vector of weights \code{w}. Function or list of functions.
 #' @param char_varz  Names of character string variables to be interpolated from source polygon layer to destination polygons. Character string or vector of character strings.
 #' @param char_assign Assignment rule to be used for variables specified in \code{char_varz}. Could be either "biggest_overlap" (default) or "all_overlap". See "details". Character string or vector of character strings.
@@ -108,12 +108,14 @@ point2poly_tess <- function(
   if("pw"%in%methodz & length(pop_raster)==0){stop("No population raster provided.")}
 
   # Create union layer
-  polyz_u <- polyz %>% ms_dissolve()
+  polyz_u <- polyz %>% rmapshaper::ms_dissolve() %>% fix_geom()
 
   # Jitter and crop by polygon
-  pointz_crop <-  suppressMessages(
-    pointz %>% st_jitter() %>% st_crop(st_bbox(polyz_u))
-  )
+  suppressWarnings({
+    pointz_crop <-  suppressMessages(
+      pointz %>% st_jitter() %>% st_crop(st_bbox(polyz_u))
+    )
+  })
 
   # Convert to multipoint
   pointz_geom <- pointz_crop  %>% st_geometry() %>% st_union()
@@ -125,9 +127,11 @@ point2poly_tess <- function(
   # )
 
   # Create Voronoi polygons
-  geo_vor <- suppressMessages(
-    st_voronoi(pointz_geom) %>% st_cast() %>% st_as_sf() %>% st_intersection(.,polyz_u) %>% as.data.table() %>% setnames(old="x",new="geometry") %>% st_as_sf()
-  )
+  suppressWarnings({
+    geo_vor <- suppressMessages(
+      st_voronoi(pointz_geom) %>% st_cast() %>% st_as_sf() %>% st_intersection(.,polyz_u) %>% as.data.table() %>% setnames(old="x",new="geometry") %>% st_as_sf()
+    )
+  })
   # Exception for single-point geometries
   if(nrow(pointz_crop)==1){
     geo_vor <- suppressMessages(
@@ -143,9 +147,11 @@ point2poly_tess <- function(
   geo_vor <- dplyr::bind_cols(geo_vor  %>% dplyr::slice(int$row.id),pointz_crop %>% as.data.table() %>% dplyr::select(-geometry) %>% dplyr::slice(int$col.id))
 
   # Crop
-  geo_vor <-  suppressMessages(
-    st_intersection(geo_vor,polyz_u)
-  )
+  suppressWarnings({
+    geo_vor <-  suppressMessages(
+      st_intersection(geo_vor,polyz_u)
+    )
+  })
 
   # Poly-in-poly
   polyz_ <- poly2poly_ap(

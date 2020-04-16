@@ -20,7 +20,7 @@ point2poly_tess(pointz, polyz, poly_id, methodz = "aw",
 
 \item{pop_raster}{Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} object.}
 
-\item{varz}{Names of numeric variable(s) to be interpolated from source polygon layer to destination polygons. Character string or vector of character strings.}
+\item{varz}{Names of numeric variable(s) to be interpolated from source polygon layer to destination polygons. Character string or list of character strings.}
 
 \item{char_varz}{Names of character string variables to be interpolated from source polygon layer to destination polygons. Character string or vector of character strings.}
 
