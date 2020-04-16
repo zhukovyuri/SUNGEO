@@ -5,8 +5,6 @@ Version 0.1.0 (April 15, 2020)
 
 Very preliminary. Feedback, bug reports welcome: zhukov-at-umich-dot-edu
 
-Dependencies: `sf`, `data.table`, `tidyverse`
-
 * `clean_geonames` / Function to clean GeoNames gazetteer files
 * `crs_select` / Automatic planar coordinate reference system (CRS) selection
 * `fix_geom` / Function to check and fix broken geometries in simple features polygon objects
