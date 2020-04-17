@@ -218,7 +218,7 @@ poly2poly_ap <- function(
   int_1_w
 
   # Merge with sf
-  polyz_ <- merge(poly_to %>% as.data.table(),int_1_w %>% as.data.table(),by=poly_to_id,suffixes=c("","_sngz")) %>% select(-grep("_sngz$",names(.))) %>% st_as_sf()
+  polyz_ <- merge(poly_to %>% as.data.table(),int_1_w %>% as.data.table(),by=poly_to_id,suffixes=c("","_sngz")) %>% dplyr::select(-grep("_sngz$",names(.))) %>% st_as_sf()
 
 
   # Output
