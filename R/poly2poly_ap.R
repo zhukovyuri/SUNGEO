@@ -120,7 +120,7 @@ poly2poly_ap <- function(
   # Intersection
   suppressWarnings({
     int_1 <- suppressMessages(
-      st_intersection(poly_from,poly_to) %>% st_buffer(dist=0)
+      st_intersection(poly_from %>% st_buffer(dist=0),poly_to %>% st_buffer(dist=0)) %>% st_buffer(dist=0)
     )
   })
   # # Fix geometry types
@@ -163,7 +163,7 @@ poly2poly_ap <- function(
   }
 
   # Aggregate
-  int_1_w <- int_1_w0 <- int_1_dt %>% dplyr::select(poly_to_id) %>% unique()
+  int_1_w <- int_1_w0 <- int_1_dt %>% dplyr::select(poly_to_id %>% all_of()) %>% unique()
 
   # Character string variables
   if(length(char_varz)>0){
@@ -175,7 +175,7 @@ poly2poly_ap <- function(
         if("pw"%in%methodz){
           int_1_w <- int_1_w %>% merge(int_1_dt[,list(w = get(char_varz[j0])[which.max(POP_W)]),by=poly_to_id] %>% data.table::setnames("w",paste0(char_varz[j0],"_pw")),by=poly_to_id,suffixes=c("","_sngz"))
         }
-        if(j0>1){int_1_w <- int_1_w %>% dplyr::select(-poly_to_id)}
+        if(j0>1){int_1_w <- int_1_w %>% dplyr::select(-(poly_to_id  %>% all_of()))}
         int_1_w
       }) %>% dplyr::bind_cols()
     }
@@ -188,7 +188,7 @@ poly2poly_ap <- function(
         if("pw"%in%methodz){
           int_1_w <- int_1_w %>% merge(int_1_dt[order(POP_W) %>% rev(),list(w = get(char_varz[j0]) %>% unlist() %>% unique() %>% paste0(collapse=" | ")),by=poly_to_id] %>% data.table::setnames("w",paste0(char_varz[j0],"_all_pw")),by=poly_to_id,suffixes=c("","_sngz"))
         }
-        if(j0>1){int_1_w <- int_1_w %>% dplyr::select(-poly_to_id)}
+        if(j0>1){int_1_w <- int_1_w %>% dplyr::select(-(poly_to_id %>% all_of()))}
         int_1_w
       }) %>% dplyr::bind_cols()
     }
@@ -207,10 +207,10 @@ poly2poly_ap <- function(
             if("pw"%in%methodz){
               int_1_w0 <- int_1_w0 %>% merge(int_1_dt[,list(w = funz[[v0]](get(varz[[v0]][j0]),w=POP_W)),by=poly_to_id] %>% data.table::setnames("w",paste0(varz[[v0]][j0],"_pw")),by=poly_to_id,suffixes=c("","_sngz"))
             }
-            if(j0>1){int_1_w0 <- int_1_w0 %>% dplyr::select(-poly_to_id)}
+            if(j0>1){int_1_w0 <- int_1_w0 %>% dplyr::select(-(poly_to_id %>% all_of()))}
             int_1_w0
           }) %>% dplyr::bind_cols()
-          if(v0>1){valz_agg_2 <- valz_agg_2 %>% dplyr::select(-poly_to_id)}
+          if(v0>1){valz_agg_2 <- valz_agg_2 %>% dplyr::select(-(poly_to_id %>% all_of()))}
           valz_agg_2
         }) %>% dplyr::bind_cols()
       },by=poly_to_id,suffixes=c("","_sngz"))
