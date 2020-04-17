@@ -55,13 +55,13 @@ crs_select <- function(polyz,sf_layer=polyz){
 
   # Find and assign optimal projection
   crs_bad <- TRUE; x0 <- 1
-  while(crs_bad&x0<=length(epsg_best)){
+  while(crs_bad&x0<=length(epsg_best)){print(x0)
     epsg_best_ <- epsg_best[x0]
     suppressWarnings({
-      sf_layer_tr <- sf_layer %>% st_transform(crs=epsg_best[x0])
+      sf_layer_tr <- sf_layer %>% st_transform(crs=st_crs(paste0("EPSG:",epsg_best[x0])))
     })
     suppressWarnings({
-      crs_bad <- (sf_layer %>% st_transform(crs=epsg_best[x0]) %>% st_bbox() %>% as.numeric() %>% is.na() %>% mean())==1 | st_is_longlat(sf_layer_tr)
+      crs_bad <- (sf_layer %>% st_transform(crs=st_crs(paste0("EPSG:",epsg_best[x0]))) %>% st_bbox() %>% as.numeric() %>% is.na() %>% mean())==1 | st_is_longlat(sf_layer_tr)
     })
     x0 <- x0+1
   }

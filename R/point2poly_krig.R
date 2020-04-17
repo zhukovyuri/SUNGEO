@@ -47,7 +47,7 @@ point2poly_krig <- function(pointz,polyz,polyz2=NULL,varz=NULL,cellsize=25000,me
   if(length(varz)==0){stop("Please supply at least one variable in varz.")}
 
   # Union layer
-  polyz_u <- polyz %>% ms_dissolve()
+  polyz_u <- polyz %>% rmapshaper::ms_dissolve() %>% dplyr::select(-1)
   if(length(polyz2)==0){polyz2 <- polyz_u}
 
   # Find optimal planar projection for map
@@ -58,7 +58,7 @@ point2poly_krig <- function(pointz,polyz,polyz2=NULL,varz=NULL,cellsize=25000,me
     )
   })
   pointz_tr_ <- pointz_tr[["sf"]]
-  epsg <- pointz_tr[["epsg_best"]]
+  epsg <- pointz_tr[["epsg_best"]] %>% paste0("EPSG:",.)
 
   # Create regular grid
   k_grid <- st_make_grid(polyz_u %>% st_transform(crs=epsg),cellsize=cellsize,what="centers")
