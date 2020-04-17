@@ -55,7 +55,7 @@ crs_select <- function(polyz,sf_layer=polyz){
 
   # Find and assign optimal projection
   crs_bad <- TRUE; x0 <- 1
-  while(crs_bad&x0<=length(epsg_best)){print(x0)
+  while(crs_bad&x0<=length(epsg_best)){
     epsg_best_ <- epsg_best[x0]
     suppressWarnings({
       sf_layer_tr <- sf_layer %>% st_transform(crs=st_crs(paste0("EPSG:",epsg_best[x0])))

@@ -61,7 +61,7 @@ point2poly_krig <- function(pointz,polyz,polyz2=NULL,varz=NULL,cellsize=25000,me
   epsg <- pointz_tr[["epsg_best"]] %>% paste0("EPSG:",.)
 
   # Create regular grid
-  k_grid <- st_make_grid(polyz_u %>% st_transform(crs=epsg),cellsize=cellsize,what="centers")
+  k_grid <- st_make_grid(polyz_u %>% st_transform(crs=epsg) %>% fix_geom(),cellsize=cellsize,what="centers")
   if(length(k_grid[polyz_u %>% st_transform(crs=epsg)])==1){
     k_grid <- st_make_grid(polyz_u %>% st_transform(crs=epsg),n=25,what="centers")
   }
@@ -80,6 +80,8 @@ point2poly_krig <- function(pointz,polyz,polyz2=NULL,varz=NULL,cellsize=25000,me
       sp::proj4string(krig_pix) <- st_crs(epsg)$proj4string
       krig_fit <- krig_pix[,"var1.pred"] %>% raster::raster() %>% raster::projectRaster( crs = sp::proj4string(as(polyz_u,"Spatial")))
       krig_sd <- krig_pix[,"var1.stdev"] %>% raster::raster() %>% raster::projectRaster( crs = sp::proj4string(as(polyz_u,"Spatial")))
+      # plot(k_grid); dev.off()
+
       a1 <- data.frame(
         x = raster::extract(krig_fit,polyz %>% as("Spatial"),fun=mean,na.rm=T),
         x_sd = raster::extract(krig_sd,polyz %>% as("Spatial"),fun=mean,na.rm=T),
