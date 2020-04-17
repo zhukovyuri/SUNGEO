@@ -151,7 +151,7 @@ point2poly_tess <- function(
   # Crop
   suppressWarnings({
     geo_vor <-  suppressMessages(
-      st_intersection(geo_vor,polyz_u)
+      st_intersection(geo_vor,polyz_u) %>% fix_geom(self_int=FALSE)
     )
   })
 
