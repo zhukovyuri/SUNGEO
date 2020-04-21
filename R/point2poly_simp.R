@@ -49,7 +49,7 @@
 #'                          na_val = list(NA_real_,0,NA_character_))
 #' }
 #' @export
-
+#'
 point2poly_simp <- function(pointz,polyz,varz,funz=function(x){sum(x,na.rm=T)},na_val=NA){
 
   # Put variables and functions into list
@@ -83,11 +83,11 @@ point2poly_simp <- function(pointz,polyz,varz,funz=function(x){sum(x,na.rm=T)},n
 
   # Merge with polygons
   polyz$o0 <- 1:nrow(polyz)
-  polyz_ <- merge(polyz,pointz_agg,by="o0",all.x=T,all.y=F) %>% (function(.){.[order(.$o0 %>% as.numeric()),]}) %>% dplyr::select(-o0)
+  polyz_ <- merge(polyz,pointz_agg,by="o0",all.x=T,all.y=F, suffixes=c("_","")) %>% (function(.){.[order(.$o0 %>% as.numeric()),]}) %>% dplyr::select(-o0)
   for(v0 in seq_along(varz)){
     polyz_[,varz[[v0]]] <- polyz_ %>% as.data.table() %>% dplyr::select(varz[[v0]]) %>% replace(., is.na(.), na_val[[v0]])
   }
-  polyz_[,grep("^o0",names(polyz_))] <- NULL
+  if(length(grep("^o0",names(polyz_)))>0){polyz_[,grep("^o0",names(polyz_))] <- NULL}
 
   # Output
   return(polyz_)
