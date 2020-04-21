@@ -109,7 +109,7 @@ point2poly_tess <- function(
 
   # Create union layer
   suppressWarnings({
-    polyz_u <- polyz %>% rmapshaper::ms_dissolve() %>% fix_geom() %>% dplyr::select(-1)
+    polyz_u <- polyz %>% rmapshaper::ms_dissolve() %>% fix_geom(self_int = FALSE) %>% dplyr::select(-1)
   })
 
   # Jitter and crop by polygon
