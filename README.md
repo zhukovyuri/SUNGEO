@@ -21,7 +21,7 @@ To install in R:
 
 ```
 library(devtools)
-devtools::install_github("zhukovyuri/SUNGEO")
+devtools::install_github("zhukovyuri/SUNGEO", dependencies = TRUE)
 ```
 
 Load package:
