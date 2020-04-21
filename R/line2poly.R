@@ -76,7 +76,7 @@ line2poly <- function(linez,
     suppressWarnings({polyz_tr <- crs_select(polyz = polyz %>% fix_geom())})
     polyz_tr_ <- polyz_tr[["sf"]]
     epsg <- polyz_tr[["epsg_best"]]
-    linez_tr_ <- linez %>% st_transform(epsg)
+    linez_tr_ <- linez %>% st_transform(st_crs(paste0("EPSG:",epsg)))
   }
   if(!reproject){
     polyz_tr_ <- polyz
@@ -100,7 +100,7 @@ line2poly <- function(linez,
 
   # Length
   if("length"%in%measurez|"density"%in%measurez){
-    polyz_tr_ <- polyz_tr_ %>% merge(lp_o %>% dplyr::select(poly_id,"sgeoz_length"),by=poly_id,all.x=T,all.y=F)
+    polyz_tr_ <- polyz_tr_ %>% merge(lp_o %>% dplyr::select(poly_id %>% tidyselect::all_of(),"sgeoz_length"),by=poly_id,all.x=T,all.y=F)
     polyz_tr_$sgeoz_length <- polyz_tr_$sgeoz_length %>% replace(is.na(.), na_val)
   }
 
@@ -111,7 +111,7 @@ line2poly <- function(linez,
   }
 
   # Rename variables
-  polyz_tr_ <- polyz_tr_ %>% dplyr::select(poly_id,names(.)[grep("^sgeoz",names(.))],dplyr::everything()) %>% data.table::setnames(names(.),gsub("^sgeoz",outvar_name,names(.)))
+  polyz_tr_ <- polyz_tr_ %>% dplyr::select(poly_id %>% tidyselect::all_of() ,names(.)[grep("^sgeoz",names(.))],dplyr::everything()) %>% data.table::setnames(names(.),gsub("^sgeoz",outvar_name,names(.)))
 
   # Reproject
   if(reproject){
