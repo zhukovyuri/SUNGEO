@@ -151,7 +151,7 @@ out_4 <- point2poly_tess(pointz = clea_deu2009_pt,
                          return_tess = TRUE)
 
 # Visualize voter turnout at grid cell level 
-plot(out_4$result["to1_aw"]))
+plot(out_4$result["to1_aw"])
 
 # Visualize Voronoi polygons used in estimation
 plot(out_4$tess["to1"])
