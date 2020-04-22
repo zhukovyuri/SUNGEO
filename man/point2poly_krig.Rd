@@ -31,7 +31,7 @@ point2poly_krig(pointz, polyz, polyz2 = NULL, varz = NULL,
 Function for interpolating values from a source points layer to an overlapping destination polygon layer, using ordinary kriging with automatic variogram fitting
 }
 \details{
-This function performs Ordinary Kriging, autmatically selecting a variogram model with the smallest residual sum of squares with the sample variogram.
+This function performs Ordinary Kriging, automatically selecting a variogram model with the smallest residual sum of squares from the sample variogram. See \link[automap]{autofitVariogram}.
 
 Unlike other available point-to-polygon interpolation techniques, this function currently only accepts numeric variables in \code{varz} and does not support interpolation of character strings.
 }
