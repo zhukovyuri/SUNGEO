@@ -16,7 +16,7 @@
 #' @details This function performs Ordinary Kriging, automatically selecting a variogram model with the smallest residual sum of squares from the sample variogram. See \link[automap]{autofitVariogram}.
 #'
 #' Unlike other available point-to-polygon interpolation techniques, this function currently only accepts numeric variables in \code{varz} and does not support interpolation of character strings.
-#' @import sf maptools data.table tidyverse automap
+#' @import sf maptools data.table tidyverse automap rgdal
 #' @importFrom stats as.dist
 #' @importFrom raster extract pointDistance raster projectRaster
 #' @importFrom methods as
@@ -61,9 +61,9 @@ point2poly_krig <- function(pointz,polyz,polyz2=NULL,varz=NULL,cellsize=25000,me
   epsg <- pointz_tr[["epsg_best"]] %>% paste0("EPSG:",.)
 
   # Create regular grid
-  k_grid <- st_make_grid(polyz_u %>% st_transform(crs=epsg) %>% fix_geom(),cellsize=cellsize,what="centers")
+  k_grid <- sf::st_make_grid(polyz_u %>% st_transform(crs=epsg) %>% fix_geom(),cellsize=cellsize,what="centers")
   if(length(k_grid[polyz_u %>% st_transform(crs=epsg)])==1){
-    k_grid <- st_make_grid(polyz_u %>% st_transform(crs=epsg),n=25,what="centers")
+    k_grid <- sf::st_make_grid(polyz_u %>% st_transform(crs=epsg),n=25,what="centers")
   }
 
   # Ordinary kriging

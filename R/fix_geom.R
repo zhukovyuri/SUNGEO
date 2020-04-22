@@ -16,15 +16,15 @@
 
 fix_geom <- function(x,self_int=TRUE){
   if(self_int){
-    if(sum(grepl("Self-inter",st_is_valid(x,reason=T)))>0){
+    if(sum(grepl("Self-inter",sf::st_is_valid(x,reason=T)))>0){
       suppressMessages(
-        x <- x %>% st_buffer(dist=0)
+        x <- x %>% sf::st_buffer(dist=0)
       )
     }}
   if(!self_int){
-    if(sum(!st_is_valid(x))>0){
+    if(sum(!sf::st_is_valid(x))>0){
       suppressMessages(
-        x <- x %>% st_buffer(dist=0)
+        x <- x %>% sf::st_buffer(dist=0)
       )
     }}
   x
