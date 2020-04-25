@@ -107,34 +107,21 @@ geocode_gn <- function(query,
     # Progress report
     if(verbose){paste0("Starting string distance matching...") %>% print()}
 
-    # Reverse string distance matrix (parallel)
-    if(match_all){
-      cl <- parallel::makePSOCKcluster(ncores, outfile="")
-      parallel::setDefaultCluster(cl)
-      parallel::clusterExport(NULL,c("query","str_meth","country_iso3","gn","verbose"),envir = environment())
-      parallel::clusterEvalQ(NULL, expr=library(stringdist))
-      parallel::clusterEvalQ(NULL, expr=library(dplyr))
-      gn_list <- parallel::parLapply(NULL,1:nrow(gn),function(j){
-        if(verbose){cat(paste0(country_iso3," Reverse string distance matrix: ",j,"/",nrow(gn),"\r"))}
-        stringdist::stringdistmatrix(query %>% tolower(),strsplit(gn$TERM[j],"\\|")[[1]] %>% gsub("[^[:alnum:] ]", "",.) %>% tolower, method=str_meth, nthread=1) %>% apply(1,min)
-      })
-      parallel::stopCluster(cl)
-      gc()
-      # Drop null elements
-      gn_mat_ <- data.frame(query=query,stringsAsFactors = FALSE) %>% cbind(gn[gn_list %>% bind_cols() %>% apply(1,which.min),.(geonameid,feature_code,asciiname,longitude,latitude)]) %>% as.data.table()
-      gn_mat_[,strdist := gn_list %>% bind_cols() %>% apply(1,min)]
-      gn_mat_[,str_meth := str_meth]
-    }
-    gc()
-
-    # Loop over ppl's
+    # Parallel setup
     cl <- parallel::makePSOCKcluster(ncores, outfile="")
     parallel::setDefaultCluster(cl)
-    parallel::clusterExport(NULL, c("query","str_meth","country_iso3","country_iso2","country_name","gn","verbose"),envir = environment())
-    parallel::clusterEvalQ(NULL, library(stringdist))
-    parallel::clusterEvalQ(NULL, library(dplyr))
+    parallel::clusterExport(NULL, c("query","str_meth","country_iso3","country_iso2","country_name","gn","verbose","match_all"),envir = environment())
+    parallel::clusterEvalQ(NULL, expr=library(stringdist))
+    parallel::clusterEvalQ(NULL, expr=library(dplyr))
     parallel::clusterEvalQ(NULL, library(data.table))
-    gn_mat <- parallel::parLapply(NULL,1:nrow(gn),function(j){
+    j <- 1
+    gn_list <- parallel::parLapply(NULL,1:nrow(gn),function(j){
+      # Reverse string distance matrix (parallel)
+      gn_rev_j <- rep(NA_real_,length(query))
+      if(match_all){
+        if(verbose){cat(paste0(country_iso3," Reverse string distance matrix: ",j,"/",nrow(gn),"\r"))}
+        gn_rev_j <- stringdist::stringdistmatrix(query %>% tolower(),strsplit(gn$TERM[j],"\\|")[[1]] %>% gsub("[^[:alnum:] ]", "",.) %>% tolower, method=str_meth, nthread=1) %>% apply(1,min)
+      }
       if(verbose){cat(paste0(country_iso3," Searching over place names: ",j,"/",nrow(gn),"\r"))}
       # Create holder matrix
       gn_j <- data.frame(country_iso3=country_iso3,country_name=country_name,geonameid=gn$geonameid[j],gn_type=gn$feature_code[j],address=gn$asciiname[j],longitude=gn$longitude[j],latitude=gn$latitude[j],gn_perfect=NA_character_,gn_pt=NA_character_,gn_fz=NA_character_,strdist=NA_real_,str_meth=str_meth,stringsAsFactors = FALSE) %>% as.data.table()
@@ -154,8 +141,17 @@ geocode_gn <- function(query,
         }
       }, error=function(e){})
       gn_j
-    }) %>% dplyr::bind_rows()
+      list(gn_j,gn_rev_j)
+    })
     parallel::stopCluster(cl)
+    gc()
+    gn_mat <- gn_list %>% sapply(subset,c(TRUE,FALSE)) %>% dplyr::bind_rows()
+    if(match_all){
+      # Drop null elements
+      gn_mat_ <- data.frame(query=query,stringsAsFactors = FALSE) %>% cbind(gn[gn_list %>% sapply(subset,c(FALSE,TRUE)) %>% bind_cols() %>% apply(1,which.min),.(geonameid,feature_code,asciiname,longitude,latitude)]) %>% as.data.table()
+      gn_mat_[,strdist := gn_list %>% sapply(subset,c(FALSE,TRUE)) %>% dplyr::bind_cols() %>% apply(1,min)]
+      gn_mat_[,str_meth := str_meth]
+    }
     gc()
 
     # Progress report
@@ -204,3 +200,4 @@ geocode_gn <- function(query,
   }
 
 }
+
