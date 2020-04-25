@@ -109,13 +109,13 @@ geocode_gn <- function(query,
 
     # Reverse string distance matrix (parallel)
     if(match_all){
-      cl <- parallel::makePSOCKcluster(ncores)
+      cl <- parallel::makePSOCKcluster(ncores, outfile="")
       parallel::setDefaultCluster(cl)
-      parallel::clusterExport(NULL,c("query","str_meth","country_iso3","gn"),envir = environment())
+      parallel::clusterExport(NULL,c("query","str_meth","country_iso3","gn","verbose"),envir = environment())
       parallel::clusterEvalQ(NULL, expr=library(stringdist))
       parallel::clusterEvalQ(NULL, expr=library(dplyr))
       gn_list <- parallel::parLapply(NULL,1:nrow(gn),function(j){
-        # cat(paste0(country_iso3,": ",j,"/",nrow(gn),"\r"))
+        if(verbose){cat(paste0(country_iso3," Reverse string distance matrix: ",j,"/",nrow(gn),"\r"))}
         stringdist::stringdistmatrix(query %>% tolower(),strsplit(gn$TERM[j],"\\|")[[1]] %>% gsub("[^[:alnum:] ]", "",.) %>% tolower, method=str_meth, nthread=1) %>% apply(1,min)
       })
       parallel::stopCluster(cl)
@@ -123,19 +123,19 @@ geocode_gn <- function(query,
       # Drop null elements
       gn_mat_ <- data.frame(query=query,stringsAsFactors = FALSE) %>% cbind(gn[gn_list %>% bind_cols() %>% apply(1,which.min),.(geonameid,feature_code,asciiname,longitude,latitude)]) %>% as.data.table()
       gn_mat_[,strdist := gn_list %>% bind_cols() %>% apply(1,min)]
-      gn_mat_[,str_met := str_meth]
+      gn_mat_[,str_meth := str_meth]
     }
     gc()
 
     # Loop over ppl's
-    cl <- parallel::makePSOCKcluster(ncores)
+    cl <- parallel::makePSOCKcluster(ncores, outfile="")
     parallel::setDefaultCluster(cl)
-    parallel::clusterExport(NULL, c("query","str_meth","country_iso3","country_iso2","country_name","gn"),envir = environment())
+    parallel::clusterExport(NULL, c("query","str_meth","country_iso3","country_iso2","country_name","gn","verbose"),envir = environment())
     parallel::clusterEvalQ(NULL, library(stringdist))
     parallel::clusterEvalQ(NULL, library(dplyr))
     parallel::clusterEvalQ(NULL, library(data.table))
     gn_mat <- parallel::parLapply(NULL,1:nrow(gn),function(j){
-      cat(paste0(country_iso3,": ",j,"/",nrow(gn),"\r"))
+      if(verbose){cat(paste0(country_iso3," Searching over place names: ",j,"/",nrow(gn),"\r"))}
       # Create holder matrix
       gn_j <- data.frame(country_iso3=country_iso3,country_name=country_name,geonameid=gn$geonameid[j],gn_type=gn$feature_code[j],address=gn$asciiname[j],longitude=gn$longitude[j],latitude=gn$latitude[j],gn_perfect=NA_character_,gn_pt=NA_character_,gn_fz=NA_character_,strdist=NA_real_,str_meth=str_meth,stringsAsFactors = FALSE) %>% as.data.table()
       tryCatch({
@@ -187,15 +187,15 @@ geocode_gn <- function(query,
     # Grab missing from reverse matrix
     if(match_all){
       if(gn_mat_[query%in%gn_best[is.na(geonameid),query] ,] %>% nrow() > 0){
-        gn_best[is.na(geonameid),query] == gn_mat_$query
-        gn_best[is.na(geonameid),strdist := gn_mat_$strdist]
-        gn_best[is.na(geonameid),str_meth := gn_mat_$str_meth]
-        gn_best[is.na(geonameid),address := gn_mat_$asciiname]
-        gn_best[is.na(geonameid),longitude := gn_mat_$longitude]
-        gn_best[is.na(geonameid),latitude := gn_mat_$latitude]
-        gn_best[is.na(geonameid),gn_type := gn_mat_$feature_code]
+        gn_best[is.na(geonameid),query := gn_mat_[is.na(gn_best$geonameid),query]]
+        gn_best[is.na(geonameid),strdist := gn_mat_[is.na(gn_best$geonameid),strdist]]
+        gn_best[is.na(geonameid),str_meth := gn_mat_[is.na(gn_best$geonameid),str_meth]]
+        gn_best[is.na(geonameid),address := gn_mat_[is.na(gn_best$geonameid),asciiname]]
+        gn_best[is.na(geonameid),longitude := gn_mat_[is.na(gn_best$geonameid),longitude]]
+        gn_best[is.na(geonameid),latitude := gn_mat_[is.na(gn_best$geonameid),latitude]]
+        gn_best[is.na(geonameid),gn_type := gn_mat_[is.na(gn_best$geonameid),feature_code]]
         gn_best[is.na(geonameid),match_type := "fuzzy"]
-        gn_best[is.na(geonameid),geonameid := gn_mat_$geonameid]
+        gn_best[is.na(geonameid),geonameid := gn_mat_[is.na(gn_best$geonameid),geonameid]]
       }}
 
     # Output
