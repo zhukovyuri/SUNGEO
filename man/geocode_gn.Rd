@@ -5,8 +5,8 @@
 \title{Batch geocode addresses with GeoNames}
 \usage{
 geocode_gn(query, country_name = NULL, country_iso3 = NULL,
-  str_meth = "cosine", match_all = FALSE, details = FALSE,
-  ncores = 1, verbose = TRUE)
+  str_meth = "lv", match_all = FALSE, details = FALSE, ncores = 1,
+  verbose = TRUE)
 }
 \arguments{
 \item{query}{Address(es) or place name(s) to be geocoded. Character string or vector.}
@@ -15,7 +15,7 @@ geocode_gn(query, country_name = NULL, country_iso3 = NULL,
 
 \item{country_iso3}{ISO 3166-1 alpha-3 country code. Must supply either \code{country_name} or \code{country_iso3}. Character string.}
 
-\item{str_meth}{String distance metric (\code{"osa"}, \code{"lv"}, \code{"dl"}, \code{"hamming"}, \code{"lcs"}, \code{"qgram"}, \code{"cosine"}, \code{"jaccard"}, \code{"jw"}, \code{"soundex"}). Default is \code{"cosine"}. See \link[stringdist]{stringdist-metrics}. Character string.}
+\item{str_meth}{String distance metric (\code{"osa"}, \code{"lv"}, \code{"dl"}, \code{"hamming"}, \code{"lcs"}, \code{"qgram"}, \code{"cosine"}, \code{"jaccard"}, \code{"jw"}, \code{"soundex"}). Default is Levenshtein distance (\code{"lv"}). See \link[stringdist]{stringdist-metrics}. Character string.}
 
 \item{match_all}{Attempt to match all queries? Default is \code{FALSE}. Logical.}
 

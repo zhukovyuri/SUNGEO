@@ -5,7 +5,7 @@
 #' @param query Address(es) or place name(s) to be geocoded. Character string or vector.
 #' @param country_name Name of country. Must supply either \code{country_name} or \code{country_iso3}. Character string.
 #' @param country_iso3 ISO 3166-1 alpha-3 country code. Must supply either \code{country_name} or \code{country_iso3}. Character string.
-#' @param str_meth String distance metric (\code{"osa"}, \code{"lv"}, \code{"dl"}, \code{"hamming"}, \code{"lcs"}, \code{"qgram"}, \code{"cosine"}, \code{"jaccard"}, \code{"jw"}, \code{"soundex"}). Default is \code{"cosine"}. See \link[stringdist]{stringdist-metrics}. Character string.
+#' @param str_meth String distance metric (\code{"osa"}, \code{"lv"}, \code{"dl"}, \code{"hamming"}, \code{"lcs"}, \code{"qgram"}, \code{"cosine"}, \code{"jaccard"}, \code{"jw"}, \code{"soundex"}). Default is Levenshtein distance (\code{"lv"}). See \link[stringdist]{stringdist-metrics}. Character string.
 #' @param match_all Attempt to match all queries? Default is \code{FALSE}. Logical.
 #' @param details Should detailed results be returned? Default is \code{FALSE}. Logical.
 #' @param ncores Number of cores to use for parallel socket cluster. Default is 1. Numeric.
@@ -56,7 +56,7 @@
 geocode_gn <- function(query,
                        country_name=NULL,
                        country_iso3=NULL,
-                       str_meth="cosine",
+                       str_meth="lv",
                        match_all=FALSE,
                        details=FALSE,
                        ncores=1,
@@ -108,7 +108,7 @@ geocode_gn <- function(query,
     if(verbose){paste0("Starting string distance matching...") %>% print()}
 
     # Parallel setup
-    cl <- parallel::makePSOCKcluster(ncores, outfile="")
+    if(verbose){cl <- parallel::makePSOCKcluster(ncores, outfile="")} else{cl <- parallel::makePSOCKcluster(ncores)}
     parallel::setDefaultCluster(cl)
     parallel::clusterExport(NULL, c("query","str_meth","country_iso3","country_iso2","country_name","gn","verbose","match_all"),envir = environment())
     parallel::clusterEvalQ(NULL, expr=library(stringdist))
@@ -119,7 +119,7 @@ geocode_gn <- function(query,
       # Reverse string distance matrix (parallel)
       gn_rev_j <- rep(NA_real_,length(query))
       if(match_all){
-        if(verbose){cat(paste0(country_iso3," Reverse string distance matrix: ",j,"/",nrow(gn),"\r"))}
+        # if(verbose){cat(paste0(country_iso3," Reverse string distance matrix: ",j,"/",nrow(gn),"\r"))}
         gn_rev_j <- stringdist::stringdistmatrix(query %>% tolower(),strsplit(gn$TERM[j],"\\|")[[1]] %>% gsub("[^[:alnum:] ]", "",.) %>% tolower, method=str_meth, nthread=1) %>% apply(1,min)
       }
       if(verbose){cat(paste0(country_iso3," Searching over place names: ",j,"/",nrow(gn),"\r"))}
@@ -148,9 +148,7 @@ geocode_gn <- function(query,
     gn_mat <- gn_list %>% sapply(subset,c(TRUE,FALSE)) %>% dplyr::bind_rows()
     if(match_all){
       # Drop null elements
-      gn_mat_ <- data.frame(query=query,stringsAsFactors = FALSE) %>% cbind(gn[gn_list %>% sapply(subset,c(FALSE,TRUE)) %>% bind_cols() %>% apply(1,which.min),.(geonameid,feature_code,asciiname,longitude,latitude)]) %>% as.data.table()
-      gn_mat_[,strdist := gn_list %>% sapply(subset,c(FALSE,TRUE)) %>% dplyr::bind_cols() %>% apply(1,min)]
-      gn_mat_[,str_meth := str_meth]
+      gn_mat_ <- data.frame(query=query,stringsAsFactors = FALSE) %>% cbind(gn[gn_list %>% sapply(subset,c(FALSE,TRUE)) %>% bind_cols() %>% apply(1,which.min),.(geonameid,feature_code,asciiname,longitude,latitude)]) %>% mutate(country_iso3 = country_iso3, country_name = country_name, str_meth = str_meth, strdist = gn_list %>% sapply(subset,c(FALSE,TRUE)) %>% dplyr::bind_cols() %>% apply(1,min)) %>% as.data.table()
     }
     gc()
 
@@ -190,6 +188,8 @@ geocode_gn <- function(query,
         gn_best[is.na(geonameid),longitude := gn_mat_[is.na(gn_best$geonameid),longitude]]
         gn_best[is.na(geonameid),latitude := gn_mat_[is.na(gn_best$geonameid),latitude]]
         gn_best[is.na(geonameid),gn_type := gn_mat_[is.na(gn_best$geonameid),feature_code]]
+        gn_best[is.na(geonameid),country_name := gn_mat_[is.na(gn_best$geonameid),country_name]]
+        gn_best[is.na(geonameid),country_iso3 := gn_mat_[is.na(gn_best$geonameid),country_iso3]]
         gn_best[is.na(geonameid),match_type := "fuzzy"]
         gn_best[is.na(geonameid),geonameid := gn_mat_[is.na(gn_best$geonameid),geonameid]]
       }}
@@ -200,4 +200,3 @@ geocode_gn <- function(query,
   }
 
 }
-
