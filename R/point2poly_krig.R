@@ -16,7 +16,7 @@
 #' @details This function performs Ordinary Kriging, automatically selecting a variogram model with the smallest residual sum of squares from the sample variogram. See \link[automap]{autofitVariogram}.
 #'
 #' Unlike other available point-to-polygon interpolation techniques, this function currently only accepts numeric variables in \code{varz} and does not support interpolation of character strings.
-#' @import sf maptools data.table tidyverse automap rgdal
+#' @import sf maptools data.table tidyverse automap
 #' @importFrom stats as.dist
 #' @importFrom raster extract pointDistance raster projectRaster
 #' @importFrom methods as
