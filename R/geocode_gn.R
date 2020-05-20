@@ -29,6 +29,9 @@
 #' @import tidyverse data.table countrycode stringdist parallel
 #' @importFrom data.table last first between
 #' @importFrom rvest html_session
+#' @importFrom utils download.file unzip
+#' @importFrom dplyr select bind_rows bind_cols everything mutate
+#' @importFrom rlang .data
 #' @details This function geocodes one or multiple addresses by computing string distances between the user-supplied address query(ies) and place names (including alternate, historical and non-English spellings) in the GeoNames' free place name gazetteer data (\url{http://www.geonames.org/}). Returns geographic coordinates and other information for the matched place name. Three types of string matches, along with
 #' \itemize{
 ##'  \item{"perfect". }{Perfect string match (e.g. "Frankfurt am Mein" -- "Frankfurt am Mein").}
@@ -86,8 +89,8 @@ geocode_gn <- function(query,
     con_gn <- unzip(zipfile = tempf,files = paste0(country_iso2,".txt"))
     gn <- read.delim(con_gn[grep(paste0(country_iso2,".txt"),con_gn)],sep="\t",header=F,quote = "", stringsAsFactors = FALSE,encoding = "utf-8") %>% as.data.table()
     gn <- clean_geonames(gn,ppl=TRUE)
-    gn[,alternatenames := gsub(",","|",alternatenames)]
-    gn[,TERM := paste0(name,"|",asciiname,"|",alternatenames,collapse="|") %>% gsub("\\|$","",.), by = geonameid]
+    gn[,alternatenames := gsub(",","|",gn$alternatenames)]
+    gn[,TERM :=  gsub("\\|$","", paste0(name,"|",asciiname,"|",alternatenames,collapse="|") ), by = geonameid]
     con_gn %>% textConnection() %>% close() %>% on.exit()
     unlink(tempf)
     gc()
@@ -114,7 +117,7 @@ geocode_gn <- function(query,
     parallel::clusterEvalQ(NULL, expr=library(stringdist))
     parallel::clusterEvalQ(NULL, expr=library(dplyr))
     parallel::clusterEvalQ(NULL, library(data.table))
-    j <- 1
+    # j <- 1
     gn_list <- parallel::parLapply(NULL,1:nrow(gn),function(j){
       # Reverse string distance matrix (parallel)
       gn_rev_j <- rep(NA_real_,length(query))
@@ -148,7 +151,7 @@ geocode_gn <- function(query,
     gn_mat <- gn_list %>% sapply(subset,c(TRUE,FALSE)) %>% dplyr::bind_rows()
     if(match_all){
       # Drop null elements
-      gn_mat_ <- data.frame(query=query,stringsAsFactors = FALSE) %>% cbind(gn[gn_list %>% sapply(subset,c(FALSE,TRUE)) %>% bind_cols() %>% apply(1,which.min),.(geonameid,feature_code,asciiname,longitude,latitude)]) %>% mutate(country_iso3 = country_iso3, country_name = country_name, str_meth = str_meth, strdist = gn_list %>% sapply(subset,c(FALSE,TRUE)) %>% dplyr::bind_cols() %>% apply(1,min)) %>% as.data.table()
+      gn_mat_ <- data.frame(query=query,stringsAsFactors = FALSE) %>% cbind(gn[gn_list %>% sapply(subset,c(FALSE,TRUE)) %>% dplyr::bind_cols() %>% apply(1,which.min),c("geonameid","feature_code","asciiname","longitude","latitude"),with=FALSE]) %>% dplyr::mutate(country_iso3 = country_iso3, country_name = country_name, str_meth = str_meth, strdist = gn_list %>% sapply(subset,c(FALSE,TRUE)) %>% dplyr::bind_cols() %>% apply(1,min)) %>% as.data.table()
     }
     gc()
 
@@ -162,7 +165,7 @@ geocode_gn <- function(query,
     # Extract best matches
     gn_perfect <- gn_mat[!is.na(gn_perfect),][match(query,gn_perfect),] %>% as.data.frame()
     gn_pt <- gn_mat[!is.na(gn_pt),][match(query,gn_pt),] %>% as.data.frame()
-    gn_fz <- gn_mat[ix%in%gn_mat[,ix[which.min(strdist)],by=gn_fz][,V1],][match(query,gn_fz),] %>% as.data.frame()
+    gn_fz <- gn_mat[.data$ix%in%gn_mat[,.data$ix[which.min(.data$strdist)],by=gn_fz][,.data$V1],][match(query,gn_fz),] %>% as.data.frame()
 
     # Replace missing exact matches with best fuzzy matches
     gn_best <- gn_perfect
@@ -174,9 +177,9 @@ geocode_gn <- function(query,
     gn_best[!is.na(gn_pt)&is.na(gn_perfect),match_type:="partial"]
     gn_best[!is.na(gn_fz)&is.na(gn_pt)&is.na(gn_perfect),match_type:="fuzzy"]
     gn_best[, c("gn_pt","gn_fz","gn_perfect","ix"):=NULL]
-    gn_best[match_type=="perfect",strdist := 0]
-    gn_best[match_type=="perfect",str_meth := "identity"]
-    gn_best <- gn_best %>% dplyr::select(query,geonameid,country_iso3,country_name,address,dplyr::everything())
+    gn_best[.data$match_type=="perfect",strdist := 0]
+    gn_best[.data$match_type=="perfect",str_meth := "identity"]
+    gn_best <- gn_best %>% dplyr::select(.data$query,.data$geonameid,.data$country_iso3,.data$country_name,.data$address,dplyr::everything())
 
     # Grab missing from reverse matrix
     if(match_all){
@@ -195,7 +198,7 @@ geocode_gn <- function(query,
       }}
 
     # Output
-    if(!details){gn_best <- gn_best %>% dplyr::select(query,geonameid,address,longitude,latitude)}
+    if(!details){gn_best <- gn_best %>% dplyr::select(.data$query,.data$geonameid,.data$address,.data$longitude,.data$latitude)}
     return(gn_best)
   }
 

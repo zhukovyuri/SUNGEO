@@ -4,8 +4,13 @@
 \alias{geocode_osm}
 \title{Geocode addresses with OpenStreetMap}
 \usage{
-geocode_osm(query, match_num = 1, return_all = FALSE,
-  details = FALSE, user_agent = NULL)
+geocode_osm(
+  query,
+  match_num = 1,
+  return_all = FALSE,
+  details = FALSE,
+  user_agent = NULL
+)
 }
 \arguments{
 \item{query}{Address or place name to be geocoded. Character string.}

@@ -30,10 +30,11 @@
 ##' }
 #' It is possible to pass multiple arguments to \code{char_assign} (e.g. \code{char_assign=c("biggest_overlap","all_overlap")}), in which case the function will calculate both, and append the resulting columns to the output.
 #' @import sf maptools data.table tidyverse
-#' @importFrom stats as.dist
+#' @importFrom stats as.dist weighted.mean
 #' @importFrom raster extract pointDistance raster projectRaster
 #' @importFrom methods as
 #' @importFrom tidyselect all_of
+#' @importFrom dplyr select bind_cols
 #' @examples
 #' # Interpolation of a single variable, with area weights
 #' \dontrun{

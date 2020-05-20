@@ -28,6 +28,8 @@
 #' @import data.table tidyverse RCurl jsonlite
 #' @importFrom data.table last first between
 #' @importFrom rvest html_session
+#' @importFrom utils URLencode
+#' @importFrom dplyr mutate_all slice mutate select starts_with
 #' @examples
 #' # Geocode an address (top match only)
 #' \dontrun{

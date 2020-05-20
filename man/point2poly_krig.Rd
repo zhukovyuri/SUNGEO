@@ -4,8 +4,14 @@
 \alias{point2poly_krig}
 \title{Point-to-polygon interpolation, ordinary kriging method}
 \usage{
-point2poly_krig(pointz, polyz, polyz2 = NULL, varz = NULL,
-  cellsize = 25000, messagez = "")
+point2poly_krig(
+  pointz,
+  polyz,
+  polyz2 = NULL,
+  varz = NULL,
+  cellsize = 25000,
+  messagez = ""
+)
 }
 \arguments{
 \item{pointz}{Source points layer. \code{sf} object.}

@@ -14,6 +14,7 @@
 #' @importFrom raster extract pointDistance raster
 #' @importFrom methods as
 #' @importFrom rmapshaper ms_dissolve
+#' @importFrom dplyr select bind_cols
 #' @examples
 #' # Assignment of a single variable (sums)
 #' \dontrun{

@@ -4,10 +4,18 @@
 \alias{point2poly_tess}
 \title{Point-to-polygon interpolation, tessellation method}
 \usage{
-point2poly_tess(pointz, polyz, poly_id, methodz = "aw",
-  pop_raster = NULL, varz = NULL, char_varz = NULL,
-  char_assign = "biggest_overlap", funz = function(x, w) {    
-  weighted.mean(x, w, na.rm = T) }, return_tess = FALSE)
+point2poly_tess(
+  pointz,
+  polyz,
+  poly_id,
+  methodz = "aw",
+  pop_raster = NULL,
+  varz = NULL,
+  char_varz = NULL,
+  char_assign = "biggest_overlap",
+  funz = function(x, w) {     weighted.mean(x, w, na.rm = T) },
+  return_tess = FALSE
+)
 }
 \arguments{
 \item{pointz}{Source points layer. \code{sf} object.}

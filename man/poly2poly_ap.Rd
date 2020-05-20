@@ -4,10 +4,17 @@
 \alias{poly2poly_ap}
 \title{Area/population weighted polygon-to-polygon interpolation}
 \usage{
-poly2poly_ap(poly_from, poly_to, poly_to_id, methodz = "aw",
-  pop_raster = NULL, varz = NULL, char_varz = NULL,
-  char_assign = "biggest_overlap", funz = function(x, w) {    
-  weighted.mean(x, w, na.rm = T) })
+poly2poly_ap(
+  poly_from,
+  poly_to,
+  poly_to_id,
+  methodz = "aw",
+  pop_raster = NULL,
+  varz = NULL,
+  char_varz = NULL,
+  char_assign = "biggest_overlap",
+  funz = function(x, w) {     weighted.mean(x, w, na.rm = T) }
+)
 }
 \arguments{
 \item{poly_from}{Source polygon layer. \code{sf} object.}

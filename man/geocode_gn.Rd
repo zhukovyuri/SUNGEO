@@ -4,9 +4,16 @@
 \alias{geocode_gn}
 \title{Batch geocode addresses with GeoNames}
 \usage{
-geocode_gn(query, country_name = NULL, country_iso3 = NULL,
-  str_meth = "lv", match_all = FALSE, details = FALSE, ncores = 1,
-  verbose = TRUE)
+geocode_gn(
+  query,
+  country_name = NULL,
+  country_iso3 = NULL,
+  str_meth = "lv",
+  match_all = FALSE,
+  details = FALSE,
+  ncores = 1,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{query}{Address(es) or place name(s) to be geocoded. Character string or vector.}

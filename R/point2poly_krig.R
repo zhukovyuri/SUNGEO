@@ -17,11 +17,12 @@
 #'
 #' Unlike other available point-to-polygon interpolation techniques, this function currently only accepts numeric variables in \code{varz} and does not support interpolation of character strings.
 #' @import sf maptools data.table tidyverse automap
-#' @importFrom stats as.dist
+#' @importFrom stats as.dist na.omit as.formula
 #' @importFrom raster extract pointDistance raster projectRaster
 #' @importFrom methods as
 #' @importFrom rmapshaper ms_dissolve
 #' @importFrom sp SpatialPixelsDataFrame coordinates proj4string
+#' @importFrom dplyr select bind_cols
 #' @examples
 #' # Ordinary Kriging with one variable
 #' \dontrun{

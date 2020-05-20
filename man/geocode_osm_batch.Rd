@@ -4,9 +4,15 @@
 \alias{geocode_osm_batch}
 \title{Batch geocode addresses with OpenStreetMap}
 \usage{
-geocode_osm_batch(query, delay = 1, return_all = FALSE,
-  match_num = 1, details = FALSE, user_agent = NULL,
-  verbose = FALSE)
+geocode_osm_batch(
+  query,
+  delay = 1,
+  return_all = FALSE,
+  match_num = 1,
+  details = FALSE,
+  user_agent = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{query}{Addresses or place names to be geocoded. Character string.}

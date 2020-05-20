@@ -4,14 +4,16 @@
 \name{gpw4_deu2010}
 \alias{gpw4_deu2010}
 \title{Population count raster for Germany, 2010.}
-\format{class       : RasterLayer.
+\format{
+class       : RasterLayer.
 dimensions  : 186, 220, 40920  (nrow, ncol, ncell).
 resolution  : 0.04166667, 0.04166667  (x, y).
 extent      : 5.875, 15.04167, 47.29167, 55.04167  (xmin, xmax, ymin, ymax).
 coord. ref. : +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0.
 data source : in memory.
 names       : gpw_v4_population_count_rev11_2010_2pt5_min.
-values      : 0, 92915.66  (min, max).}
+values      : 0, 92915.66  (min, max).
+}
 \source{
 Gridded Population of the World (GPW) v4: Population Count, v4.11 \url{https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-count-rev11}
 }

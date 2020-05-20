@@ -89,13 +89,13 @@
 
 #' Roads polylines for Germany, 1992
 #'
-#' Roads thematic layer from Digital Chart of the World.
+#' Roads thematic layer from Digital Chart of the World. Subset: divided multi-lane highways.
 #'
 #' @format
-#' Simple feature collection with 4713 features and 5 fields.
+#' Simple feature collection with 1741 features and 5 fields.
 #' geometry type:  MULTILINESTRING.
 #' dimension:      XY.
-#' bbox:           xmin: 5.750933 ymin: 47.30845 xmax: 14.99799 ymax: 55.01572.
+#' bbox:           xmin: 5.750933 ymin: 47.58799 xmax: 14.75109 ymax: 54.80712
 #' epsg (SRID):    4326.
 #' proj4string:    +proj=longlat +datum=WGS84 +no_defs.
 #' \describe{
@@ -106,4 +106,4 @@
 #'   \item{ISOCOUNTRY }{Country name. Character string.}
 #' }
 #' @source Defense Mapping Agency (DMA), 1992. Digital Chart of the World. Defense Mapping Agency, Fairfax, Virginia. (Four CD-ROMs.)  \url{https://earth-info.nga.mil/publications/specs/printed/89009/89009_DCW.pdf}. Available through DIVA-GIS: \url{http://www.diva-gis.org/gData} (accessed April 15, 2020).
-"dcwroad_deu1992"
+"highways_deu1992"

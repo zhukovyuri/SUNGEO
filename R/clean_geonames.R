@@ -8,6 +8,8 @@
 #' @import tidyverse data.table
 #' @importFrom data.table last first between
 #' @importFrom sf st_make_valid
+#' @importFrom dplyr mutate_if
+#' @importFrom rlang .data
 #' @details Function used internally by \code{geocode_gn}
 #' @export
 
@@ -49,6 +51,6 @@ clean_geonames <- function(gn,ppl=FALSE){
 
   # Output
   geonames <- geonames_t %>% as.data.table()
-  if(ppl){geonames <- geonames[grepl("PPL",feature_code),]}
+  if(ppl){geonames <- geonames[grepl("PPL",geonames$feature_code),]}
   return(geonames)
 }

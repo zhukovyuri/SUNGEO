@@ -33,13 +33,13 @@
 #' @importFrom raster extract pointDistance raster projectRaster
 #' @importFrom methods as
 #' @importFrom udunits2 ud.convert
+#' @importFrom dplyr select everything
 #' @examples
 #' # Road lengths, densities and distance from polygon to nearest highway
 #' \dontrun{
 #' data(hex_05_deu)
-#' data(dcwroad_deu1992)
-#' highways <- dcwroad_deu1992[dcwroad_deu1992$MED_DESCRI%in%"With Median",]
-#' out_1 <- line2poly(linez = highways,
+#' data(highways_deu1992)
+#' out_1 <- line2poly(linez = highways_deu1992,
 #'                    polyz = hex_05_deu,
 #'                    poly_id = "HEX_ID")
 #' plot(out_1["line_length"])
@@ -49,7 +49,7 @@
 #'
 #' # Replace missing road lengths and densities with 0's, rename variables
 #' \dontrun{
-#' out_2 <- line2poly(linez = highways,
+#' out_2 <- line2poly(linez = highways_deu1992,
 #'                    polyz = hex_05_deu,
 #'                    poly_id = "HEX_ID",
 #'                    outvar_name = "road",

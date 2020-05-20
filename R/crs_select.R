@@ -11,6 +11,10 @@
 ##'  }
 #' @details Optimal map projection for the object \code{sf_layer} is defined as one that maximizes areal overlap between the study area and the spatial extent of planar coordinate reference systems and transformations in the EPSG Geodetic Parameter Dataset (polygons version 9.8, 2019-09-19).
 #' @import sf data.table tidyverse
+#' @importFrom stats dist
+#' @importFrom utils read.delim
+#' @importFrom dplyr select bind_rows
+#' @importFrom rlang .data
 #' @examples
 #' # Find a planar projection for an unprojected (WSG 1984) hexagonal grid of Germany
 #' \dontrun{
@@ -42,14 +46,14 @@ crs_select <- function(polyz,sf_layer=polyz){
     data.frame(
       overlap_1 = area_ix/area_1,
       overlap_2 = area_ix/area_2,
-      area_code = epsg_poly[epsg_candidates[e0],] %>% as.data.table() %>% dplyr::select(AREA_CODE) %>% unlist(),
-      area_name = epsg_poly[epsg_candidates[e0],] %>% as.data.table() %>% dplyr::select(AREA_NAME) %>% unlist(),
-      region = epsg_poly[epsg_candidates[e0],] %>% as.data.table() %>% dplyr::select(REGION) %>% unlist(),
+      area_code = epsg_poly[epsg_candidates[e0],] %>% as.data.table() %>% dplyr::select(.data$AREA_CODE) %>% unlist(),
+      area_name = epsg_poly[epsg_candidates[e0],] %>% as.data.table() %>% dplyr::select(.data$AREA_NAME) %>% unlist(),
+      region = epsg_poly[epsg_candidates[e0],] %>% as.data.table() %>% dplyr::select(.data$REGION) %>% unlist(),
       stringsAsFactors = FALSE
     ) %>% as.data.table()
   }) %>% dplyr::bind_rows()
   epsg_mat <- epsg_mat[overlap_1<=1&overlap_2<=1,]
-  epsg_dist <- epsg_mat[,.(overlap_1,overlap_2)] %>% as.matrix() %>% rbind(c(1,1),.) %>% dist() %>% as.matrix()
+  epsg_dist <- epsg_mat[,c("overlap_1","overlap_2"),with=FALSE] %>% as.matrix() %>% rbind(c(1,1),.) %>% dist() %>% as.matrix()
   epsg_best <- epsg_mat[epsg_dist[-1,1] %>% order(),area_code]
   epsg_best <- lapply(epsg_best,function(x){st_crs(x)$epsg}) %>% unlist() %>% na.omit()
 

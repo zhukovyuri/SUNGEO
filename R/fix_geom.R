@@ -5,7 +5,8 @@
 #' @param x Polygon layer to be checked and fixed. \code{sf} object.
 #' @param self_int Look only for self-intersections? Logical.
 #' @return Returns a \code{sf} polygon object, with self-intersections and other geometry problems fixed.
-#' @import sf tidyverse
+#' @import tidyverse
+#' @importFrom sf st_make_valid st_buffer
 #' @examples
 #' # Assignment of a single variable (sums)
 #' \dontrun{

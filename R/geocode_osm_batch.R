@@ -30,6 +30,7 @@
 #' @import data.table tidyverse RCurl jsonlite
 #' @importFrom data.table last first between
 #' @importFrom rvest html_session
+#' @importFrom dplyr bind_rows
 #' @examples
 #' # Geocode multiple addresses (top matches only)
 #' \dontrun{

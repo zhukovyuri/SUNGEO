@@ -4,9 +4,17 @@
 \alias{line2poly}
 \title{Line-in-polygon analysis}
 \usage{
-line2poly(linez, polyz, poly_id, measurez = c("length", "density",
-  "distance"), outvar_name = "line", unitz = "km", reproject = TRUE,
-  na_val = NA, verbose = TRUE)
+line2poly(
+  linez,
+  polyz,
+  poly_id,
+  measurez = c("length", "density", "distance"),
+  outvar_name = "line",
+  unitz = "km",
+  reproject = TRUE,
+  na_val = NA,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{linez}{Source polyline layer. \code{sf} object.}
@@ -53,9 +61,8 @@ Function for basic geometry calculations on polyline features, within an overlap
 # Road lengths, densities and distance from polygon to nearest highway
 \dontrun{
 data(hex_05_deu)
-data(dcwroad_deu1992)
-highways <- dcwroad_deu1992[dcwroad_deu1992$MED_DESCRI\%in\%"With Median",]
-out_1 <- line2poly(linez = highways,
+data(highways_deu1992)
+out_1 <- line2poly(linez = highways_deu1992,
                    polyz = hex_05_deu,
                    poly_id = "HEX_ID")
 plot(out_1["line_length"])
@@ -65,7 +72,7 @@ plot(out_1["line_distance"])
 
 # Replace missing road lengths and densities with 0's, rename variables
 \dontrun{
-out_2 <- line2poly(linez = highways,
+out_2 <- line2poly(linez = highways_deu1992,
                    polyz = hex_05_deu,
                    poly_id = "HEX_ID",
                    outvar_name = "road",
