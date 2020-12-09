@@ -8,7 +8,7 @@ point2poly_simp(
   pointz,
   polyz,
   varz,
-  funz = function(x) {     sum(x, na.rm = T) },
+  funz = list(function(x) {     sum(x, na.rm = T) }),
   na_val = NA
 )
 }

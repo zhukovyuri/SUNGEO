@@ -8,13 +8,15 @@ point2poly_tess(
   pointz,
   polyz,
   poly_id,
+  char_methodz = "aw",
   methodz = "aw",
   pop_raster = NULL,
   varz = NULL,
   char_varz = NULL,
   char_assign = "biggest_overlap",
-  funz = function(x, w) {     weighted.mean(x, w, na.rm = T) },
-  return_tess = FALSE
+  funz = function(x, w) {     stats::weighted.mean(x, w, na.rm = T) },
+  return_tess = FALSE,
+  seed = 1
 )
 }
 \arguments{
@@ -24,7 +26,9 @@ point2poly_tess(
 
 \item{poly_id}{Name of unique ID column for destination polygon layer. Character string.}
 
-\item{methodz}{Area interpolation method(s). Could be either of "aw" (areal weighting, default) and/or "pw" (population weighting). See "details". Character string or vector of character strings.}
+\item{char_methodz}{Interpolation method(s) for character strings. Could be either of "aw" (areal weighting, default) or "pw" (population weighting). See "details". Character string.}
+
+\item{methodz}{Interpolation method(s) for numeric covariates. Could be either of "aw" (areal weighting, default) and/or "pw" (population weighting). See "details". Character string or vector of character strings.}
 
 \item{pop_raster}{Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} object.}
 
@@ -36,7 +40,9 @@ point2poly_tess(
 
 \item{funz}{Aggregation function to be applied to variables specified in \code{varz}. Must take as an input a numeric vector \code{x} and vector of weights \code{w}. Function or list of functions.}
 
-\item{return_tess}{Return Voronoi polygons, in addition to destinaton polygon layer? Defaul is \code{FALSE}. Logical.}
+\item{return_tess}{Return Voronoi polygons, in addition to destinaton polygon layer? Default is \code{FALSE}. Logical.}
+
+\item{seed}{Seed for generation of random numbers. Default is 1. Numeric.}
 }
 \value{
 If \code{return_tess=FALSE}, returns a \code{sf} polygon object, with variables from \code{pointz} interpolated to the geometries of \code{polyz}.
@@ -58,7 +64,9 @@ Currently supported integration methods in the second step (\code{methodz}) incl
  \item{Areal weighting ("aw"). }{Values from \code{poly_from} weighted in proportion to relative area of spatial overlap between source features and geometries of \code{poly_to}.}
  \item{Population weighting ("pw"). }{Values from \code{poly_from} weighted in proportion to relative population sizes in areas of spatial overlap between source features and geometries of \code{poly_to}. This routine uses a third layer (supplied in \code{pop_raster}) to calculate the weights.}
 }
-It is possible to pass multiple arguments to \code{methodz} (e.g. \code{methodz=c("aw","pw")}), in which case the function will calculate both sets of weights, and append the resulting columns to the output.
+When a list of variables are supplied and one methods argument specified, then the chosen method will be applied to all variables.
+
+When a list of of variables are supplied and multiple methods arguments specified, then weighting methods will be applied in a pairwise order. For example, specifying \code{varz = list(c("to1","pvs1_margin"), c("vv1"))} and \code{methodz = c('aw', 'pw')} will apply areal weighting to the the first set of variables (to1 and pvs1_margin) and population weighing to the second set (vv1).
 
 Interpolation procedures are handled somewhat differently for numeric and character string variables. For numeric variables supplied in \code{varz}, "aw" and/or "pw" weights are passed to the function specified in \code{funz}. If different sets of numeric variables are to be aggregated with different functions, both \code{varz} and \code{funz} should be specified as lists (see examples below).
 
@@ -106,7 +114,7 @@ out_3 <- point2poly_tess(pointz = clea_deu2009_pt,
                            c("vv1")
                          ),
                          funz = list(
-                           function(x,w){weighted.mean(x,w)},
+                           function(x,w){stats::weighted.mean(x,w)},
                            function(x,w){sum(x*w)}
                            ),
                          char_varz = c("incumb_pty_n","win1_pty_n"),

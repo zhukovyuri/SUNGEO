@@ -30,7 +30,7 @@ geocode_osm_batch(
 \item{verbose}{Print status messages and progress? Default is \code{FALSE}. Logical.}
 }
 \value{
-A \code{data.table} object. If \code{details=FALSE}, contains fields
+A \code{data.frame} object. If \code{details=FALSE}, contains fields
 \itemize{
  \item{"query". }{User-supplied address query(ies). Character string.}
  \item{"osm_id". }{OpenStreetMap ID. Character string.}

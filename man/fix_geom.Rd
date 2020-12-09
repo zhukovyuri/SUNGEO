@@ -2,20 +2,20 @@
 % Please edit documentation in R/fix_geom.R
 \name{fix_geom}
 \alias{fix_geom}
-\title{Polygon geometry fix}
+\title{Fix polygon geometries}
 \usage{
-fix_geom(x, self_int = TRUE)
+fix_geom(x, n_it = 10)
 }
 \arguments{
 \item{x}{Polygon layer to be checked and fixed. \code{sf} object.}
 
-\item{self_int}{Look only for self-intersections? Logical.}
+\item{n_it}{Number of iterations. Default is 10. Numeric..}
 }
 \value{
 Returns a \code{sf} polygon object, with self-intersections and other geometry problems fixed.
 }
 \description{
-Function to check and fix broken geometries in simple features polygon objects
+Function to check validity and fix broken geometries in simple features polygon objects
 }
 \examples{
 # Assignment of a single variable (sums)

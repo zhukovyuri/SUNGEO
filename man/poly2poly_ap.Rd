@@ -2,18 +2,21 @@
 % Please edit documentation in R/poly2poly_ap.R
 \name{poly2poly_ap}
 \alias{poly2poly_ap}
-\title{Area/population weighted polygon-to-polygon interpolation}
+\title{Area and population weighted polygon-to-polygon interpolation}
 \usage{
 poly2poly_ap(
   poly_from,
   poly_to,
   poly_to_id,
+  geo_vor = NULL,
   methodz = "aw",
+  char_methodz = "aw",
   pop_raster = NULL,
   varz = NULL,
   char_varz = NULL,
   char_assign = "biggest_overlap",
-  funz = function(x, w) {     weighted.mean(x, w, na.rm = T) }
+  funz = function(x, w) {     stats::weighted.mean(x, w, na.rm = T) },
+  seed = 1
 )
 }
 \arguments{
@@ -23,7 +26,11 @@ poly2poly_ap(
 
 \item{poly_to_id}{Name of unique ID column for destination polygon layer. Character string.}
 
+\item{geo_vor}{Voronoi polygons object (used internally by \code{point2poly_tess}). \code{sf} object.}
+
 \item{methodz}{Area interpolation method(s). Could be either of "aw" (areal weighting, default) and/or "pw" (population weighting). See "details". Character string or vector of character strings.}
+
+\item{char_methodz}{Interpolation method(s) for character strings. Could be either of "aw" (areal weighting, default) or "pw" (population weighting). See "details". Character string.}
 
 \item{pop_raster}{Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} object.}
 
@@ -34,6 +41,8 @@ poly2poly_ap(
 \item{char_assign}{Assignment rule to be used for variables specified in \code{char_varz}. Could be either "biggest_overlap" (default) or "all_overlap". See "details". Character string or vector of character strings.}
 
 \item{funz}{Aggregation function to be applied to variables specified in \code{varz}. Must take as an input a numeric vector \code{x} and vector of weights \code{w}. Function or list of functions.}
+
+\item{seed}{Seed for generation of random numbers. Default is 1. Numeric.}
 }
 \value{
 \code{sf} polygon object, with variables from \code{poly_from} interpolated to the geometries of \code{poly_to}.
@@ -82,7 +91,7 @@ out_2 <- poly2poly_ap(
                 c("to1","pvs1_margin"),
                 c("vv1") ),
               funz = list(
-                function(x,w){weighted.mean(x,w)},
+                function(x,w){stats::weighted.mean(x,w)},
                 function(x,w){sum(x*w)} ),
               char_varz = c("incumb_pty_n","win1_pty_n")
              )

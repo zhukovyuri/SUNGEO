@@ -1,21 +1,26 @@
 # `SUNGEO` / Sub-National Geospatial Data Archive System: Geoprocessing Toolkit
 R package for integrating spatially-misaligned GIS datasets.
 
-Version 0.1.0 (April 15, 2020)
+Version 0.2.0 (December 9, 2020)
 
-Very preliminary. Feedback, bug reports welcome: zhukov-at-umich-dot-edu
+Jason Byers, Marty Davidson, Yuri M. Zhukov
+Center for Political Studies, Institute for Social Research
+University of Michigan
 
-* `clean_geonames` / Function to clean GeoNames gazetteer files
-* `crs_select` / Automatic planar coordinate reference system (CRS) selection
-* `fix_geom` / Function to check and fix broken geometries in simple features polygon objects
-* `geocode_gn` / Batch geocode addresses with GeoNames
+Feedback, bug reports welcome: zhukov-at-umich-dot-edu
+
+* `df2sf` / Convert data.frame object into simple features object
+* `fix_geom` / Fix polygon geometries
 * `geocode_osm` / Geocode addresses with OpenStreetMap
 * `geocode_osm_batch` / Batch geocode addresses with OpenStreetMap
+* `hot_spot` / Automatically calculate Local G hot spot intensity
 * `line2poly` / Line-in-polygon analysis
-* `point2poly_krig` / Point-to-polygon interpolation, ordinary kriging method
 * `point2poly_simp` / Point-to-polygon interpolation, simple overlay method
 * `point2poly_tess` / Point-to-polygon interpolation, tessellation method
-* `poly2poly_ap` / Area/population weighted polygon-to-polygon interpolation
+* `poly2poly_ap` / Area and population weighted polygon-to-polygon interpolation
+* `sf2raster` / Convert simple features object into regularly spaced raster
+* `utm_select` / Automatically convert geographic (degree) to planar coordinates (meters)
+
 
 To install in R:
 
@@ -34,7 +39,7 @@ Read help files:
 
 ```
 ?poly2poly_ap
-?geo2planar
+?utm_select
 ```
 
 Example: geocode an address with OpenStreetMap
@@ -42,6 +47,7 @@ Example: geocode an address with OpenStreetMap
 ```
 # Get geographic coordinates for the Big House (top match only)
 geocode_osm("Michigan Stadium")
+geocode_osm("Big House")
 
 # Return detailed results for top match
 geocode_osm("Michigan Stadium", details=TRUE)
@@ -65,20 +71,6 @@ geocode_osm_batch(c("Ann Arbor","East Lansing","Columbus"),
 geocode_osm_batch(c("Ann Arbor","East Lansing","Columbus"),
                   details = TRUE, return_all = TRUE)
 
-```
-
-Example: geocode addresses with GeoNames
-
-```
-# Geocode an address
-geocode_gn("Chisinau", country_name = "Moldova")
-
-# Return detailed results
-geocode_gn("Chisinau", country_name = "Moldova", details = TRUE)
-
-# Return detailed results for multiple addresses, with progress reports
-geocode_gn(query = c("Chisinau","Buiucani, Chisinau","Chisinau centru"),
-           country_name = "Moldova", details = TRUE, verbose = TRUE)
 ```
 
 Example: area-weighted polygon-to-polygon interpolation
@@ -122,27 +114,12 @@ out_2 <- poly2poly_ap(poly_from = clea_deu2009,
 plot(out_2["to1_pw"])
 ```
 
-Example: point-to-polygon interpolation using ordinary kriging (with automatic variogram model selection)
-
-```
-# Load point-level legislative election results (from CLEA)
-data(clea_deu2009_pt)
-
-# Interpolate
-out_3 <- point2poly_krig(pointz = clea_deu2009_pt,
-                         polyz = hex_05_deu,
-                         varz = "to1")
-
-# Visualize predicted voter turnout values
-plot(out_3["to1_kr"])
-
-# Visualize standard deviation of predicted values
-plot(out_3["to1_kr_sd"])
-```
-
 Example: point-to-polygon interpolation using tessellation method and area weights
 
 ```
+# Load point-level election results
+data(clea_deu2009_pt)
+
 # Interpolate
 out_4 <- point2poly_tess(pointz = clea_deu2009_pt,
                          polyz = hex_05_deu,
@@ -164,7 +141,7 @@ Example: line-in-polygon analysis
 data(highways_deu1992)
 
 # Basic map overlay
-plot(hex_05_deu$geometry)
+plot(hex_05_deu["geometry"])
 plot(highways_deu1992$geometry, add=TRUE, col = "blue", lwd=2)
 
 # Calculate road lengths, densities and distances from each polygon to nearest highway
@@ -193,14 +170,62 @@ plot(out_6["road_distance"])
 Example: Automatically find a planar CRS for a GIS dataset
 
 ```
+# Visualize original geometries (WGS1984, degrees)
+plot(clea_deu2009["geometry"], axes=T)
+
 # Find a suitable CRS and re-project
-clea_tr <- crs_select(clea_deu2009)
+out_7 <- utm_select(clea_deu2009)
 
-# EPSG code of transformed data
-clea_tr$epsg_best
+# Visualize transformed geometries (UTM 32N, meters)
+plot(out_7["geometry"], axes=T)
 
-# Visualize transformed geometries
-plot(clea_tr$sf$geometry)
+# proj4string of transformed data
+utm_select(clea_deu2009, return_list=T)$proj_out
+```
+
+Example: Rasterization of polygons
+
+```
+# Transform sf polygon layer into 1km-by-1km RasterLayer (requires planar CRS)
+out_8 <- sf2raster(polyz_from = utm_select(clea_deu2009),
+                   input_variable = "to1")
+# Visualize raster
+raster::plot(out_8)
+
+# 25km-by-25km RasterLayer (requires planar CRS)
+out_9 <- sf2raster(polyz_from = utm_select(clea_deu2009),
+                   input_variable = "to1",
+                   grid_res = c(25000, 25000))
+# Visualize raster
+raster::plot(out_9)
+```
+
+Example: Create cartogram
+
+```
+# Cartogram of turnout scaled by number of valid votes
+out_10 <- sf2raster(polyz_from = utm_select(clea_deu2009),
+                  input_variable = "to1",
+                  cartogram = TRUE,
+                  carto_var = "vv1")
+raster::plot(out_10)
+```
+
+Example: reverse rasterization
+
+```
+# Polygonization of cartogram raster
+out_11a <- sf2raster(polyz_from = utm_select(clea_deu2009),
+                    input_variable = "to1",
+                    cartogram = TRUE,
+                    carto_var = "vv1",
+                    return_list = TRUE)
+out_11 <- sf2raster(reverse = TRUE,
+                   poly_to = out_11a$poly_to,
+                   return_output = out_11a$return_output,
+                   return_field = out_11a$return_field)
+plot(out_11["to1"])
+
 ```
 
 Additional examples in help files of individual functions.

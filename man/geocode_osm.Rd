@@ -24,7 +24,7 @@ geocode_osm(
 \item{user_agent}{Valid User-Agent identifying the application for OSM-Nominatum. If none supplied, function will attempt to auto-detect. Character string.}
 }
 \value{
-A \code{data.table} object. If \code{details=FALSE}, contains fields
+A \code{data.frame} object. If \code{details=FALSE}, contains fields
 \itemize{
  \item{"query". }{User-supplied address query(ies). Character string.}
  \item{"osm_id". }{OpenStreetMap ID. Character string.}
@@ -46,7 +46,7 @@ If \code{details=TRUE}, contains additional fields
 Function to find geographic coordinates of addresses and place names, using OpenStreetMap's Nominatum API.
 }
 \details{
-Note that Nominatim Usage Policy stipulates an absolute maximum of 1 request per second (\url{https://operations.osmfoundation.org/policies/nominatim/}). For batch geocoding of multiple addresses, please use \code{\link[SUNGEO]{geocode_osm_batch}} or \code{\link[SUNGEO]{geocode_gn}}.
+Note that Nominatim Usage Policy stipulates an absolute maximum of 1 request per second (\url{https://operations.osmfoundation.org/policies/nominatim/}). For batch geocoding of multiple addresses, please use \code{\link[SUNGEO]{geocode_osm_batch}}.
 }
 \examples{
 # Geocode an address (top match only)

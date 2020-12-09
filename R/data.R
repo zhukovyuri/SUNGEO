@@ -52,6 +52,30 @@
 #' @source Constituency-Level Elections Archive (CLEA) \url{http://www.electiondataarchive.org/}
 "clea_deu2009_pt"
 
+#' Constituency level results for lower chamber legislative elections, Germany 2009.
+#'
+#' A data.frame object containing the geographic centroids of electoral
+#' contituencies, and data on turnout levels, votes shares and other attributes of
+#' lower chamber legislative elections.
+#'
+#' @format data.frame with 16 observations and 12 variables.
+#' \describe{
+#'   \item{cst }{Constituency number. Numeric.}
+#'   \item{cst_n }{Constituency name. Character.}
+#'   \item{ctr }{Country number. Numeric.}
+#'   \item{ctr_n }{Country name. Character.}
+#'   \item{yrmo }{Year and month of election (YYYYMM). Character.}
+#'   \item{to1 }{Turnout in first round. Numeric.}
+#'   \item{vv1 }{Number of valid votes in first round. Numeric.}
+#'   \item{pvs1_margin }{Popular vote share margin in first round. Numeric.}
+#'   \item{incumb_pty_n }{Incumbent party name.}
+#'   \item{win1_pty_n }{Party name of popular vote share winner in first round. Character.}
+#'   \item{longitude }{Longitude of constituency centroid. Numeric.}
+#'   \item{latitude }{Latitude of constituency centroid. Numeric.}
+#' }
+#' @source Constituency-Level Elections Archive (CLEA) \url{http://www.electiondataarchive.org/}
+"clea_deu2009_df"
+
 #' Population count raster for Germany, 2010.
 #'
 #' 2.5 arc-minute resolution raster of estimates of human population (number of persons per pixel),

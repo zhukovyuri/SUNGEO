@@ -7,7 +7,7 @@
 #' @param return_all Should all matches be returned? Overrides \code{match_num} if \code{TRUE}. Default is \code{FALSE}. Logical.
 #' @param details Should detailed results be returned? Default is \code{FALSE}. Logical.
 #' @param user_agent Valid User-Agent identifying the application for OSM-Nominatum. If none supplied, function will attempt to auto-detect. Character string.
-#' @return A \code{data.table} object. If \code{details=FALSE}, contains fields
+#' @return A \code{data.frame} object. If \code{details=FALSE}, contains fields
 #' \itemize{
 ##'  \item{"query". }{User-supplied address query(ies). Character string.}
 ##'  \item{"osm_id". }{OpenStreetMap ID. Character string.}
@@ -24,12 +24,11 @@
 ##'  \item{"bbox_xmin". }{Minimum horizontal coordinate of bounding box. Numeric.}
 ##'  \item{"bbox_xmax". }{Maximum horizontal coordinate of bounding box. Numeric.}
 ##'  }
-#' @details Note that Nominatim Usage Policy stipulates an absolute maximum of 1 request per second (\url{https://operations.osmfoundation.org/policies/nominatim/}). For batch geocoding of multiple addresses, please use \code{\link[SUNGEO]{geocode_osm_batch}} or \code{\link[SUNGEO]{geocode_gn}}.
-#' @import data.table tidyverse RCurl jsonlite
-#' @importFrom data.table last first between
-#' @importFrom rvest html_session
-#' @importFrom utils URLencode
+#' @details Note that Nominatim Usage Policy stipulates an absolute maximum of 1 request per second (\url{https://operations.osmfoundation.org/policies/nominatim/}). For batch geocoding of multiple addresses, please use \code{\link[SUNGEO]{geocode_osm_batch}}.
+#' @import RCurl
 #' @importFrom dplyr mutate_all slice mutate select starts_with
+#' @importFrom jsonlite fromJSON
+#' @importFrom utils URLencode
 #' @examples
 #' # Geocode an address (top match only)
 #' \dontrun{
@@ -54,7 +53,7 @@ geocode_osm <- function(
 ){
 
   # Batch geocoding warning
-  if(length(query)>1){query <- query[1]; warning("Returning first result only. Please use geocode_osm_batch() or geocode_gn() to geocode multiple addresses.")}
+  if(length(query)>1){query <- query[1]; warning("Returning first result only. Please use geocode_osm_batch() to geocode multiple addresses.")}
 
   # Error handling
   downloadFail <- FALSE
@@ -64,13 +63,12 @@ geocode_osm <- function(
   osm_id=NA_character_; osm_type = NA_character_; address=NA_character_; longitude=NA_real_; latitude=NA_real_; importance=NA_real_; bbx=data.frame(bbox_ymin=NA_real_,bbox_ymax=NA_real_,bbox_xmin=NA_real_,bbox_xmax=NA_real_,stringsAsFactors = FALSE)
 
   # User-Agent
-  if(length(user_agent)==0){user_agent <- rvest::html_session("https://httpbin.org/user-agent") %>%
-    (function(.){.["response"][[1]]["request"][[1]]["options"][[1]]["useragent"][[1]]})}
+  if(length(user_agent)==0){user_agent <- html_sessionSunGeo("https://httpbin.org/user-agent")["response"][[1]]["request"][[1]]["options"][[1]]["useragent"][[1]]}
 
   # Send query to OSM Nominatum API
   root_url <- "https://nominatim.openstreetmap.org/search?q="
   sufx_url <- "&format=json&polygon=1&addressdetails=1"
-  doc <- paste0(root_url, query, sufx_url) %>% URLencode() %>% RCurl::getURL(httpheader = c('User-Agent' = user_agent))
+  doc <- RCurl::getURL(utils::URLencode(paste0(root_url, query, sufx_url)),httpheader = c('User-Agent' = user_agent))
 
   }, warning = function(w) {
     downloadFail <<- TRUE
@@ -89,27 +87,27 @@ geocode_osm <- function(
     dat <- jsonlite::fromJSON(doc)
     if(return_all){match_num <- 1:nrow(dat)}
     if(nrow(dat)>0){
-      osm_id <- dat$osm_id[match_num] %>% as.character()
-      osm_type <- dat$osm_type[match_num] %>% as.character()
-      address <- dat$display_name[match_num] %>% as.character()
-      longitude <- dat$lon[match_num] %>% as.character() %>% as.numeric()
-      latitude <- dat$lat[match_num] %>% as.character() %>% as.numeric()
-      importance <- dat$importance[match_num] %>% as.character() %>% as.numeric()
-      bbx <- dat$boundingbox %>% do.call(rbind,.) %>% as.data.frame(stringsAsFactors = FALSE) %>% data.table::setnames(names(.),c("bbox_ymin","bbox_ymax","bbox_xmin","bbox_xmax")) %>% dplyr::mutate_all(function(.){as.numeric(.)}) %>% dplyr::slice(match_num)
+      osm_id <- as.character(dat$osm_id[match_num])
+      osm_type <- as.character(dat$osm_type[match_num])
+      address <- as.character(dat$display_name[match_num])
+      longitude <- as.numeric(as.character(dat$lon[match_num]))
+      latitude <- as.numeric(as.character(dat$lat[match_num]))
+      importance <- as.numeric(as.character(dat$importance[match_num]))
+      bbx <- dplyr::slice(dplyr::mutate_all(as.data.frame(do.call(rbind,dat$boundingbox),stringsAsFactors = FALSE),function(.){as.numeric(.)}),match_num)
+      colnames(bbx) <- c("bbox_ymin","bbox_ymax","bbox_xmin","bbox_xmax")
     }
   }
 
   # Output
-  out <- data.frame(query=query,
+  out <- cbind(data.frame(query=query,
                     osm_id=osm_id,
                     osm_type=osm_type,
                     importance=importance,
                     address=address,
                     longitude=longitude,
                     latitude=latitude,
-                    stringsAsFactors = FALSE) %>% cbind(bbx)
-  if(!details){out <- out %>% dplyr::mutate(osm_type=NULL,importance=NULL) %>% dplyr::select(-dplyr::starts_with("bbox"))}
-  return(out %>% as.data.table())
-
+                    stringsAsFactors = FALSE), bbx)
+  if(!details){out <- dplyr::select(dplyr::mutate(out,osm_type=NULL,importance=NULL),-dplyr::starts_with("bbox"))}
+  return(as.data.frame(out))
   }
 }

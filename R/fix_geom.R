@@ -1,12 +1,11 @@
-#' Polygon geometry fix
+#' Fix polygon geometries
 #'
-#' Function to check and fix broken geometries in simple features polygon objects
+#' Function to check validity and fix broken geometries in simple features polygon objects
 #'
 #' @param x Polygon layer to be checked and fixed. \code{sf} object.
-#' @param self_int Look only for self-intersections? Logical.
+#' @param n_it Number of iterations. Default is 10. Numeric..
 #' @return Returns a \code{sf} polygon object, with self-intersections and other geometry problems fixed.
-#' @import tidyverse
-#' @importFrom sf st_make_valid st_buffer
+#' @importFrom sf st_make_valid st_is_valid st_buffer
 #' @examples
 #' # Assignment of a single variable (sums)
 #' \dontrun{
@@ -15,18 +14,33 @@
 #' }
 #' @export
 
-fix_geom <- function(x,self_int=TRUE){
-  if(self_int){
-    if(sum(grepl("Self-inter",sf::st_is_valid(x,reason=T)))>0){
-      suppressMessages(
-        x <- x %>% sf::st_buffer(dist=0)
-      )
-    }}
-  if(!self_int){
-    if(sum(!sf::st_is_valid(x))>0){
-      suppressMessages(
-        x <- x %>% sf::st_buffer(dist=0)
-      )
-    }}
-  x
+fix_geom <- function(x, n_it = 10){
+  #Part 1 -
+  ValidityVector <- sf::st_is_valid(x)
+
+  #Part 2 -
+  countIter <- 0
+
+  while(all(ValidityVector) == F || countIter < n_it){
+    suppressMessages(
+      x <- sf::st_buffer(x,dist=0)
+    )
+
+    ValidityVector <- sf::st_is_valid(x)
+
+    countIter <- 1 + countIter
+
+    if(all(ValidityVector)){
+      break
+    }
+
+    if(all(ValidityVector) == F && countIter == n_it){
+      stop('Non-Convergence for Polygon; Please increase number of iterations or check to see whether polygon is corrupted')
+    }
+
+  }
+
+  message(paste0('Completed ', countIter, ' Round of Buffering'))
+
+  return(x)
 }

@@ -28,10 +28,9 @@
 ##'  \item{"\code{_distance}". }{Distance from each polygon to nearest line feature, in km or other units supplied in \code{unitz}.}
 ##'  }
 #' If \code{measurez = c("length","density","distance")} (default), contains all of the above.
-#' @import sf data.table tidyverse
+#' @import sf
 #' @importFrom stats as.dist
 #' @importFrom raster extract pointDistance raster projectRaster
-#' @importFrom methods as
 #' @importFrom udunits2 ud.convert
 #' @importFrom dplyr select everything
 #' @examples
@@ -71,12 +70,16 @@ line2poly <- function(linez,
                       verbose=TRUE){
 
   # Find optimal planar projection for map
+  # if(reproject){
+  #   if(verbose){print("Finding optimal planar projection...")}
+  #   suppressWarnings({polyz_tr <- crs_select(polyz = fix_geom(polyz))})
+  #   polyz_tr_ <- polyz_tr[["sf"]]
+  #   epsg <- polyz_tr[["epsg_best"]]
+  #   linez_tr_ <- sf::st_transform(linez,sf::st_crs(paste0("EPSG:",epsg)))
+  # }
   if(reproject){
-    if(verbose){print("Finding optimal planar projection...")}
-    suppressWarnings({polyz_tr <- crs_select(polyz = polyz %>% fix_geom())})
-    polyz_tr_ <- polyz_tr[["sf"]]
-    epsg <- polyz_tr[["epsg_best"]]
-    linez_tr_ <- linez %>% st_transform(st_crs(paste0("EPSG:",epsg)))
+    polyz_tr_ <- utm_select(polyz)
+    linez_tr_ <- utm_select(linez)
   }
   if(!reproject){
     polyz_tr_ <- polyz
@@ -88,35 +91,37 @@ line2poly <- function(linez,
 
   # Overlay
   if(verbose){print("Conducting overlay operations...")}
-  lp_o <- suppressWarnings({linez_tr_ %>% st_intersection(polyz_tr_)})
-  lp_o$sgeoz_length <- st_length(lp_o) %>% udunits2::ud.convert("m", unitz) %>% as.numeric()
-  lp_o <- lp_o %>% as.data.table()
-  lp_o <- lp_o[,sum(sgeoz_length),by=poly_id] %>% data.table::setnames("V1","sgeoz_length")
+  lp_o <- suppressWarnings({sf::st_intersection(linez_tr_,polyz_tr_)})
+  lp_o$sgeoz_length <- as.numeric(udunits2::ud.convert(sf::st_length(lp_o),"m", unitz))
+  lp_o <- base::as.data.frame(lp_o)
+  lp_o <- stats::aggregate(lp_o$sgeoz_length, by=list(lp_o[,which(colnames(lp_o)==poly_id)]), FUN=sum)
+  colnames(lp_o) <- c(poly_id,"sgeoz_length")
 
   # Distance
   if("distance"%in%measurez){
-    polyz_tr_$sgeoz_distance <- polyz_tr_ %>% st_distance(linez_tr_ %>% st_union()) %>% udunits2::ud.convert("m", unitz) %>% as.numeric()
+    polyz_tr_$sgeoz_distance <- as.numeric(udunits2::ud.convert(sf::st_distance(polyz_tr_,sf::st_union(linez_tr_)),"m", unitz))
   }
 
   # Length
   if("length"%in%measurez|"density"%in%measurez){
-    polyz_tr_ <- polyz_tr_ %>% merge(lp_o %>% dplyr::select(poly_id %>% tidyselect::all_of(),"sgeoz_length"),by=poly_id,all.x=T,all.y=F)
-    polyz_tr_$sgeoz_length <- polyz_tr_$sgeoz_length %>% replace(is.na(.), na_val)
+    polyz_tr_ <- merge(polyz_tr_,dplyr::select(lp_o,all_ofSunGeo(poly_id),"sgeoz_length"),by=poly_id,all.x=T,all.y=F)
+    polyz_tr_$sgeoz_length <- replace(polyz_tr_$sgeoz_length,is.na(polyz_tr_$sgeoz_length), na_val)
   }
 
   # Density
   if("density"%in%measurez){
-    polyz_tr_$sgeoz_area <- polyz_tr_ %>% st_area() %>% udunits2::ud.convert("m^2", unitz_sq) %>% as.numeric()
-    polyz_tr_$sgeoz_density <- polyz_tr_$sgeoz_length/polyz_tr_$sgeoz_area %>% replace(is.na(.), na_val)
+    polyz_tr_$sgeoz_area <- as.numeric(udunits2::ud.convert(sf::st_area(polyz_tr_),"m^2", unitz_sq))
+    polyz_tr_$sgeoz_density <- replace(polyz_tr_$sgeoz_length/polyz_tr_$sgeoz_area,is.na(polyz_tr_$sgeoz_length/polyz_tr_$sgeoz_area), na_val)
   }
 
   # Rename variables
-  polyz_tr_ <- polyz_tr_ %>% dplyr::select(poly_id %>% tidyselect::all_of() ,names(.)[grep("^sgeoz",names(.))],dplyr::everything()) %>% data.table::setnames(names(.),gsub("^sgeoz",outvar_name,names(.)))
+  polyz_tr_2 <- dplyr::select(polyz_tr_, all_ofSunGeo(poly_id) ,grep("^sgeoz",names(polyz_tr_),value=T),dplyr::everything())
+  colnames(polyz_tr_) <- gsub("^sgeoz",outvar_name,colnames(polyz_tr_))
 
   # Reproject
   if(reproject){
     if(verbose){print("Restoring original projection...")}
-    polyz_ <- polyz_tr_ %>% st_transform(st_crs(polyz))
+    polyz_ <- sf::st_transform(polyz_tr_,sf::st_crs(polyz))
   }
   if(!reproject){
     polyz_ <- polyz_tr_
