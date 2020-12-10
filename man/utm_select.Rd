@@ -26,7 +26,7 @@ If \code{return_list=TRUE}, returns a list object containing
 Function to automatically convert simple feature and raster objects with geographic coordinates (longitude, latitude / WGS 1984, EPSG:4326) to planar UTM coordinates. If the study region spans multiple UTM zones, defaults to Albers Equal Area.
 }
 \details{
-Optimal map projection for the object \code{x} is defined by matching its horizontal extent with that of the 60 UTM zones. If object spans multiple UTM zones, uses either the median zone (if number of zones is equal to or less than \code{max_zones}) or Albers Equal Area projection with mean longitude as projection center (if number of zones is greater than \code{max_zones}).
+Optimal map projection for the object \code{x} is defined by matching its horizontal extent with that of the 60 UTM zones. If object spans multiple UTM zones, uses either the median zone (if number of zones is equal to or less than \code{max_zones}) or Albers Equal Area projection with median longitude as projection center (if number of zones is greater than \code{max_zones}).
 }
 \examples{
 # Find a planar projection for an unprojected (WSG 1984) hexagonal grid of Germany

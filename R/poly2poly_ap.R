@@ -588,6 +588,7 @@ poly2poly_ap <- function(
   polyz_$Return_ID <- NULL
 
   #Part 4 - Output
+  polyz_ <- sf::st_cast(polyz_,"MULTIPOLYGON")
   return(polyz_)
 
 }

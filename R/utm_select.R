@@ -12,7 +12,7 @@
 ##'  \item{"x_out". }{The re-projected layer. \code{sf} or \code{RasterLayer} object, depending on input.}
 ##'  \item{"proj4_best". }{proj4string of the projection. Character string.}
 ##'  }
-#' @details Optimal map projection for the object \code{x} is defined by matching its horizontal extent with that of the 60 UTM zones. If object spans multiple UTM zones, uses either the median zone (if number of zones is equal to or less than \code{max_zones}) or Albers Equal Area projection with mean longitude as projection center (if number of zones is greater than \code{max_zones}).
+#' @details Optimal map projection for the object \code{x} is defined by matching its horizontal extent with that of the 60 UTM zones. If object spans multiple UTM zones, uses either the median zone (if number of zones is equal to or less than \code{max_zones}) or Albers Equal Area projection with median longitude as projection center (if number of zones is greater than \code{max_zones}).
 #' @importFrom sf st_bbox st_transform
 #' @importFrom raster projectRaster
 #' @importFrom stats median
@@ -25,6 +25,8 @@
 #' @export
 
 utm_select <- function(x, max_zones=5, return_list=FALSE){
+  # Extract median longitude
+  median_x <- median(sf::st_coordinates(x)[,"X"],na.rm=TRUE)
   # Extract bounding box
   bb <- sf::st_bbox(x)
   # Conversion table
@@ -38,7 +40,7 @@ utm_select <- function(x, max_zones=5, return_list=FALSE){
   Location_UTM_Begin <- which(bb["xmax"] >= UTM_Converter_Table$Begin)
   Location_UTM_End <- which(bb["xmin"] <= UTM_Converter_Table$End)
   Location_UTM <- base::intersect(Location_UTM_Begin,Location_UTM_End)
-  proj_out <- ifelse(length(Location_UTM)<=max_zones,as.character(UTM_Converter_Table$CRS[stats::median(Location_UTM)]),paste0("+proj=aea +lon_0=",mean(bb[c("xmin","xmax")])))
+  proj_out <- ifelse(length(Location_UTM)<=max_zones,as.character(UTM_Converter_Table$CRS[stats::median(Location_UTM)]),paste0("+proj=aea +lon_0=",median_x))
   # Re-project
   if(any(grepl("sf",class(x)))){x_out <- sf::st_transform(x, proj_out)}
   if(any(grepl("Raster",class(x)))){x_out <- raster::projectRaster(x, crs=proj_out)}

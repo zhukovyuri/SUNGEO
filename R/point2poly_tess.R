@@ -134,7 +134,8 @@ point2poly_tess <- function(
   #Part 1 - Create union layer
   ###########################
   suppressWarnings({
-    polyz_u <- dplyr::select(fix_geom(rmapshaper::ms_dissolve(polyz)),-1)
+    # polyz_u <- dplyr::select(fix_geom(rmapshaper::ms_dissolve(polyz)),-1)
+    polyz_u <- fix_geom(sf::st_union(polyz))
   })
 
 

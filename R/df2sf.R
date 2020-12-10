@@ -37,7 +37,7 @@
 #' @export
 #'
 
-df2sf <- function(x_coord, y_coord, input_data = NULL, file = NULL, n_max = Inf, start = 0, projection_input = '+proj=longlat', zero.policy = FALSE, show_removed = FALSE){
+df2sf <- function(x_coord, y_coord, input_data = NULL, file = NULL, n_max = Inf, start = 0, projection_input = 'EPSG:4326', zero.policy = FALSE, show_removed = FALSE){
   #Part 1 -
   if(is.null(file) == F){
     input_data <- as.data.frame(data.table::fread(file, nrows = n_max, skip = start))

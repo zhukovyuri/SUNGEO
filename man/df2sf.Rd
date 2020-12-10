@@ -11,7 +11,7 @@ df2sf(
   file = NULL,
   n_max = Inf,
   start = 0,
-  projection_input = "+proj=longlat",
+  projection_input = "EPSG:4326",
   zero.policy = FALSE,
   show_removed = FALSE
 )
