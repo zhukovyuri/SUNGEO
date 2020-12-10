@@ -4,7 +4,9 @@ R package for integrating spatially-misaligned GIS datasets.
 Version 0.2.0 (December 9, 2020)
 
 Jason Byers, Marty Davidson, Yuri M. Zhukov
+
 Center for Political Studies, Institute for Social Research
+
 University of Michigan
 
 Feedback, bug reports welcome: zhukov-at-umich-dot-edu
