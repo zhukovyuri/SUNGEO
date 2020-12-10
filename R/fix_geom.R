@@ -22,9 +22,11 @@ fix_geom <- function(x, n_it = 10){
   countIter <- 0
 
   while(all(ValidityVector) == F || countIter < n_it){
-    suppressMessages(
-      x <- sf::st_buffer(x,dist=0)
-    )
+    suppressMessages({
+      suppressWarnings({
+        x <- sf::st_buffer(x,dist=0)
+      })
+    })
 
     ValidityVector <- sf::st_is_valid(x)
 
