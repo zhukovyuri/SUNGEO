@@ -15,7 +15,7 @@ poly2poly_ap(
   varz = NULL,
   char_varz = NULL,
   char_assign = "biggest_overlap",
-  funz = function(x, w) {     stats::weighted.mean(x, w, na.rm = T) },
+  funz = function(x, w) {     stats::weighted.mean(x, w, na.rm = TRUE) },
   seed = 1
 )
 }

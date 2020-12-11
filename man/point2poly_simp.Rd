@@ -8,7 +8,7 @@ point2poly_simp(
   pointz,
   polyz,
   varz,
-  funz = list(function(x) {     sum(x, na.rm = T) }),
+  funz = list(function(x) {     sum(x, na.rm = TRUE) }),
   na_val = NA
 )
 }
@@ -61,8 +61,8 @@ out_3 <- point2poly_simp(pointz = clea_deu2009_pt,
                            c("vv1"),
                            c("incumb_pty_n","win1_pty_n")),
                          funz = list(
-                           function(x){mean(x,na.rm=T)},
-                           function(x){sum(x,na.rm=T)},
+                           function(x){mean(x,na.rm=TRUE)},
+                           function(x){sum(x,na.rm=TRUE)},
                            function(x){paste0(unique(na.omit(x)),collapse=" | ") }),
                          na_val = list(NA_real_,0,NA_character_))
 }
