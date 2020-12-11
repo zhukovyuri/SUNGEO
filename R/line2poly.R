@@ -104,7 +104,7 @@ line2poly <- function(linez,
 
   # Length
   if("length"%in%measurez|"density"%in%measurez){
-    polyz_tr_ <- merge(polyz_tr_,dplyr::select(lp_o,all_ofSunGeo(poly_id),"sgeoz_length"),by=poly_id,all.x=T,all.y=F)
+    polyz_tr_ <- merge(polyz_tr_,dplyr::select(lp_o,all_ofSunGeo(poly_id),"sgeoz_length"),by=poly_id,all.x=TRUE,all.y=FALSE)
     polyz_tr_$sgeoz_length <- replace(polyz_tr_$sgeoz_length,is.na(polyz_tr_$sgeoz_length), na_val)
   }
 
@@ -115,7 +115,7 @@ line2poly <- function(linez,
   }
 
   # Rename variables
-  polyz_tr_2 <- dplyr::select(polyz_tr_, all_ofSunGeo(poly_id) ,grep("^sgeoz",names(polyz_tr_),value=T),dplyr::everything())
+  polyz_tr_2 <- dplyr::select(polyz_tr_, all_ofSunGeo(poly_id) ,grep("^sgeoz",names(polyz_tr_),value=TRUE),dplyr::everything())
   colnames(polyz_tr_) <- gsub("^sgeoz",outvar_name,colnames(polyz_tr_))
 
   # Reproject

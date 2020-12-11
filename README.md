@@ -1,4 +1,4 @@
-# `SUNGEO` / Sub-National Geospatial Data Archive System: Geoprocessing Toolkit
+# `SUNGEO` / Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 R package for integrating spatially-misaligned GIS datasets.
 
 Version 0.2.0 (December 9, 2020)
@@ -173,16 +173,16 @@ Example: Automatically find a planar CRS for a GIS dataset
 
 ```
 # Visualize original geometries (WGS1984, degrees)
-plot(clea_deu2009["geometry"], axes=T)
+plot(clea_deu2009["geometry"], axes=TRUE)
 
 # Find a suitable CRS and re-project
 out_7 <- utm_select(clea_deu2009)
 
 # Visualize transformed geometries (UTM 32N, meters)
-plot(out_7["geometry"], axes=T)
+plot(out_7["geometry"], axes=TRUE)
 
 # proj4string of transformed data
-utm_select(clea_deu2009, return_list=T)$proj_out
+utm_select(clea_deu2009, return_list=TRUE)$proj_out
 ```
 
 Example: Rasterization of polygons

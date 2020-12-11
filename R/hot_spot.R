@@ -92,14 +92,14 @@ hot_spot <- function(insert,
       #Part C -
       LocalG_Output <- spdep::localG(variable, NNobj)
 
-      if(include_Moran%in%T){
+      if(include_Moran%in%TRUE){
         LocalM_Output <- spdep::localmoran(variable, NNobj)[,1]
       }
 
       #Part D -
       insert$LocalG <- LocalG_Output
 
-      if(include_Moran%in%T){
+      if(include_Moran%in%TRUE){
         insert$LocalM <- LocalM_Output
       }
 
@@ -117,7 +117,7 @@ hot_spot <- function(insert,
     variable <- raster::values(insert)
 
     #Part B -
-    IDxy_Matrix <- raster::as.data.frame(insert, xy = T)
+    IDxy_Matrix <- raster::as.data.frame(insert, xy = TRUE)
 
     #Part C -
     IDxy_Matrix <- IDxy_Matrix[,c(1:2)]
@@ -129,14 +129,14 @@ hot_spot <- function(insert,
     Location_Missing <- which(is.na(variable))
 
     #Part F -
-    if(T%in%remove_missing && length(Location_Missing) > 0){
+    if(TRUE%in%remove_missing && length(Location_Missing) > 0){
       IDxy_Matrix <- IDxy_Matrix[-Location_Missing,]
 
       variable <- variable[-Location_Missing]
     }
 
     #Part G -
-    if(F%in%remove_missing && length(Location_Missing) > 0){
+    if(FALSE%in%remove_missing && length(Location_Missing) > 0){
       variable[Location_Missing] <- NA_Value
     }
 
@@ -149,18 +149,18 @@ hot_spot <- function(insert,
   if('sf'%in%class(insert)){
     if(all(sf::st_is(insert, 'POINT'))){
       #Part A -
-      IDxy_Matrix <- raster::as.data.frame(sf::st_coordinates(insert), xy = T)
+      IDxy_Matrix <- raster::as.data.frame(sf::st_coordinates(insert), xy = TRUE)
 
       #Part B -
       Location_Missing <- which(is.na(variable))
 
       #Part C -
-      if(T%in%remove_missing && length(Location_Missing) > 0){
+      if(TRUE%in%remove_missing && length(Location_Missing) > 0){
         IDxy_Matrix <- IDxy_Matrix[-Location_Missing,]
       }
 
       #Part D -
-      if(F%in%remove_missing && length(Location_Missing) > 0){
+      if(FALSE%in%remove_missing && length(Location_Missing) > 0){
         variable[Location_Missing] <- NA_Value
       }
 
@@ -187,7 +187,7 @@ hot_spot <- function(insert,
     #Part E -
     LocalG_Output <- spdep::localG(variable, NNobj)
 
-    if(include_Moran%in%T){
+    if(include_Moran%in%TRUE){
       LocalM_Output <- spdep::localmoran(variable, NNobj)[,1]
     }
   }
@@ -214,7 +214,7 @@ hot_spot <- function(insert,
   #Section 8 -
   if('RasterLayer'%in%class(insert)){
     #Part A -
-    IDxy_Matrix <- raster::as.data.frame(insert, xy = T)
+    IDxy_Matrix <- raster::as.data.frame(insert, xy = TRUE)
 
     ##########################
     #Part B -
@@ -237,7 +237,7 @@ hot_spot <- function(insert,
     ##########################
     #Part C -
     ##########################
-    if(include_Moran%in%T){
+    if(include_Moran%in%TRUE){
 
       IDxy_Matrix$LocalM <- NA
 
@@ -257,7 +257,7 @@ hot_spot <- function(insert,
 
     }
 
-    if(include_Moran%in%F){
+    if(include_Moran%in%FALSE){
       #Part F -
       returnBrick <- raster::brick(insert, TemporaryRaster)
 

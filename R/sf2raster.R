@@ -101,7 +101,7 @@ sf2raster <- function (polyz_from = NULL,
     reverse_function <- list(reverse_function)
   }
 
-  if (message_out && !reverse && !any(grepl("meter|metre",sf::st_crs(polyz_from),ignore.case = T))) {
+  if (message_out && !reverse && !any(grepl("meter|metre",sf::st_crs(polyz_from),ignore.case = TRUE))) {
     message("Note: Please project the SF object into a meter-based projection coordinate system prior to using this function. Default grid resolution is in meters.")
   }
   if (!is.null(polyz_from) && !is.null(pointz_from) && !reverse) {

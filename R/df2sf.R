@@ -39,7 +39,7 @@
 
 df2sf <- function(x_coord, y_coord, input_data = NULL, file = NULL, n_max = Inf, start = 0, projection_input = 'EPSG:4326', zero.policy = FALSE, show_removed = FALSE){
   #Part 1 -
-  if(is.null(file) == F){
+  if(is.null(file) == FALSE){
     input_data <- as.data.frame(data.table::fread(file, nrows = n_max, skip = start))
 
   }
@@ -49,7 +49,7 @@ df2sf <- function(x_coord, y_coord, input_data = NULL, file = NULL, n_max = Inf,
     message('Warning: When input_data is supplied, x_coord and y_coord should be either column names or numeric vectors of the same length as nrow(input_data)')
   }
 
-  if(is.null(input_data) == F & (length(x_coord)==1&length(y_coord)==1)){
+  if(is.null(input_data) == FALSE & (length(x_coord)==1&length(y_coord)==1)){
     locationCoords_x <- which(names(input_data)%in%x_coord)
 
     locationCoords_y <- which(names(input_data)%in%y_coord)
@@ -62,7 +62,7 @@ df2sf <- function(x_coord, y_coord, input_data = NULL, file = NULL, n_max = Inf,
   }
 
   #Part 3 - Identify NA Results
-  if(zero.policy == T){
+  if(zero.policy == TRUE){
     Location_Missing_Rows <- which(
       is.na(Coordinate_Matrix[,1]) |
         is.na(Coordinate_Matrix[,2]) |
@@ -97,7 +97,7 @@ df2sf <- function(x_coord, y_coord, input_data = NULL, file = NULL, n_max = Inf,
   sf::st_crs(ST_SFC) <- projection_input
 
   #Part 8 -
-  if(is.null(input_data) == F){
+  if(is.null(input_data) == FALSE){
     if(length(Location_Missing_Rows) > 0){
       input_data <- input_data[-Location_Missing_Rows,]
 

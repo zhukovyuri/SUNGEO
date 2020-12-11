@@ -43,8 +43,8 @@
 #'                            c("vv1"),
 #'                            c("incumb_pty_n","win1_pty_n")),
 #'                          funz = list(
-#'                            function(x){mean(x,na.rm=T)},
-#'                            function(x){sum(x,na.rm=T)},
+#'                            function(x){mean(x,na.rm=TRUE)},
+#'                            function(x){sum(x,na.rm=TRUE)},
 #'                            function(x){paste0(unique(na.omit(x)),collapse=" | ") }),
 #'                          na_val = list(NA_real_,0,NA_character_))
 #' }
@@ -54,7 +54,7 @@
 point2poly_simp <- function(pointz,
                             polyz,
                             varz,
-                            funz=list(function(x){sum(x,na.rm=T)}),
+                            funz=list(function(x){sum(x,na.rm=TRUE)}),
                             na_val=NA){
   ################################################
   #Part 1 -  Put variables and functions into list
@@ -70,7 +70,7 @@ point2poly_simp <- function(pointz,
   #Part iii -
   if(class(funz)!="list"){funz <- list(funz)}
   funz <- lapply(funz, function(sub_iter){
-    if(class(sub_iter)%in%"function" == F && class(sub_iter)%in%'character'){
+    if(class(sub_iter)%in%"function" == FALSE && class(sub_iter)%in%'character'){
       funzInt <- get(sub_iter, mode = 'function')
       return(funzInt)
     } else {
@@ -101,7 +101,7 @@ point2poly_simp <- function(pointz,
   })
 
   #Part iii -
-  pointz_dt <- pointz_dt[,pointz_dt_NACols == F, with = F] #Subset columns
+  pointz_dt <- pointz_dt[,pointz_dt_NACols == FALSE, with = FALSE] #Subset columns
 
   ###################################
   #Part 4 -  Match points to polygons
@@ -140,9 +140,9 @@ point2poly_simp <- function(pointz,
   ClassTypes_Variables <- lapply(1:length(ClassTypes_Variables$Varz), function(sub_iter) {
     Varz_Int <- unlist(ClassTypes_Variables$Varz[sub_iter])
 
-    Funz_Int <- unlist(ClassTypes_Variables$Funz[sub_iter], recursive = T)
+    Funz_Int <- unlist(ClassTypes_Variables$Funz[sub_iter], recursive = TRUE)
 
-    NAValue <- unlist(ClassTypes_Variables$NAval[sub_iter], recursive = T)
+    NAValue <- unlist(ClassTypes_Variables$NAval[sub_iter], recursive = TRUE)
 
     OutputMatrix <- data.table::data.table('Varz' = Varz_Int, 'Funz' = Funz_Int, 'NAval' = NAValue)
 
@@ -155,7 +155,7 @@ point2poly_simp <- function(pointz,
   # sub_iter <- 1
   Aggregation_Matrix <- lapply(1:nrow(ClassTypes_Variables), function(sub_iter){
     #Part a -
-    Select_Columns <- pointz_dt[,names(pointz_dt)%in%c(ClassTypes_Variables$Varz[sub_iter], 'polygon_id'), with = F]
+    Select_Columns <- pointz_dt[,names(pointz_dt)%in%c(ClassTypes_Variables$Varz[sub_iter], 'polygon_id'), with = FALSE]
 
     #Part b -
     names(Select_Columns) <- c('var', 'polygon_id')
@@ -165,7 +165,7 @@ point2poly_simp <- function(pointz,
 
     #Part d -
     suppressWarnings({
-      Output <- by(data=Select_Columns,INDICES=Select_Columns$polygon_id,FUN=function(x){IntermediateFunction(x$var)},simplify=T)
+      Output <- by(data=Select_Columns,INDICES=Select_Columns$polygon_id,FUN=function(x){IntermediateFunction(x$var)},simplify=TRUE)
       Output <- data.table::data.table(polygon_id=as.numeric(names(Output)),V1=c(Output))
     })
 
@@ -178,8 +178,8 @@ point2poly_simp <- function(pointz,
 
   #Part iv -
   Empty_Sets <- sapply(Aggregation_Matrix, function(x) is.null(x) || grepl('Error', x))
-  if(T%in%Empty_Sets){
-      Aggregation_Matrix <- Aggregation_Matrix[Empty_Sets == F]
+  if(TRUE%in%Empty_Sets){
+      Aggregation_Matrix <- Aggregation_Matrix[Empty_Sets == FALSE]
   }
 
   #Part v -
@@ -187,7 +187,7 @@ point2poly_simp <- function(pointz,
 
   #Part vi - Remove NA Rows (Failed Matches)
   if(any(is.na(Combined_Matrix$polygon_id))){
-      Combined_Matrix <- Combined_Matrix[is.na(Combined_Matrix$polygon_id) == F,]
+      Combined_Matrix <- Combined_Matrix[is.na(Combined_Matrix$polygon_id) == FALSE,]
   }
 
   #######################################
@@ -213,7 +213,7 @@ point2poly_simp <- function(pointz,
   sf::st_geometry(polyz_) <- Coordinates
 
   # Ensure classes are same as in source file
-  classez <- sapply(as.data.frame(pointz,stringsAsFactors=F)[,unique(unlist(varz))],class)
+  classez <- sapply(as.data.frame(pointz,stringsAsFactors=FALSE)[,unique(unlist(varz))],class)
   polyz_ng <- sf::st_drop_geometry(polyz_)
   for(cl0 in 1:length(classez)){polyz_ng[,names(classez[cl0])] <- methods::as(polyz_ng[,names(classez[cl0])],classez[cl0])}
   polyz_ <- sf::st_set_geometry(polyz_ng,polyz_$geometry); rm(polyz_ng)

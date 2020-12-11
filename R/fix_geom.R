@@ -21,7 +21,7 @@ fix_geom <- function(x, n_it = 10){
   #Part 2 -
   countIter <- 0
 
-  while(all(ValidityVector) == F || countIter < n_it){
+  while(all(ValidityVector) == FALSE || countIter < n_it){
     suppressMessages({
       suppressWarnings({
         x <- sf::st_buffer(x,dist=0)
@@ -36,7 +36,7 @@ fix_geom <- function(x, n_it = 10){
       break
     }
 
-    if(all(ValidityVector) == F && countIter == n_it){
+    if(all(ValidityVector) == FALSE && countIter == n_it){
       stop('Non-Convergence for Polygon; Please increase number of iterations or check to see whether polygon is corrupted')
     }
 

@@ -1,6 +1,6 @@
 Package: SUNGEO
 Type: Package
-Title: Sub-National Geospatial Data Archive System: Geoprocessing Toolkit
+Title: Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 Version: 0.2.0
 Date: 2020-12-09
 Author: Jason Byers, Marty Davidson, Yuri M. Zhukov
