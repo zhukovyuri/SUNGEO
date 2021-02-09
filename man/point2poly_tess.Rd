@@ -14,7 +14,7 @@ point2poly_tess(
   varz = NULL,
   char_varz = NULL,
   char_assign = "biggest_overlap",
-  funz = function(x, w) {     stats::weighted.mean(x, w, na.rm = T) },
+  funz = function(x, w) {     stats::weighted.mean(x, w, na.rm = TRUE) },
   return_tess = FALSE,
   seed = 1
 )

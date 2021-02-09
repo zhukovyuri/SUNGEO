@@ -7,6 +7,7 @@
 #' @param varz Names of variable(s) to be assigned from source polygon layer to destination polygons. Character string or vector of character strings.
 #' @param funz Aggregation function to be applied to variables specified in \code{varz}. Must take as an input a vector \code{x}. Function or list of functions.
 #' @param na_val Value to be assigned to missing values. Defaul is \code{NA}. Logical or list.
+#' @param drop_na_cols Drop columns with completely missing values. Defaul is \code{FALSE}. Logical.
 #' @return Returns a \code{sf} polygon object, with variables from \code{pointz} assigned to the geometries of \code{polyz}.
 #' @details Assignment procedures are the same for numeric and character string variables. All variables supplied in \code{varz} are passed directly to the function specified in \code{funz}. If different sets of variables are to be aggregated with different functions, both \code{varz} and \code{funz} should be specified as lists (see examples below).
 #' @import sf
@@ -55,7 +56,8 @@ point2poly_simp <- function(pointz,
                             polyz,
                             varz,
                             funz=list(function(x){sum(x,na.rm=TRUE)}),
-                            na_val=NA){
+                            na_val=NA,
+                            drop_na_cols=FALSE){
   ################################################
   #Part 1 -  Put variables and functions into list
   ################################################
@@ -100,9 +102,10 @@ point2poly_simp <- function(pointz,
     all(is.na(x))
   })
 
-  #Part iii -
-  pointz_dt <- pointz_dt[,pointz_dt_NACols == FALSE, with = FALSE] #Subset columns
-
+  #Part iii - drop NA columns (optional)
+  if(drop_na_cols==TRUE){
+    pointz_dt <- pointz_dt[,pointz_dt_NACols == FALSE, with = FALSE] #Subset columns
+  }
   ###################################
   #Part 4 -  Match points to polygons
   ###################################

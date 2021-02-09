@@ -9,7 +9,8 @@ point2poly_simp(
   polyz,
   varz,
   funz = list(function(x) {     sum(x, na.rm = TRUE) }),
-  na_val = NA
+  na_val = NA,
+  drop_na_cols = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ point2poly_simp(
 \item{funz}{Aggregation function to be applied to variables specified in \code{varz}. Must take as an input a vector \code{x}. Function or list of functions.}
 
 \item{na_val}{Value to be assigned to missing values. Defaul is \code{NA}. Logical or list.}
+
+\item{drop_na_cols}{Drop columns with completely missing values. Defaul is \code{FALSE}. Logical.}
 }
 \value{
 Returns a \code{sf} polygon object, with variables from \code{pointz} assigned to the geometries of \code{polyz}.
