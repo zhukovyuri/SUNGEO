@@ -8,6 +8,7 @@ point2poly_simp(
   pointz,
   polyz,
   varz,
+  char_varz = NULL,
   funz = list(function(x) {     sum(x, na.rm = TRUE) }),
   na_val = NA,
   drop_na_cols = FALSE
@@ -19,6 +20,8 @@ point2poly_simp(
 \item{polyz}{Destination polygon layer. Must have identical CRS to \code{pointz}. \code{sf} object.}
 
 \item{varz}{Names of variable(s) to be assigned from source polygon layer to destination polygons. Character string or vector of character strings.}
+
+\item{char_varz}{Names of character string variable(s) in \code{varz}. Character string or vector of character strings.}
 
 \item{funz}{Aggregation function to be applied to variables specified in \code{varz}. Must take as an input a vector \code{x}. Function or list of functions.}
 

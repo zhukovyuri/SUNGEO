@@ -5,6 +5,7 @@
 #' @param pointz Source points layer. \code{sf} object.
 #' @param polyz Destination polygon layer. Must have identical CRS to \code{pointz}. \code{sf} object.
 #' @param varz Names of variable(s) to be assigned from source polygon layer to destination polygons. Character string or vector of character strings.
+#' @param char_varz Names of character string variable(s) in \code{varz}. Character string or vector of character strings.
 #' @param funz Aggregation function to be applied to variables specified in \code{varz}. Must take as an input a vector \code{x}. Function or list of functions.
 #' @param na_val Value to be assigned to missing values. Defaul is \code{NA}. Logical or list.
 #' @param drop_na_cols Drop columns with completely missing values. Defaul is \code{FALSE}. Logical.
@@ -55,6 +56,7 @@
 point2poly_simp <- function(pointz,
                             polyz,
                             varz,
+                            char_varz=NULL,
                             funz=list(function(x){sum(x,na.rm=TRUE)}),
                             na_val=NA,
                             drop_na_cols=FALSE){
