@@ -215,8 +215,9 @@ point2poly_simp <- function(pointz,
   #Part iv -
   sf::st_geometry(polyz_) <- Coordinates
 
-  # Ensure classes are same as in source file
+  # Ensure classes are same as in source file (+ coerce char_varz to character)
   classez <- sapply(as.data.frame(pointz,stringsAsFactors=FALSE)[,unique(unlist(varz))],class)
+  if(length(char_varz)>0){classez[names(classez)%in%char_varz] <- "character"}
   polyz_ng <- sf::st_drop_geometry(polyz_)
   for(cl0 in 1:length(classez)){polyz_ng[,names(classez[cl0])] <- methods::as(polyz_ng[,names(classez[cl0])],classez[cl0])}
   polyz_ <- sf::st_set_geometry(polyz_ng,polyz_$geometry); rm(polyz_ng)
