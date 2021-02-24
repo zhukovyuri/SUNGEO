@@ -138,7 +138,7 @@ poly2poly_ap <- function(
   if("pw"%in%methodz & length(pop_raster)==0){stop("No population raster provided.")}
 
   # Area-weights (part 1)
-  if("aw"%in%methodz){
+  if("aw"%in%methodz|"aw"%in%char_methodz){
     # Calculate polygon areas
     poly_from$AREA_TOTAL <- as.numeric(sf::st_area(poly_from))
   }
@@ -174,7 +174,7 @@ poly2poly_ap <- function(
   #Part iii -
   #############################
   # Area-weights (part 2)
-  if("aw"%in%methodz){
+  if("aw"%in%methodz|"aw"%in%char_methodz){
     # Calculate weights
     int_1$AREA_INT <- as.numeric(sf::st_area(int_1))
     int_1$AREA_W <- int_1$AREA_INT/int_1$AREA_TOTAL
