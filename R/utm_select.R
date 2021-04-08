@@ -27,6 +27,19 @@
 
 utm_select <- function(x, max_zones=5, return_list=FALSE){
 
+  # Fix sf geometry type
+  if(any(grepl("sf", class(x)))){
+    if(grepl("GEOMETRY",sf::st_geometry_type(x,by_geometry = FALSE))&any(grepl("POLYGON",sf::st_geometry_type(x)))){
+      x <- sf::st_cast(x,"MULTIPOLYGON")
+    }
+    if(grepl("GEOMETRY",sf::st_geometry_type(x,by_geometry = FALSE))&any(grepl("LINE",sf::st_geometry_type(x)))){
+      x <- sf::st_cast(x,"MULTILINESTRING")
+    }
+    if(grepl("GEOMETRY",sf::st_geometry_type(x,by_geometry = FALSE))&any(grepl("POINT",sf::st_geometry_type(x)))){
+      x <- sf::st_cast(x,"POINT")
+    }
+  }
+
   # Extract bounding box & median x coordinate
   if(any(grepl("sp", attr(class(x), 'package')))){
     bb <- sp::bbox(x)

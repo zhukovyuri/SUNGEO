@@ -1,7 +1,7 @@
 # `SUNGEO` / Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 R package for integrating spatially-misaligned GIS datasets.
 
-Version 0.2.21 (February 23, 2021)
+Version 0.2.22 (April 8, 2021)
 
 Jason Byers, Marty Davidson, Yuri M. Zhukov
 
@@ -19,6 +19,7 @@ Feedback, bug reports welcome: zhukov-at-umich-dot-edu
 * `line2poly` / Line-in-polygon analysis
 * `point2poly_simp` / Point-to-polygon interpolation, simple overlay method
 * `point2poly_tess` / Point-to-polygon interpolation, tessellation method
+* `point2poly_krige` / Point-to-polygon interpolation, ordinary and universal Kriging method
 * `poly2poly_ap` / Area and population weighted polygon-to-polygon interpolation
 * `sf2raster` / Convert simple features object into regularly spaced raster
 * `utm_select` / Automatically convert geographic (degree) to planar coordinates (meters)
@@ -134,6 +135,60 @@ plot(out_4$result["to1_aw"])
 
 # Visualize Voronoi polygons used in estimation
 plot(out_4$tess["to1"])
+```
+
+Example: point-to-polygon interpolation using ordinary Kriging
+
+```
+# Load legislative election constituencies (from CLEA)
+data(clea_deu2009)
+
+# Load point-level election results
+data(clea_deu2009_pt)
+
+# Ordinary Kriging with one outcome variable
+out_1 <- point2poly_krige(pointz = clea_deu2009_pt,
+                          polyz = clea_deu2009,
+                          yvarz = "to1")
+
+# Compare observed values to predictions
+par(mfrow=c(1,2))
+plot(clea_deu2009["to1"], key.pos = NULL, reset = FALSE)
+plot(out_1["to1.pred"], key.pos = NULL, reset = FALSE)
+
+# Ordinary Kriging with multiple outcome variables
+out_2 <- point2poly_krige(pointz = clea_deu2009_pt,
+                          polyz = clea_deu2009,
+                          yvarz = c("to1","pvs1_margin"))
+
+# Compare observed values to predictions
+par(mfrow=c(1,2))
+plot(clea_deu2009["pvs1_margin"], key.pos = NULL, reset = FALSE)
+plot(out_2["pvs1_margin.pred"], key.pos = NULL, reset = FALSE)
+```
+
+Example: point-to-polygon interpolation using universal Kriging
+
+```
+# Load legislative election constituencies (from CLEA)
+data(clea_deu2009)
+
+# Load point-level election results
+data(clea_deu2009_pt)
+
+# Load population raster
+data(gpw4_deu2010)
+
+# Universal Kriging with one outcome variable and one covariate
+out_3 <- point2poly_krige(pointz = clea_deu2009_pt,
+                        polyz = clea_deu2009,
+                        yvarz = "to1",
+                        rasterz = gpw4_deu2010)
+
+# Compare observed values to predictions
+par(mfrow=c(1,2))
+plot(clea_deu2009["to1"], key.pos = NULL, reset = FALSE)
+plot(out_3["to1.pred"], key.pos = NULL, reset = FALSE)
 ```
 
 Example: line-in-polygon analysis

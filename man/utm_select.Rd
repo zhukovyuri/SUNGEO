@@ -7,7 +7,7 @@
 utm_select(x, max_zones = 5, return_list = FALSE)
 }
 \arguments{
-\item{x}{Layer to be reprojected. \code{sf} or \code{RasterLayer} object.}
+\item{x}{Layer to be reprojected. \code{sf}, \code{sp} or \code{RasterLayer} object.}
 
 \item{max_zones}{Maximum number of UTM zones for single layer. Default is 5. Numeric.}
 
@@ -23,7 +23,7 @@ If \code{return_list=TRUE}, returns a list object containing
  }
 }
 \description{
-Function to automatically convert simple feature and raster objects with geographic coordinates (longitude, latitude / WGS 1984, EPSG:4326) to planar UTM coordinates. If the study region spans multiple UTM zones, defaults to Albers Equal Area.
+Function to automatically convert simple feature, spatial and raster objects with geographic coordinates (longitude, latitude / WGS 1984, EPSG:4326) to planar UTM coordinates. If the study region spans multiple UTM zones, defaults to Albers Equal Area.
 }
 \details{
 Optimal map projection for the object \code{x} is defined by matching its horizontal extent with that of the 60 UTM zones. If object spans multiple UTM zones, uses either the median zone (if number of zones is equal to or less than \code{max_zones}) or Albers Equal Area projection with median longitude as projection center (if number of zones is greater than \code{max_zones}).
