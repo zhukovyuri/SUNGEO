@@ -167,6 +167,10 @@ poly2poly_ap <- function(
     )
   })
 
+  # Drop empty geometries
+  if(any(sf::st_is_empty(int_1))){int_1 <- int_1[!sf::st_is_empty(int_1),]}
+
+
   #
   #
 
