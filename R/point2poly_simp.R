@@ -112,7 +112,7 @@ point2poly_simp <- function(pointz,
   #Part 4 -  Match points to polygons
   ###################################
   #Part i -
-  polyz$polygon_id <- 1:nrow(polyz)
+  polyz$polygon_id_ <- 1:nrow(polyz)
 
   #Part ii -
   suppressWarnings({
@@ -128,12 +128,12 @@ point2poly_simp <- function(pointz,
   #Part 5 - Add polygon index to point layer
   ##########################################
   #Part i -
-  pointz_dt$polygon_id <- NA
-  pointz_dt$polygon_id[ErrorCheck == 1] <- polyz$polygon_id[unlist(Point_Overlay[ErrorCheck == 1])]
+  pointz_dt$polygon_id_ <- NA
+  pointz_dt$polygon_id_[ErrorCheck == 1] <- polyz$polygon_id_[unlist(Point_Overlay[ErrorCheck == 1])]
 
   #Part ii -
-  pointz$polygon_id <- NA
-  pointz$polygon_id[ErrorCheck == 1] <- polyz$polygon_id[unlist(Point_Overlay[ErrorCheck == 1])]
+  pointz$polygon_id_ <- NA
+  pointz$polygon_id_[ErrorCheck == 1] <- polyz$polygon_id_[unlist(Point_Overlay[ErrorCheck == 1])]
 
   #######################################
   #Part 6 - Aggregate (numeric variables)
@@ -160,18 +160,18 @@ point2poly_simp <- function(pointz,
   # sub_iter <- 1
   Aggregation_Matrix <- lapply(1:nrow(ClassTypes_Variables), function(sub_iter){
     #Part a -
-    Select_Columns <- pointz_dt[,names(pointz_dt)%in%c(ClassTypes_Variables$Varz[sub_iter], 'polygon_id'), with = FALSE]
+    Select_Columns <- pointz_dt[,names(pointz_dt)%in%c(ClassTypes_Variables$Varz[sub_iter], 'polygon_id_'), with = FALSE]
 
     #Part b -
-    names(Select_Columns) <- c('var', 'polygon_id')
+    names(Select_Columns) <- c('var', 'polygon_id_')
 
     #Part c -
     IntermediateFunction <- ClassTypes_Variables$Funz[sub_iter][[1]]
 
     #Part d -
     suppressWarnings({
-      Output <- by(data=Select_Columns,INDICES=Select_Columns$polygon_id,FUN=function(x){IntermediateFunction(x$var)},simplify=TRUE)
-      Output <- data.table::data.table(polygon_id=as.numeric(names(Output)),V1=c(Output))
+      Output <- by(data=Select_Columns,INDICES=Select_Columns$polygon_id_,FUN=function(x){IntermediateFunction(x$var)},simplify=TRUE)
+      Output <- data.table::data.table(polygon_id_=as.numeric(names(Output)),V1=c(Output))
     })
 
     #Part e -
@@ -188,11 +188,11 @@ point2poly_simp <- function(pointz,
   }
 
   #Part v -
-  Combined_Matrix <- purrr::reduce(Aggregation_Matrix,dplyr::full_join, by = 'polygon_id')
+  Combined_Matrix <- purrr::reduce(Aggregation_Matrix,dplyr::full_join, by = 'polygon_id_')
 
   #Part vi - Remove NA Rows (Failed Matches)
-  if(any(is.na(Combined_Matrix$polygon_id))){
-      Combined_Matrix <- Combined_Matrix[is.na(Combined_Matrix$polygon_id) == FALSE,]
+  if(any(is.na(Combined_Matrix$polygon_id_))){
+      Combined_Matrix <- Combined_Matrix[is.na(Combined_Matrix$polygon_id_) == FALSE,]
   }
 
   #######################################
@@ -203,7 +203,7 @@ point2poly_simp <- function(pointz,
   sf::st_geometry(polyz) <- NULL
 
   #Part ii -
-  polyz_ <- dplyr::left_join(polyz, Combined_Matrix, by = 'polygon_id')
+  polyz_ <- as.data.frame(dplyr::left_join(polyz, Combined_Matrix, by = 'polygon_id_') )
 
   #Part iii -
   for(iter in 1:length(ClassTypes_Variables$Varz)){
