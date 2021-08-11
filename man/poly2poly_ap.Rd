@@ -13,6 +13,7 @@ poly2poly_ap(
   char_methodz = "aw",
   pop_raster = NULL,
   varz = NULL,
+  pycno_varz = NULL,
   char_varz = NULL,
   char_assign = "biggest_overlap",
   funz = function(x, w) {     stats::weighted.mean(x, w, na.rm = TRUE) },
@@ -35,6 +36,8 @@ poly2poly_ap(
 \item{pop_raster}{Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} object.}
 
 \item{varz}{Names of numeric variable(s) to be interpolated from source polygon layer to destination polygons. Character string or vector of character strings.}
+
+\item{pycno_varz}{Names of spatially extensive numeric variables for which the pycnophylactic (mass-preserving) property should be preserved. Character string or vector of character strings.}
 
 \item{char_varz}{Names of character string variables to be interpolated from source polygon layer to destination polygons. Character string or vector of character strings.}
 
@@ -90,6 +93,7 @@ out_2 <- poly2poly_ap(
               varz = list(
                 c("to1","pvs1_margin"),
                 c("vv1") ),
+              pycno_varz = "vv1",
               funz = list(
                 function(x,w){stats::weighted.mean(x,w)},
                 function(x,w){sum(x*w)} ),

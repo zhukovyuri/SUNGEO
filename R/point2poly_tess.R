@@ -10,6 +10,7 @@
 #' @param pop_raster Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} object.
 #' @param varz Names of numeric variable(s) to be interpolated from source polygon layer to destination polygons. Character string or list of character strings.
 #' @param funz Aggregation function to be applied to variables specified in \code{varz}. Must take as an input a numeric vector \code{x} and vector of weights \code{w}. Function or list of functions.
+#' @param pycno_varz Names of spatially extensive numeric variables for which the pycnophylactic (mass-preserving) property should be preserved. Character string or vector of character strings.
 #' @param char_varz  Names of character string variables to be interpolated from source polygon layer to destination polygons. Character string or vector of character strings.
 #' @param char_assign Assignment rule to be used for variables specified in \code{char_varz}. Could be either "biggest_overlap" (default) or "all_overlap". See "details". Character string or vector of character strings.
 #' @param return_tess Return Voronoi polygons, in addition to destinaton polygon layer? Default is \code{FALSE}. Logical.
@@ -85,6 +86,7 @@
 #'                            c("to1","pvs1_margin"),
 #'                            c("vv1")
 #'                          ),
+#'                          pycno_varz = "vv1",
 #'                          funz = list(
 #'                            function(x,w){stats::weighted.mean(x,w)},
 #'                            function(x,w){sum(x*w)}
@@ -104,6 +106,7 @@ point2poly_tess <- function(
   methodz="aw",
   pop_raster=NULL,
   varz=NULL,
+  pycno_varz=NULL,
   char_varz=NULL,
   char_assign="biggest_overlap",
   funz=function(x,w){stats::weighted.mean(x,w,na.rm=TRUE)},
@@ -255,6 +258,7 @@ point2poly_tess <- function(
     pop_raster = pop_raster,
     varz = varz,
     char_methodz = char_methodz,
+    pycno_varz = pycno_varz,
     char_varz = char_varz,
     char_assign = char_assign,
     funz = funz,
