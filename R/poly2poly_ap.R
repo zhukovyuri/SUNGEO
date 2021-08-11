@@ -580,7 +580,7 @@ poly2poly_ap <- function(
   #
 
   ###########################################################
-  #Section E - Pycnophilactic
+  #Section E - Pycnophylactic variables
   ###########################################################
 
   if(!is.null(pycno_varz)){
@@ -589,7 +589,7 @@ poly2poly_ap <- function(
       # Find sum of original variable
       sum_from <- data.table::as.data.table(poly_from)[,sum(get(pycno_varz[p0]),na.rm=TRUE)]
       # Find matching processed variables in target geometry
-      pycno_varz_to <- Numeric_Subset[Numeric_Subset$Varz%in%pycno_varz[p0],paste0(Numeric_Subset$Varz,"_",Numeric_Subset$methodz)]
+      pycno_varz_to <- grep(paste0("^",pycno_varz[p0]),Numeric_Subset[,paste0(Numeric_Subset$Varz,"_",Numeric_Subset$methodz)],value=TRUE)
       # Rescale variables in target geometry
       for(p00 in 1:length(pycno_varz_to)){
         Numeric_Aggregation_Matrix[,eval(pycno_varz_to[p00]) := get(pycno_varz_to[p00])*sum_from/sum(get(pycno_varz_to[p00]),na.rm = TRUE)]
