@@ -15,7 +15,7 @@ names       : gpw_v4_population_count_rev11_2010_2pt5_min.
 values      : 0, 92915.66  (min, max).
 }
 \source{
-Gridded Population of the World (GPW) v4: Population Count, v4.11 \url{https://doi.org/10.7927/H4JW8BX5} (accessed August 12, 2021).
+Gridded Population of the World (GPW) v4: Population Count, v4.11 <doi:10.7927/H4JW8BX5>.
 }
 \usage{
 gpw4_deu2010
