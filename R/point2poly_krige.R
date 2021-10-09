@@ -103,27 +103,38 @@ point2poly_krige <- function(pointz,
   }
 
   # Extract raster information
-  if(is.null(rasterz) == FALSE){
+  if(is.null(rasterz) == F){
     finalrasterz2polyz <- NULL
+    finalrasterz2pointz <- NULL
     if(class(rasterz)=="list"){
       for(v0 in seq_along(rasterz)){
         krig_polyz_ <- sp::spTransform(krig_polyz, sp::proj4string(rasterz[[v0]]))
         extractdata <- suppressWarnings(raster::extract(rasterz[[v0]], krig_polyz_))
         rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
-        finalrasterz2polyz<- cbind(finalrasterz2polyz, rastervarz)
+        finalrasterz2polyz <- cbind(finalrasterz2polyz, rastervarz)
         rm(krig_polyz_)
+        krig_pointz_ <- sp::spTransform(krig_pointz, sp::proj4string(rasterz[[v0]]))
+        extractdata <- suppressWarnings(raster::extract(rasterz, krig_pointz_))
+        rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
+        finalrasterz2pointz <- cbind(finalrasterz2pointz, rastervarz)
+        rm(krig_pointz_)
       }} else{
         krig_polyz_ <- sp::spTransform(krig_polyz, sp::proj4string(rasterz))
         extractdata <- suppressWarnings(raster::extract(rasterz, krig_polyz_))
         rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
         finalrasterz2polyz<- cbind(finalrasterz2polyz, rastervarz)
         rm(krig_polyz_)
+        krig_pointz_ <- sp::spTransform(krig_pointz, sp::proj4string(rasterz))
+        extractdata <- suppressWarnings(raster::extract(rasterz, krig_pointz_))
+        rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
+        finalrasterz2pointz <- cbind(finalrasterz2pointz, rastervarz)
+        rm(krig_pointz_)
       }
 
-    #c Cmbine with pointz and polyz
+    # Combine with pointz and polyz
     col_length <- ncol(krig_polyz@data)
     krig_polyz <- cbind(krig_polyz, finalrasterz2polyz)
-    krig_pointz <- cbind(krig_pointz, finalrasterz2polyz)
+    krig_pointz <- cbind(krig_pointz, finalrasterz2pointz)
 
     #add raster variables to xvarz
     xvarz <- c(xvarz, colnames(krig_polyz@data)[(col_length+1):ncol(krig_polyz@data)])
