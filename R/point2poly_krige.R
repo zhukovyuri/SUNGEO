@@ -7,6 +7,7 @@
 #' @param rasterz Source raster layer (or list of raster), with covariate(s) used for universal kriging. Must have identical CRS to \code{polyz}.  \code{RasterLayer} object or list of \code{RasterLayer} objects.
 #' @param yvarz Names of numeric variable(s) to be interpolated from source points layer to destination polygons. Character string or vector of character strings.
 #' @param xvarz Names of numeric variable(s) for universal Kriging, in which yvarz is linearly dependent. Character string or vector of character strings.
+#' @param funz Aggregation function to be applied to values in \code{rasterz}. Must take as an input a vector \code{x}. Default is sum.  Function.
 #' @param pointz_x_coord Name of numeric variable corresponding to a measure of longitude (Easting) in a data frame object for \code{pointz}. Character string.
 #' @param pointz_y_coord Name of numeric variable corresponding to a measure of Latitude (Northing) in a data frame object for \code{pointz}. Character string.
 #' @param polyz_x_coord Name of numeric variable corresponding to a measure of longitude (Easting) in a data frame object for \code{polyz}. Character string.
@@ -64,6 +65,7 @@ point2poly_krige <- function(pointz,
                              rasterz=NULL,
                              yvarz=NULL,
                              xvarz=NULL,
+                             funz=base::sum,
                              pointz_x_coord=NULL,
                              pointz_y_coord=NULL,
                              polyz_x_coord=NULL,
@@ -105,25 +107,36 @@ point2poly_krige <- function(pointz,
   # Extract raster information
   if(is.null(rasterz) == FALSE){
     finalrasterz2polyz <- NULL
+    finalrasterz2pointz <- NULL
     if(class(rasterz)=="list"){
       for(v0 in seq_along(rasterz)){
         krig_polyz_ <- sp::spTransform(krig_polyz, sp::proj4string(rasterz[[v0]]))
         extractdata <- suppressWarnings(raster::extract(rasterz[[v0]], krig_polyz_))
-        rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
-        finalrasterz2polyz<- cbind(finalrasterz2polyz, rastervarz)
+        rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) funz(x, na.rm=TRUE) else NA))
+        finalrasterz2polyz <- cbind(finalrasterz2polyz, rastervarz)
         rm(krig_polyz_)
+        krig_pointz_ <- sp::spTransform(krig_pointz, sp::proj4string(rasterz[[v0]]))
+        extractdata <- suppressWarnings(raster::extract(rasterz, krig_pointz_))
+        rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) funz(x, na.rm=TRUE) else NA))
+        finalrasterz2pointz <- cbind(finalrasterz2pointz, rastervarz)
+        rm(krig_pointz_)
       }} else{
         krig_polyz_ <- sp::spTransform(krig_polyz, sp::proj4string(rasterz))
         extractdata <- suppressWarnings(raster::extract(rasterz, krig_polyz_))
-        rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
+        rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) funz(x, na.rm=TRUE) else NA))
         finalrasterz2polyz<- cbind(finalrasterz2polyz, rastervarz)
         rm(krig_polyz_)
+        krig_pointz_ <- sp::spTransform(krig_pointz, sp::proj4string(rasterz))
+        extractdata <- suppressWarnings(raster::extract(rasterz, krig_pointz_))
+        rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) funz(x, na.rm=TRUE) else NA))
+        finalrasterz2pointz <- cbind(finalrasterz2pointz, rastervarz)
+        rm(krig_pointz_)
       }
 
-    #c Cmbine with pointz and polyz
+    # Combine with pointz and polyz
     col_length <- ncol(krig_polyz@data)
     krig_polyz <- cbind(krig_polyz, finalrasterz2polyz)
-    krig_pointz <- cbind(krig_pointz, finalrasterz2polyz)
+    krig_pointz <- cbind(krig_pointz, finalrasterz2pointz)
 
     #add raster variables to xvarz
     xvarz <- c(xvarz, colnames(krig_polyz@data)[(col_length+1):ncol(krig_polyz@data)])
