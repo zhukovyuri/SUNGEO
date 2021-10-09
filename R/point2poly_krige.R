@@ -74,7 +74,7 @@ point2poly_krige <- function(pointz,
   if(class(pointz)[1] == 'sf'){
     krig_pointz <- as(pointz, "Spatial")
   } else if(class(pointz)[1] == 'data.frame'){
-    if(is.null(pointz_x_coord) == T & is.null(pointz_y_coord) == T){stop("Please supply both a pointz_x_coord and pointz_y_coord.")}
+    if(is.null(pointz_x_coord) == TRUE & is.null(pointz_y_coord) == TRUE){stop("Please supply both a pointz_x_coord and pointz_y_coord.")}
     colnames(pointz)[which(colnames(pointz)== pointz_x_coord)] <- "x"
     colnames(pointz)[which(colnames(pointz)== pointz_y_coord)] <- "y"
     sf.convert_pointz <- df2sf(pointz$x, pointz$y, pointz)
@@ -86,7 +86,7 @@ point2poly_krige <- function(pointz,
   if(class(polyz)[1] == 'sf'){
     krig_polyz <- as(polyz, "Spatial")
   } else if(class(polyz)[1] == 'data.frame'){
-    if(is.null(polyz_x_coord) == T & is.null(polyz_y_coord) == T){stop("Please supply both a pointz_x_coord and pointz_y_coord.")}
+    if(is.null(polyz_x_coord) == TRUE & is.null(polyz_y_coord) == TRUE){stop("Please supply both a pointz_x_coord and pointz_y_coord.")}
     colnames(polyz)[which(colnames(polyz)== polyz_x_coord)] <- "x"
     colnames(polyz)[which(colnames(polyz)== polyz_y_coord)] <- "y"
     sf.convert_polyz <- df2sf(polyz$x, polyz$y, polyz)
@@ -96,24 +96,28 @@ point2poly_krige <- function(pointz,
   } else{stop("Please supply either a sf or sp object for polyz.")}
 
   # Check that xvarz entry is in both pointz and polyz
-  if (is.null(xvarz) == F){
-    pointz_check <- ifelse(xvarz %in% colnames(krig_pointz@data), T, F)
-    poly_check <- ifelse(xvarz %in% colnames(krig_polyz@data), T, F)
-    if (pointz_check == F | poly_check == F) {stop("Please ensure that column names in xvarz appear in both pointz and polyz.")}
+  if (is.null(xvarz) == FALSE){
+    pointz_check <- ifelse(xvarz %in% colnames(krig_pointz@data), TRUE, FALSE)
+    poly_check <- ifelse(xvarz %in% colnames(krig_polyz@data), TRUE, FALSE)
+    if (pointz_check == FALSE | poly_check == FALSE) {stop("Please ensure that column names in xvarz appear in both pointz and polyz.")}
   }
 
   # Extract raster information
-  if(is.null(rasterz) == F){
+  if(is.null(rasterz) == FALSE){
     finalrasterz2polyz <- NULL
     if(class(rasterz)=="list"){
       for(v0 in seq_along(rasterz)){
-        extractdata <- suppressWarnings(raster::extract(rasterz[[v0]], krig_polyz))
+        krig_polyz_ <- sp::spTransform(krig_polyz, sp::proj4string(rasterz[[v0]]))
+        extractdata <- suppressWarnings(raster::extract(rasterz[[v0]], krig_polyz_))
         rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
         finalrasterz2polyz<- cbind(finalrasterz2polyz, rastervarz)
+        rm(krig_polyz_)
       }} else{
-        extractdata <- suppressWarnings(raster::extract(rasterz, krig_polyz))
+        krig_polyz_ <- sp::spTransform(krig_polyz, sp::proj4string(rasterz))
+        extractdata <- suppressWarnings(raster::extract(rasterz, krig_polyz_))
         rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
         finalrasterz2polyz<- cbind(finalrasterz2polyz, rastervarz)
+        rm(krig_polyz_)
       }
 
     #c Cmbine with pointz and polyz
@@ -126,12 +130,16 @@ point2poly_krige <- function(pointz,
   }
 
   # Find optimal planar projection for map
-  polyz_layer <- utm_select(krig_polyz)
-  pointz_layer <- utm_select(krig_pointz)
+  suppressMessages({
+    suppressWarnings({
+      polyz_layer <- utm_select(krig_polyz)
+      pointz_layer <- sp::spTransform(krig_pointz, sp::proj4string(polyz_layer))
+    })
+  })
 
   #autokrige
   krige_mat <- lapply(seq_along(yvarz), function(v1){
-    if(is.null(xvarz) == T){
+    if(is.null(xvarz) == TRUE){
       krige_form <- stats::as.formula(paste(yvarz[v1],1, sep = "~"))
       krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, polyz_layer))
     }else if (length(xvarz) >= 1){
