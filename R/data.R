@@ -22,7 +22,7 @@
 #'   \item{incumb_pty_n }{Incumbent party name.}
 #'   \item{win1_pty_n }{Party name of popular vote share winner in first round. Character.}
 #' }
-#' @source Constituency-Level Elections Archive (CLEA) \url{http://www.electiondataarchive.org/}
+#' @source Constituency-Level Elections Archive (CLEA) \url{https://electiondataarchive.org/}
 "clea_deu2009"
 
 #' Constituency level results for lower chamber legislative elections, Germany 2009.
@@ -49,7 +49,7 @@
 #'   \item{incumb_pty_n }{Incumbent party name.}
 #'   \item{win1_pty_n }{Party name of popular vote share winner in first round. Character.}
 #' }
-#' @source Constituency-Level Elections Archive (CLEA) \url{http://www.electiondataarchive.org/}
+#' @source Constituency-Level Elections Archive (CLEA) \url{https://electiondataarchive.org/}
 "clea_deu2009_pt"
 
 #' Constituency level results for lower chamber legislative elections, Germany 2009.
@@ -73,7 +73,7 @@
 #'   \item{longitude }{Longitude of constituency centroid. Numeric.}
 #'   \item{latitude }{Latitude of constituency centroid. Numeric.}
 #' }
-#' @source Constituency-Level Elections Archive (CLEA) \url{http://www.electiondataarchive.org/}
+#' @source Constituency-Level Elections Archive (CLEA) \url{https://electiondataarchive.org/}
 "clea_deu2009_df"
 
 #' Population count raster for Germany, 2010.

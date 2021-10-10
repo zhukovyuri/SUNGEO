@@ -31,7 +31,7 @@
 #' @import sf
 #' @importFrom stats as.dist
 #' @importFrom raster extract pointDistance raster projectRaster
-#' @importFrom udunits2 ud.convert
+#' @importFrom measurements conv_unit
 #' @importFrom dplyr select everything
 #' @examples
 #' # Road lengths, densities and distance from polygon to nearest highway
@@ -87,19 +87,19 @@ line2poly <- function(linez,
   }
 
   # Set units
-  unitz_sq <- paste0(unitz,"^2")
+  unitz_sq <- paste0(unitz,"2")
 
   # Overlay
   if(verbose){print("Conducting overlay operations...")}
   lp_o <- suppressWarnings({sf::st_intersection(linez_tr_,polyz_tr_)})
-  lp_o$sgeoz_length <- as.numeric(udunits2::ud.convert(sf::st_length(lp_o),"m", unitz))
+  lp_o$sgeoz_length <- as.numeric(measurements::conv_unit(sf::st_length(lp_o),"m", unitz))
   lp_o <- base::as.data.frame(lp_o)
   lp_o <- stats::aggregate(lp_o$sgeoz_length, by=list(lp_o[,which(colnames(lp_o)==poly_id)]), FUN=sum)
   colnames(lp_o) <- c(poly_id,"sgeoz_length")
 
   # Distance
   if("distance"%in%measurez){
-    polyz_tr_$sgeoz_distance <- as.numeric(udunits2::ud.convert(sf::st_distance(polyz_tr_,sf::st_union(linez_tr_)),"m", unitz))
+    polyz_tr_$sgeoz_distance <- as.numeric(measurements::conv_unit(sf::st_distance(polyz_tr_,sf::st_union(linez_tr_)),"m", unitz))
   }
 
   # Length
@@ -110,7 +110,7 @@ line2poly <- function(linez,
 
   # Density
   if("density"%in%measurez){
-    polyz_tr_$sgeoz_area <- as.numeric(udunits2::ud.convert(sf::st_area(polyz_tr_),"m^2", unitz_sq))
+    polyz_tr_$sgeoz_area <- as.numeric(measurements::conv_unit(sf::st_area(polyz_tr_),"m2", unitz_sq))
     polyz_tr_$sgeoz_density <- replace(polyz_tr_$sgeoz_length/polyz_tr_$sgeoz_area,is.na(polyz_tr_$sgeoz_length/polyz_tr_$sgeoz_area), na_val)
   }
 
