@@ -25,7 +25,7 @@ proj4string:    +proj=longlat +datum=WGS84 +no_defs.
 }
 }
 \source{
-Constituency-Level Elections Archive (CLEA) \url{http://www.electiondataarchive.org/}
+Constituency-Level Elections Archive (CLEA) \url{https://electiondataarchive.org/}
 }
 \usage{
 clea_deu2009

@@ -22,7 +22,7 @@ data.frame with 16 observations and 12 variables.
 }
 }
 \source{
-Constituency-Level Elections Archive (CLEA) \url{http://www.electiondataarchive.org/}
+Constituency-Level Elections Archive (CLEA) \url{https://electiondataarchive.org/}
 }
 \usage{
 clea_deu2009_df
