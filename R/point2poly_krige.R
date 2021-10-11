@@ -147,20 +147,31 @@ point2poly_krige <- function(pointz,
   }
 
   # Create empty prediction grid
-  suppressMessages({
-    suppressWarnings({
-      k_grid <- sf::st_make_grid(sf::st_as_sf(krig_polyz),n=nz_grid,what="centers")
-      krig_polyz$ID_kriggrid <- 1:nrow(krig_polyz)
-      k_grid <- as(sf::st_as_sf(cbind(k_grid,as.data.frame(krig_polyz[unlist(sf::st_intersects(k_grid,sf::st_as_sf(krig_polyz))),]))),"Spatial")
+  if(use_grid==TRUE){
+    suppressMessages({
+      suppressWarnings({
+        k_grid <- sf::st_make_grid(sf::st_as_sf(krig_polyz),n=nz_grid,what="centers")
+        krig_polyz$ID_kriggrid <- 1:nrow(krig_polyz)
+        k_ix <- sf::st_intersects(k_grid,sf::st_as_sf(krig_polyz))
+        if(any(lengths(k_ix)==0)){
+          k_mat <- rbind(as.data.frame(k_ix),data.frame(row.id=which(lengths(k_ix)==0),col.id=apply(sf::st_distance(k_grid[lengths(k_ix)==0],sf::st_as_sf(krig_polyz)),1,which.min)))
+          k_mat <- k_mat[order(k_mat$row.id),]
+        }else{
+          k_mat <- as.data.frame(k_ix)
+        }
+        k_grid <- as(sf::st_as_sf(cbind(k_grid,as.data.frame(krig_polyz)[k_mat$col.id,])),"Spatial")
+      })
     })
-  })
+  }
 
   # Find optimal planar projection for map
   suppressMessages({
     suppressWarnings({
       polyz_layer <- utm_select(krig_polyz)
       pointz_layer <- sp::spTransform(krig_pointz, sp::proj4string(polyz_layer))
-      gridz_layer <- sp::spTransform(k_grid, sp::proj4string(polyz_layer))
+      if(use_grid==TRUE){
+        gridz_layer <- sp::spTransform(k_grid, sp::proj4string(polyz_layer))
+      }
     })
   })
 
