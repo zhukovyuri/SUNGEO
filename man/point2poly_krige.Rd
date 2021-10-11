@@ -10,7 +10,9 @@ point2poly_krige(
   rasterz = NULL,
   yvarz = NULL,
   xvarz = NULL,
-  funz = base::sum,
+  funz = base::mean,
+  use_grid = TRUE,
+  nz_grid = 100,
   pointz_x_coord = NULL,
   pointz_y_coord = NULL,
   polyz_x_coord = NULL,
@@ -29,7 +31,11 @@ point2poly_krige(
 
 \item{xvarz}{Names of numeric variable(s) for universal Kriging, in which yvarz is linearly dependent. Character string or vector of character strings.}
 
-\item{funz}{Aggregation function to be applied to values in \code{rasterz}. Must take as an input a vector \code{x}. Default is sum.  Function.}
+\item{funz}{Aggregation function to be applied to values in \code{rasterz} and to interpolated values. Must take as an input a vector \code{x}. Default is mean.  Function.}
+
+\item{use_grid}{Use regular grid as destination layer for interpolation, before aggregating to polygons? Default is TRUE.}
+
+\item{nz_grid}{Number of grid cells in x and y direction (columns, rows). integer of length 1 or 2. Default is 100. Ignored if use_grid=FALSE.}
 
 \item{pointz_x_coord}{Name of numeric variable corresponding to a measure of longitude (Easting) in a data frame object for \code{pointz}. Character string.}
 

@@ -7,7 +7,9 @@
 #' @param rasterz Source raster layer (or list of raster), with covariate(s) used for universal kriging. Must have identical CRS to \code{polyz}.  \code{RasterLayer} object or list of \code{RasterLayer} objects.
 #' @param yvarz Names of numeric variable(s) to be interpolated from source points layer to destination polygons. Character string or vector of character strings.
 #' @param xvarz Names of numeric variable(s) for universal Kriging, in which yvarz is linearly dependent. Character string or vector of character strings.
-#' @param funz Aggregation function to be applied to values in \code{rasterz}. Must take as an input a vector \code{x}. Default is sum.  Function.
+#' @param funz Aggregation function to be applied to values in \code{rasterz} and to interpolated values. Must take as an input a vector \code{x}. Default is mean.  Function.
+#' @param use_grid Use regular grid as destination layer for interpolation, before aggregating to polygons? Default is TRUE.
+#' @param nz_grid Number of grid cells in x and y direction (columns, rows). integer of length 1 or 2. Default is 100. Ignored if use_grid=FALSE.
 #' @param pointz_x_coord Name of numeric variable corresponding to a measure of longitude (Easting) in a data frame object for \code{pointz}. Character string.
 #' @param pointz_y_coord Name of numeric variable corresponding to a measure of Latitude (Northing) in a data frame object for \code{pointz}. Character string.
 #' @param polyz_x_coord Name of numeric variable corresponding to a measure of longitude (Easting) in a data frame object for \code{polyz}. Character string.
@@ -20,7 +22,7 @@
 #' @import sf sp
 #' @importFrom raster extract
 #' @importFrom automap autoKrige
-#' @importFrom stats as.formula
+#' @importFrom stats as.formula aggregate
 #' @examples
 #' # Ordinary Kriging with one variable
 #' \dontrun{
@@ -65,7 +67,9 @@ point2poly_krige <- function(pointz,
                              rasterz=NULL,
                              yvarz=NULL,
                              xvarz=NULL,
-                             funz=base::sum,
+                             funz=base::mean,
+                             use_grid=TRUE,
+                             nz_grid=100,
                              pointz_x_coord=NULL,
                              pointz_y_coord=NULL,
                              polyz_x_coord=NULL,
@@ -142,37 +146,76 @@ point2poly_krige <- function(pointz,
     xvarz <- c(xvarz, colnames(krig_polyz@data)[(col_length+1):ncol(krig_polyz@data)])
   }
 
+  # Create empty prediction grid
+  suppressMessages({
+    suppressWarnings({
+      k_grid <- sf::st_make_grid(sf::st_as_sf(krig_polyz),n=nz_grid,what="centers")
+      krig_polyz$ID_kriggrid <- 1:nrow(krig_polyz)
+      k_grid <- as(sf::st_as_sf(cbind(k_grid,as.data.frame(krig_polyz[unlist(sf::st_intersects(k_grid,sf::st_as_sf(krig_polyz))),]))),"Spatial")
+    })
+  })
+
   # Find optimal planar projection for map
   suppressMessages({
     suppressWarnings({
       polyz_layer <- utm_select(krig_polyz)
       pointz_layer <- sp::spTransform(krig_pointz, sp::proj4string(polyz_layer))
+      gridz_layer <- sp::spTransform(k_grid, sp::proj4string(polyz_layer))
     })
   })
 
-  #autokrige
-  krige_mat <- lapply(seq_along(yvarz), function(v1){
-    if(is.null(xvarz) == TRUE){
-      krige_form <- stats::as.formula(paste(yvarz[v1],1, sep = "~"))
-      krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, polyz_layer))
-    }else if (length(xvarz) >= 1){
-      krige_form <- stats::as.formula(paste(yvarz[v1],paste0(xvarz, collapse = "+"), sep = "~"))
-      krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, polyz_layer))
+  if(use_grid==TRUE){
+    # autokrige (to grid)
+    krige_mat <- lapply(seq_along(yvarz), function(v1){
+      if(is.null(xvarz) == TRUE){
+        krige_form <- stats::as.formula(paste(yvarz[v1],1, sep = "~"))
+        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, gridz_layer))
+      }else if (length(xvarz) >= 1){
+        krige_form <- stats::as.formula(paste(yvarz[v1],paste0(xvarz, collapse = "+"), sep = "~"))
+        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, gridz_layer))
+      }
+      colnames(krige_result[["krige_output"]]@data)[grep("pred$|var$|stdev$",colnames(krige_result[["krige_output"]]@data))] <- c(paste0(yvarz[v1],".pred"), paste0(yvarz[v1],".var"),paste0(yvarz[v1],".stdev"))
+      out <- krige_result[["krige_output"]]@data[,grep("pred$|var$|stdev$",colnames(krige_result[["krige_output"]]@data))]
+      return(out)
+    })
+    # bind with polygons
+    krige_agg <- stats::aggregate(krige_mat,by=list(ID_kriggrid=gridz_layer$ID_kriggrid),FUN=funz, na.rm=TRUE, na.action=NULL)
+    if(class(polyz)[1] == "sf"){
+      krige_out <- merge(polyz_layer, krige_agg)
+      krige_out$ID_kriggrid <- NULL
+      krige_out <- sf::st_as_sf(krige_out)
+    }else if(class(polyz)[1] == "data.frame"){
+      krige_out <- merge(polyz_layer, krige_agg)
+      krige_out$ID_kriggrid <- NULL
+      krige_out <- sf::st_as_sf(krige_out)
+    }else if(attr(class(polyz), 'package') == 'sp'){
+      krige_out <- merge(polyz_layer, krige_agg)
+      krige_out$ID_kriggrid <- NULL
     }
-    colnames(krige_result[["krige_output"]]@data)[3:5] <- c(paste0(yvarz[v1],".pred"), paste0(yvarz[v1],".var"),paste0(yvarz[v1],".stdev"))
-    out <- krige_result[["krige_output"]]@data[,c(3,5)]
-    return(out)
-  })
-
-  #Mbind with polygons
-  if(class(polyz)[1] == "sf"){
-    krige_out <- cbind(polyz_layer, krige_mat)
-    krige_out <- sf::st_as_sf(krige_out)
-  }else if(class(polyz)[1] == "data.frame"){
-    krige_out <- cbind(polyz_layer, krige_mat)
-    krige_out <- sf::st_as_sf(krige_out)
-  }else if(attr(class(polyz), 'package') == 'sp'){
-    krige_out <- cbind(polyz_layer, krige_mat)
+  } else {
+    # autokrige (to polyz)
+    krige_mat <- lapply(seq_along(yvarz), function(v1){
+      if(is.null(xvarz) == TRUE){
+        krige_form <- stats::as.formula(paste(yvarz[v1],1, sep = "~"))
+        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, polyz_layer))
+      }else if (length(xvarz) >= 1){
+        krige_form <- stats::as.formula(paste(yvarz[v1],paste0(xvarz, collapse = "+"), sep = "~"))
+        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, polyz_layer))
+      }
+      colnames(krige_result[["krige_output"]]@data)[grep("pred$|var$|stdev$",colnames(krige_result[["krige_output"]]@data))] <- c(paste0(yvarz[v1],".pred"), paste0(yvarz[v1],".var"),paste0(yvarz[v1],".stdev"))
+      out <- krige_result[["krige_output"]]@data[,grep("pred$|var$|stdev$",colnames(krige_result[["krige_output"]]@data))]
+      return(out)
+    })
+    # bind with polygons
+    if(class(polyz)[1] == "sf"){
+      krige_out <- cbind(polyz_layer, krige_mat)
+      krige_out <- sf::st_as_sf(krige_out)
+    }else if(class(polyz)[1] == "data.frame"){
+      krige_out <- cbind(polyz_layer, krige_mat)
+      krige_out <- sf::st_as_sf(krige_out)
+    }else if(attr(class(polyz), 'package') == 'sp'){
+      krige_out <- cbind(polyz_layer, krige_mat)
+    }
   }
 
   #Output
