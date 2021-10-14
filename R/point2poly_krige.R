@@ -21,9 +21,9 @@
 #'
 #' Unlike other available point-to-polygon interpolation techniques, this function currently only accepts numeric variables in \code{varz} and does not support interpolation of character strings.
 #' @import sf sp
-#' @importFrom raster extract crs
+#' @importFrom raster extract crs values
 #' @importFrom automap autoKrige
-#' @importFrom stats as.formula aggregate
+#' @importFrom stats as.formula aggregate sd
 #' @examples
 #' # Ordinary Kriging with one variable
 #' \dontrun{
@@ -76,8 +76,7 @@ point2poly_krige <- function(pointz,
                              pointz_y_coord=NULL,
                              polyz_x_coord=NULL,
                              polyz_y_coord=NULL,
-                             messagez=""
-){
+                             messagez=""){
 
   # Convert SF/DataFrame to SP
   if(class(pointz)[1] == 'sf'){
@@ -121,6 +120,9 @@ point2poly_krige <- function(pointz,
     finalrasterz2pointz <- NULL
     if(class(rasterz)=="list"){
       for(v0 in seq_along(rasterz)){
+        if(stats::sd(raster::values(rasterz[[v0]]),na.rm=TRUE)==0){
+          raster::values(rasterz[[v0]]) <- jitter(raster::values(rasterz[[v0]]))
+        }
         krig_polyz_ <- sp::spTransform(krig_polyz, sp::proj4string(rasterz[[v0]]))
         extractdata <- suppressWarnings(raster::extract(rasterz[[v0]], krig_polyz_))
         rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) funz(x, na.rm=TRUE) else NA))
@@ -132,6 +134,9 @@ point2poly_krige <- function(pointz,
         finalrasterz2pointz <- cbind(finalrasterz2pointz, rastervarz)
         rm(krig_pointz_)
       }} else{
+        if(stats::sd(raster::values(rasterz),na.rm=TRUE)==0){
+          raster::values(rasterz) <- jitter(raster::values(rasterz))
+        }
         krig_polyz_ <- sp::spTransform(krig_polyz, sp::proj4string(rasterz))
         extractdata <- suppressWarnings(raster::extract(rasterz, krig_polyz_))
         rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) funz(x, na.rm=TRUE) else NA))
@@ -256,6 +261,3 @@ point2poly_krige <- function(pointz,
   #Output
   return(krige_out)
 }
-
-
-
