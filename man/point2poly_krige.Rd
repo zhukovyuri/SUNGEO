@@ -10,6 +10,7 @@ point2poly_krige(
   rasterz = NULL,
   yvarz = NULL,
   xvarz = NULL,
+  pycno_yvarz = NULL,
   funz = base::mean,
   use_grid = TRUE,
   nz_grid = 100,
@@ -30,6 +31,8 @@ point2poly_krige(
 \item{yvarz}{Names of numeric variable(s) to be interpolated from source points layer to destination polygons. Character string or vector of character strings.}
 
 \item{xvarz}{Names of numeric variable(s) for universal Kriging, in which yvarz is linearly dependent. Character string or vector of character strings.}
+
+\item{pycno_yvarz}{Names of spatially extensive numeric variables for which the pycnophylactic (mass-preserving) property should be preserved. Must be a subset of \code{yvarz}. Character string or vector of character strings.}
 
 \item{funz}{Aggregation function to be applied to values in \code{rasterz} and to interpolated values. Must take as an input a vector \code{x}. Default is mean.  Function.}
 
