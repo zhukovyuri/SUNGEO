@@ -81,7 +81,11 @@ point2poly_krige <- function(pointz,
   # Convert SF/DataFrame to SP
   if(class(pointz)[1] == 'sf'){
     krig_pointz <- as(pointz, "Spatial")
-    raster::crs(krig_pointz) <- paste0("+init=",tolower(sf::st_crs(pointz)$input))
+    if(!is.na(sf::st_crs(pointz)$input)){
+      raster::crs(krig_pointz) <- paste0("+init=",tolower(sf::st_crs(pointz)$input))
+    }else{
+      raster::crs(krig_pointz) <- raster::crs(pointz)
+    }
   } else if(class(pointz)[1] == 'data.frame'){
     if(is.null(pointz_x_coord) == TRUE & is.null(pointz_y_coord) == TRUE){stop("Please supply both a pointz_x_coord and pointz_y_coord.")}
     colnames(pointz)[which(colnames(pointz)== pointz_x_coord)] <- "x"
@@ -95,7 +99,11 @@ point2poly_krige <- function(pointz,
 
   if(class(polyz)[1] == 'sf'){
     krig_polyz <- as(polyz, "Spatial")
-    raster::crs(krig_polyz) <- paste0("+init=",tolower(sf::st_crs(polyz)$input))
+    if(!is.na(sf::st_crs(polyz)$input)){
+      raster::crs(krig_polyz) <- paste0("+init=",tolower(sf::st_crs(polyz)$input))
+    }else{
+      raster::crs(krig_polyz) <- raster::crs(polyz)
+    }
   } else if(class(polyz)[1] == 'data.frame'){
     if(is.null(polyz_x_coord) == TRUE & is.null(polyz_y_coord) == TRUE){stop("Please supply both a pointz_x_coord and pointz_y_coord.")}
     colnames(polyz)[which(colnames(polyz)== polyz_x_coord)] <- "x"
@@ -179,10 +187,18 @@ point2poly_krige <- function(pointz,
   # Find optimal planar projection for map
   suppressMessages({
     suppressWarnings({
-      polyz_layer <- utm_select(krig_polyz)
-      pointz_layer <- sp::spTransform(krig_pointz, sp::proj4string(polyz_layer))
-      if(use_grid==TRUE){
-        gridz_layer <- sp::spTransform(k_grid, sp::proj4string(polyz_layer))
+      if(grepl("longlat",as.character(raster::crs(krig_polyz)))){
+        polyz_layer <- utm_select(krig_polyz)
+        pointz_layer <- sp::spTransform(krig_pointz, sp::proj4string(polyz_layer))
+        if(use_grid==TRUE){
+          gridz_layer <- sp::spTransform(k_grid, sp::proj4string(polyz_layer))
+        }
+      }else{
+        polyz_layer <- krig_polyz
+        pointz_layer <- sp::spTransform(krig_pointz, sp::proj4string(polyz_layer))
+        if(use_grid==TRUE){
+          gridz_layer <- sp::spTransform(k_grid, sp::proj4string(polyz_layer))
+        }
       }
     })
   })
