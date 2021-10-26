@@ -96,7 +96,6 @@ point2poly_krige <- function(pointz,
   } else if(attr(class(pointz), 'package')[1] == 'sp'){
     krig_pointz <- pointz
   } else{stop("Please supply either a data frame, sf, or sp object for pointz.")}
-
   if(class(polyz)[1] == 'sf'){
     krig_polyz <- as(polyz, "Spatial")
     if(!is.na(sf::st_crs(polyz)$input)){
@@ -203,15 +202,16 @@ point2poly_krige <- function(pointz,
     })
   })
 
+
   if(use_grid==TRUE){
     # autokrige (to grid)
     krige_mat <- lapply(seq_along(yvarz), function(v1){
       if(is.null(xvarz) == TRUE){
         krige_form <- stats::as.formula(paste(yvarz[v1],1, sep = "~"))
-        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, gridz_layer))
+        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer[!is.na(as.data.frame(pointz_layer)[,yvarz[v1]]),], gridz_layer))
       }else if (length(xvarz) >= 1){
         krige_form <- stats::as.formula(paste(yvarz[v1],paste0(xvarz, collapse = "+"), sep = "~"))
-        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, gridz_layer))
+        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer[!is.na(as.data.frame(pointz_layer)[,xvarz])&!is.na(as.data.frame(pointz_layer)[,yvarz[v1]]),], gridz_layer))
       }
       colnames(krige_result[["krige_output"]]@data)[grep("pred$|var$|stdev$",colnames(krige_result[["krige_output"]]@data))] <- c(paste0(yvarz[v1],".pred"), paste0(yvarz[v1],".var"),paste0(yvarz[v1],".stdev"))
       out <- krige_result[["krige_output"]]@data[,grep("pred$|var$|stdev$",colnames(krige_result[["krige_output"]]@data))]
@@ -253,10 +253,10 @@ point2poly_krige <- function(pointz,
     krige_mat <- lapply(seq_along(yvarz), function(v1){
       if(is.null(xvarz) == TRUE){
         krige_form <- stats::as.formula(paste(yvarz[v1],1, sep = "~"))
-        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, polyz_layer))
+        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer[!is.na(as.data.frame(pointz_layer)[,yvarz[v1]]),], polyz_layer))
       }else if (length(xvarz) >= 1){
         krige_form <- stats::as.formula(paste(yvarz[v1],paste0(xvarz, collapse = "+"), sep = "~"))
-        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer, polyz_layer))
+        krige_result <- suppressWarnings(automap::autoKrige(krige_form, pointz_layer[!is.na(as.data.frame(pointz_layer)[,xvarz])&!is.na(as.data.frame(pointz_layer)[,yvarz[v1]]),], polyz_layer))
       }
       colnames(krige_result[["krige_output"]]@data)[grep("pred$|var$|stdev$",colnames(krige_result[["krige_output"]]@data))] <- c(paste0(yvarz[v1],".pred"), paste0(yvarz[v1],".var"),paste0(yvarz[v1],".stdev"))
       out <- krige_result[["krige_output"]]@data[,grep("pred$|var$|stdev$",colnames(krige_result[["krige_output"]]@data))]

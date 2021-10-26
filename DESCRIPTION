@@ -1,7 +1,7 @@
 Package: SUNGEO
 Type: Package
 Title: Sub-National Geospatial Data Archive: Geoprocessing Toolkit
-Version: 0.2.283
+Version: 0.2.284
 Date: 2021-10-25
 Author: Jason Byers, Marty Davidson, Yuri M. Zhukov
 Maintainer: Yuri M. Zhukov <zhukov@umich.edu>
