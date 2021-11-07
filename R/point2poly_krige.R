@@ -82,7 +82,11 @@ point2poly_krige <- function(pointz,
   if(class(pointz)[1] == 'sf'){
     krig_pointz <- as(pointz, "Spatial")
     if(!is.na(sf::st_crs(pointz)$input)){
-      raster::crs(krig_pointz) <- paste0("+init=",tolower(sf::st_crs(pointz)$input))
+      if(grepl("epsg",sf::st_crs(pointz)$input,ignore.case=TRUE)){
+        raster::crs(krig_pointz) <- paste0("+init=",tolower(sf::st_crs(pointz)$input))
+      }else{
+        raster::crs(krig_pointz) <- paste0(as.character(sf::st_crs(pointz)$input))
+      }
     }else{
       raster::crs(krig_pointz) <- raster::crs(pointz)
     }
@@ -99,7 +103,11 @@ point2poly_krige <- function(pointz,
   if(class(polyz)[1] == 'sf'){
     krig_polyz <- as(polyz, "Spatial")
     if(!is.na(sf::st_crs(polyz)$input)){
-      raster::crs(krig_polyz) <- paste0("+init=",tolower(sf::st_crs(polyz)$input))
+      if(grepl("epsg",sf::st_crs(pointz)$input,ignore.case=TRUE)){
+        raster::crs(krig_polyz) <- paste0("+init=",tolower(sf::st_crs(polyz)$input))
+      }else{
+        raster::crs(krig_polyz) <- paste0(as.character(sf::st_crs(polyz)$input))
+      }
     }else{
       raster::crs(krig_polyz) <- raster::crs(polyz)
     }
@@ -277,3 +285,4 @@ point2poly_krige <- function(pointz,
   #Output
   return(krige_out)
 }
+
