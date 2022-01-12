@@ -14,6 +14,7 @@ point2poly_krige(
   funz = base::mean,
   use_grid = TRUE,
   nz_grid = 100,
+  blockz = 0,
   pointz_x_coord = NULL,
   pointz_y_coord = NULL,
   polyz_x_coord = NULL,
@@ -38,7 +39,9 @@ point2poly_krige(
 
 \item{use_grid}{Use regular grid as destination layer for interpolation, before aggregating to polygons? Default is TRUE.}
 
-\item{nz_grid}{Number of grid cells in x and y direction (columns, rows). integer of length 1 or 2. Default is 100. Ignored if use_grid=FALSE.}
+\item{nz_grid}{Number of grid cells in x and y direction (columns, rows). Integer of length 1 or 2. Default is 100. Ignored if use_grid=FALSE.}
+
+\item{blockz}{Size of blocks used for Block Kriging, in meters. Integer of length 1 or 2. Default is 0.}
 
 \item{pointz_x_coord}{Name of numeric variable corresponding to a measure of longitude (Easting) in a data frame object for \code{pointz}. Character string.}
 
@@ -96,5 +99,18 @@ out_3 <- point2poly_krige(pointz = clea_deu2009_pt,
 par(mfrow=c(1,2))
 plot(clea_deu2009["to1"], key.pos = NULL, reset = FALSE)
 plot(out_3["to1.pred"], key.pos = NULL, reset = FALSE)
+}
+
+# Block Kriging with block size of 100 km
+\dontrun{
+data(clea_deu2009)
+data(clea_deu2009_pt)
+out_4 <- point2poly_krige(pointz = clea_deu2009_pt,
+                         polyz = clea_deu2009,
+                         yvarz = "to1",
+                         blockz = 100000)
+par(mfrow=c(1,2))
+plot(clea_deu2009["to1"], key.pos = NULL, reset = FALSE)
+plot(out_4["to1.pred"], key.pos = NULL, reset = FALSE)
 }
 }
