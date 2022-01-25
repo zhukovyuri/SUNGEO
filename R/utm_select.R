@@ -27,6 +27,11 @@
 
 utm_select <- function(x, max_zones=5, return_list=FALSE){
 
+  # Turn off s2 processing
+  suppressMessages({
+    sf::sf_use_s2(FALSE)
+  })
+
   # Fix sf geometry type
   if(any(grepl("sf", class(x)))){
     if(grepl("GEOMETRY",sf::st_geometry_type(x,by_geometry = FALSE))&any(grepl("POLYGON",sf::st_geometry_type(x)))){

@@ -93,6 +93,12 @@ point2poly_krige <- function(pointz,
                              polyz_y_coord=NULL,
                              messagez=""){
 
+
+  # Turn off s2 processing
+  suppressMessages({
+    sf::sf_use_s2(FALSE)
+  })
+
   # Convert SF/DataFrame to SP
   if(class(pointz)[1] == 'sf'){
     krig_pointz <- as(pointz, "Spatial")
@@ -195,9 +201,17 @@ point2poly_krige <- function(pointz,
         k_grid <- sf::st_make_grid(sf::st_as_sf(krig_polyz),n=nz_grid,what="centers")
         krig_polyz$ID_kriggrid <- 1:nrow(krig_polyz)
         k_ix <- sf::st_intersects(k_grid,sf::st_as_sf(krig_polyz))
-        if(any(lengths(k_ix)==0)){
-          k_mat <- rbind(as.data.frame(k_ix),data.frame(row.id=which(lengths(k_ix)==0),col.id=apply(sf::st_distance(k_grid[lengths(k_ix)==0],sf::st_as_sf(krig_polyz)),1,which.min)))
+        if(any(lengths(k_ix)==0)&any(lengths(k_ix)>1)){
+          suppressMessages({sf::sf_use_s2(TRUE)})
+          k_mat <- rbind(as.data.frame(k_ix),data.frame(row.id=which(lengths(k_ix)==0),col.id=apply(sf::st_distance(k_grid[lengths(k_ix)==0],sf::st_make_valid( sf::st_as_sf(krig_polyz) )),1,which.min)))
           k_mat <- k_mat[order(k_mat$row.id),]
+          k_mat <- k_mat[!duplicated(k_mat$row.id),]
+          suppressMessages({sf::sf_use_s2(FALSE)})
+        } else if(any(lengths(k_ix)==0)){
+          suppressMessages({sf::sf_use_s2(TRUE)})
+          k_mat <- rbind(as.data.frame(k_ix),data.frame(row.id=which(lengths(k_ix)==0),col.id=apply(sf::st_distance(k_grid[lengths(k_ix)==0],sf::st_make_valid( sf::st_as_sf(krig_polyz))),1,which.min)))
+          k_mat <- k_mat[order(k_mat$row.id),]
+          suppressMessages({sf::sf_use_s2(FALSE)})
         }else if(any(lengths(k_ix)>1)){
           k_mat <- as.data.frame(k_ix)
           k_mat <- k_mat[!duplicated(k_mat$row.id),]

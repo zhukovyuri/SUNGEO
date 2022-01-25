@@ -38,6 +38,12 @@
 #'
 
 df2sf <- function(x_coord, y_coord, input_data = NULL, file = NULL, n_max = Inf, start = 0, projection_input = 'EPSG:4326', zero.policy = FALSE, show_removed = FALSE){
+
+  # Turn off s2 processing
+  suppressMessages({
+    sf::sf_use_s2(FALSE)
+  })
+
   #Part 1 -
   if(is.null(file) == FALSE){
     input_data <- as.data.frame(data.table::fread(file, nrows = n_max, skip = start))

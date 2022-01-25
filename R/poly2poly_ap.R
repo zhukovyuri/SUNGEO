@@ -111,6 +111,11 @@ poly2poly_ap <- function(
 
   set.seed(seed)
 
+  # Turn off s2 processing
+  suppressMessages({
+    sf::sf_use_s2(FALSE)
+  })
+
   ###########################################################
   #Section A - Preparing the Gemetries for Tessalation Prcess
   ###########################################################

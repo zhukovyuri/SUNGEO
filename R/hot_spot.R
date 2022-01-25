@@ -65,6 +65,12 @@ hot_spot <- function(insert,
                      remove_missing = TRUE,
                      NA_Value = 0,
                      include_Moran = FALSE){
+
+  # Turn off s2 processing
+  suppressMessages({
+    sf::sf_use_s2(FALSE)
+  })
+
   #Section 1 -
   if(any(class(insert)%in%c("SpatialPolygonsDataFrame", "SpatialPointsDataFrame"))){
     insert <- sf::st_as_sf(insert)

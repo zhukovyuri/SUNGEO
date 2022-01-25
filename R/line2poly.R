@@ -69,6 +69,12 @@ line2poly <- function(linez,
                       na_val=NA,
                       verbose=TRUE){
 
+
+  # Turn off s2 processing
+  suppressMessages({
+    sf::sf_use_s2(FALSE)
+  })
+
   # Find optimal planar projection for map
   # if(reproject){
   #   if(verbose){print("Finding optimal planar projection...")}

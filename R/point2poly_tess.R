@@ -115,9 +115,16 @@ point2poly_tess <- function(
 
   set.seed(seed)
 
+  # Turn off s2 processing
+  suppressMessages({
+    sf::sf_use_s2(FALSE)
+  })
+
   ###########################################################
   #Section A - Preparing the Gemetries for Tessalation Prcess
   ###########################################################
+
+
   # Put variables and functions into list
   if(class(varz)=="character"){varz <- list(varz)}
   if(class(funz)=="function"){funz <- list(funz)}

@@ -60,6 +60,13 @@ point2poly_simp <- function(pointz,
                             funz=list(function(x){sum(x,na.rm=TRUE)}),
                             na_val=NA,
                             drop_na_cols=FALSE){
+
+
+  # Turn off s2 processing
+  suppressMessages({
+    sf::sf_use_s2(FALSE)
+  })
+
   ################################################
   #Part 1 -  Put variables and functions into list
   ################################################

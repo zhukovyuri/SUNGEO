@@ -94,6 +94,13 @@ sf2raster <- function (polyz_from = NULL,
                        message_out = TRUE,
                        return_list = FALSE)
 {
+
+  # Turn off s2 processing
+  suppressMessages({
+    sf::sf_use_s2(FALSE)
+  })
+
+
   if (class(aggregate_function) != "list") {
     aggregate_function <- list(aggregate_function)
   }
