@@ -1,7 +1,7 @@
 # `SUNGEO` / Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 R package for integrating spatially-misaligned GIS datasets.
 
-Version 0.2.287 (January 25, 2022)
+Version 0.2.288 (January 31, 2022)
 
 Jason Byers, Marty Davidson, Yuri M. Zhukov
 
@@ -17,6 +17,7 @@ Feedback, bug reports welcome: zhukov-at-umich-dot-edu
 * `geocode_osm_batch` / Batch geocode addresses with OpenStreetMap
 * `hot_spot` / Automatically calculate Local G hot spot intensity
 * `line2poly` / Line-in-polygon analysis
+* `nesting` / Relative scale and nesting coefficients
 * `point2poly_simp` / Point-to-polygon interpolation, simple overlay method
 * `point2poly_tess` / Point-to-polygon interpolation, tessellation method
 * `point2poly_krige` / Point-to-polygon interpolation, ordinary and universal Kriging method
@@ -74,6 +75,35 @@ geocode_osm_batch(c("Ann Arbor","East Lansing","Columbus"),
 geocode_osm_batch(c("Ann Arbor","East Lansing","Columbus"),
                   details = TRUE, return_all = TRUE)
 
+```
+
+Example: scale and nesting metrics for two polygons
+
+```
+# Load source polygons (legislative districts)
+data(clea_deu2009)
+
+# Load destination polygons (grid cells)
+data(hex_05_deu)
+
+# Preview
+plot(clea_deu2009["geometry"])
+plot(hex_05_deu["geometry"],add=TRUE,border="grey")
+
+# Calculate all scale and nesting metrics at once
+nest_1 <- nesting(
+              poly_from = clea_deu2009,
+              poly_to = hex_05_deu
+              )
+nest_1
+
+# Calculate just Relative Nesting, in the opposite direction
+nest_2 <- nesting(
+              poly_from = hex_05_deu,
+              poly_to = clea_deu2009,
+              metrix = "rn"
+              )
+nest_2
 ```
 
 Example: area-weighted polygon-to-polygon interpolation
