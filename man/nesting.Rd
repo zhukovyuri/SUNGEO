@@ -4,7 +4,13 @@
 \alias{nesting}
 \title{Relative scale and nesting coefficients}
 \usage{
-nesting(poly_from = NULL, poly_to = NULL, metrix = "all", tol_ = 0.001)
+nesting(
+  poly_from = NULL,
+  poly_to = NULL,
+  metrix = "all",
+  tol_ = 0.001,
+  by_unit = FALSE
+)
 }
 \arguments{
 \item{poly_from}{Source polygon layer. \code{sf} object (polygon or multipolygon).}
@@ -14,9 +20,11 @@ nesting(poly_from = NULL, poly_to = NULL, metrix = "all", tol_ = 0.001)
 \item{metrix}{Requested scaling and nesting metrics. See "details". Default is "all". Character string or vector of character strings.}
 
 \item{tol_}{Minimum area of polygon intersection, in square meters. Default is 0.001. Numeric.}
+
+\item{by_unit}{Include a by-unit decomposition of requested nesting metrics (if available)? Default is FALSE. Logical.}
 }
 \value{
-Named list, with numeric values for each requested metric in \code{metrix}.
+Named list, with numeric values for each requested metric in \code{metrix}. If \code{by_unit==TRUE}, last element of list is a data.table, with nesting metrics disaggregated by source unit, where the first column is a row index for the source polygon layer.
 }
 \description{
 Function to calculate relative scale and nesting metrics for changes of support from a source polygon layer to an overlapping (but spatially misaligned) destination polygon layer.

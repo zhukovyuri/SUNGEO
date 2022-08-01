@@ -6,7 +6,8 @@
 #' @param poly_to Destination polygon layer. Must have identical CRS to \code{poly_from}. \code{sf} object (polygon or multipolygon).
 #' @param metrix Requested scaling and nesting metrics. See "details". Default is "all". Character string or vector of character strings.
 #' @param tol_ Minimum area of polygon intersection, in square meters. Default is 0.001. Numeric.
-#' @return Named list, with numeric values for each requested metric in \code{metrix}.
+#' @param by_unit Include a by-unit decomposition of requested nesting metrics (if available)? Default is FALSE. Logical.
+#' @return Named list, with numeric values for each requested metric in \code{metrix}. If \code{by_unit==TRUE}, last element of list is a data.table, with nesting metrics disaggregated by source unit, where the first column is a row index for the source polygon layer.
 #' @details Currently supported metrics (\code{metrix}) include:
 #' \itemize{
 ##'  \item{Relative scale ("rs"). }{Measures whether a change-of-support (CoS) task is one of aggregation or disaggregation, by calculating the share of source units that are smaller than destination units. Its range is from 0 to 1, where values of 1 indicate pure aggregation (all source units are smaller than destination units) and values of 0 indicate no aggregation (all source units are at least as large as destination units). Values between 0 and 1 indicate a hybrid (i.e. some source units are smaller, others are larger than target units).}
@@ -54,7 +55,11 @@ nesting <- function(
   poly_from = NULL,
   poly_to = NULL,
   metrix = "all",
-  tol_ = 0.001){
+  tol_ = 0.001,
+  by_unit=FALSE){
+
+  # Null out undefined variables
+  .N <- ID_1_ <- area_in_ <- V1 <- NULL
 
   # Turn off s2 processing
   suppressMessages({
@@ -110,14 +115,27 @@ nesting <- function(
     o_sf$area_ix_ <- sf::st_area(o_sf)
     o_sf$area_in_ <- o_sf$area_ix_/o_sf$area_1_
 
+    # Create unit matrix
+    if(by_unit==TRUE){
+      nesting_dt <- data.table::data.table(ID_1_ = 1:nrow(poly_from))
+    }
+
     # Relative scale
     if("rs"%in%metrix){
       rs <- data.table::data.table(o_sf)[as.numeric(get("area_in_"))>tol_,base::mean(1*(get("area_1_")<get("area_2_")),na.rm=TRUE)]
+      if(by_unit==TRUE){
+        rs_byun <- data.table::data.table(o_sf)[as.numeric(get("area_in_"))>tol_,base::mean(1*(get("area_1_")<get("area_2_")),na.rm=TRUE),by="ID_1_"]
+        nesting_dt[,rs := rs_byun[match(nesting_dt[,ID_1_],rs_byun[,ID_1_]),V1]]
+      }
     }
 
     # Relative nesting
     if("rn"%in%metrix|"rn_sym"%in%metrix){
       rn <- data.table::as.data.table(o_sf)[as.numeric(get("area_in_"))>tol_,base::sum(as.numeric(get("area_ix_")/get("area_1_"))^2),by="ID_1_"][,base::mean(get("V1"),na.rm=TRUE)]
+      if(by_unit==TRUE){
+        rn_byun <- data.table::as.data.table(o_sf)[as.numeric(get("area_in_"))>tol_,base::sum(as.numeric(get("area_ix_")/get("area_1_"))^2),by="ID_1_"]
+        nesting_dt[,rn := rn_byun[match(nesting_dt[,ID_1_],rn_byun[,ID_1_]),V1]]
+      }
     }
 
     # Relative scale, symmetric
@@ -132,22 +150,34 @@ nesting <- function(
       })
       o_sf_2$area_ix_ <- sf::st_area(o_sf_2)
       o_sf_2$area_in_ <- o_sf_2$area_ix_/o_sf_2$area_2_
-      rn_sym <- rn - data.table::as.data.table(o_sf_2)[as.numeric(get("area_in_"))>tol_,base::sum(as.numeric(get("area_ix_")/get("area_2_"))^2),by="ID_2_"][,base::mean(get("V1"))]
+      rn_sym <- data.table::as.data.table(o_sf_2)[as.numeric(get("area_in_"))>tol_,rn - base::sum(as.numeric(get("area_ix_")/get("area_2_"))^2),by="ID_2_"][,base::mean(get("V1"))]
     }
 
     # Relative scale, alternative
     if("rs_alt"%in%metrix){
       rs_alt <- data.table::data.table(o_sf)[as.numeric(get("area_in_"))>tol_,as.numeric(base::mean((get("area_2_")-get("area_1_"))/base::mean(get("area_2_")),na.rm=TRUE))]
+      if(by_unit==TRUE){
+        rs_alt_byun <- data.table::data.table(o_sf)[as.numeric(get("area_in_"))>tol_,as.numeric(base::mean((get("area_2_")-get("area_1_"))/base::mean(get("area_2_")),na.rm=TRUE)),by="ID_1_"]
+        nesting_dt[,rs_alt := rs_alt_byun[match(nesting_dt[,ID_1_],rs_alt_byun[,ID_1_]),V1]]
+      }
     }
 
     # Relative nesting, alternative
     if("rn_alt"%in%metrix){
-      rn_alt <- base::mean(stats::aggregate(base::data.frame(area_in_=as.numeric(o_sf$area_in_)),by=list(ID_1_=o_sf$ID_1_),FUN=base::max,na.rm=TRUE)[,"area_in_"])
+      rn_alt <- data.table::as.data.table(o_sf)[as.numeric(get("area_in_"))>tol_,as.numeric(base::max(area_in_)),by="ID_1_"][,mean(V1)]
+      if(by_unit==TRUE){
+        rn_alt_byun <- data.table::as.data.table(o_sf)[as.numeric(get("area_in_"))>tol_,as.numeric(base::max(area_in_)),by="ID_1_"]
+        nesting_dt[,rn_alt := rn_alt_byun[match(nesting_dt[,ID_1_],rn_alt_byun[,ID_1_]),V1]]
+      }
     }
 
     # Proportion intact
     if("p_intact"%in%metrix){
       p_intact <- data.table::as.data.table(o_sf)[as.numeric(get("area_in_"))>tol_,base::mean(base::table(get("ID_1_"))==1)]
+      if(by_unit==TRUE){
+        p_intact_byun <- data.table::as.data.table(o_sf)[as.numeric(get("area_in_"))>tol_,1*(.N==1),by="ID_1_"]
+        nesting_dt[,p_intact := p_intact_byun[match(nesting_dt[,ID_1_],p_intact_byun[,ID_1_]),V1]]
+      }
     }
 
     # Relative overlap
@@ -166,6 +196,10 @@ nesting <- function(
     # Gibbs-Martin index
     if("gmi"%in%metrix){
       gmi <- data.table::as.data.table(o_sf)[as.numeric(get("area_in_"))>tol_,1-sum(as.numeric(get("area_ix_")/get("area_1_"))^2),by="ID_1_"][,base::mean(get("V1"))]
+      if(by_unit==TRUE){
+        gmi_byun <- data.table::as.data.table(o_sf)[as.numeric(get("area_in_"))>tol_,1-sum(as.numeric(get("area_ix_")/get("area_1_"))^2),by="ID_1_"][,base::mean(get("V1")),by="ID_1_"]
+        nesting_dt[,gmi := gmi_byun[match(nesting_dt[,ID_1_],gmi_byun[,ID_1_]),V1]]
+      }
     }
 
     # Output
@@ -173,6 +207,10 @@ nesting <- function(
       get(m0)
     })
     names(out_list) <- metrix
+    if(by_unit==TRUE){
+      out_list <- append(out_list,list(nesting_dt))
+      names(out_list)[length(out_list)] <- "by_unit"
+    }
     return(out_list)
 
   }
