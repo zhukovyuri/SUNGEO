@@ -126,10 +126,10 @@ poly2poly_ap <- function(
   }
 
   #Part ii -
-  if(class(varz)=="character"){varz <- list(varz)}
+  if(inherits(varz,"character")){varz <- list(varz)}
 
   #Part iii -
-  if(class(funz)!="list"){funz <- list(funz)}
+  if(!inherits(funz,"list")){funz <- list(funz)}
   funz <- lapply(funz, function(sub_iter){
     if(class(sub_iter)%in%"function" == FALSE && class(sub_iter)%in%'character'){
       funzInt <- get(sub_iter, mode = 'function')

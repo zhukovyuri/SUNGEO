@@ -100,7 +100,7 @@ point2poly_krige <- function(pointz,
   })
 
   # Convert SF/DataFrame to SP
-  if(class(pointz)[1] == 'sf'){
+  if(class(pointz)[1] %in% 'sf'){
     krig_pointz <- as(pointz, "Spatial")
     if(!is.na(sf::st_crs(pointz)$input)){
       if(grepl("epsg",sf::st_crs(pointz)$input,ignore.case=TRUE)){
@@ -111,7 +111,7 @@ point2poly_krige <- function(pointz,
     }else{
       raster::crs(krig_pointz) <- raster::crs(pointz)
     }
-  } else if(class(pointz)[1] == 'data.frame'){
+  } else if(class(pointz)[1] %in% 'data.frame'){
     if(is.null(pointz_x_coord) == TRUE & is.null(pointz_y_coord) == TRUE){stop("Please supply both a pointz_x_coord and pointz_y_coord.")}
     colnames(pointz)[which(colnames(pointz)== pointz_x_coord)] <- "x"
     colnames(pointz)[which(colnames(pointz)== pointz_y_coord)] <- "y"
@@ -121,7 +121,7 @@ point2poly_krige <- function(pointz,
   } else if(attr(class(pointz), 'package')[1] == 'sp'){
     krig_pointz <- pointz
   } else{stop("Please supply either a data frame, sf, or sp object for pointz.")}
-  if(class(polyz)[1] == 'sf'){
+  if(class(polyz)[1] %in% 'sf'){
     krig_polyz <- as(polyz, "Spatial")
     if(!is.na(sf::st_crs(polyz)$input)){
       if(grepl("epsg",sf::st_crs(pointz)$input,ignore.case=TRUE)){
@@ -132,7 +132,7 @@ point2poly_krige <- function(pointz,
     }else{
       raster::crs(krig_polyz) <- raster::crs(polyz)
     }
-  } else if(class(polyz)[1] == 'data.frame'){
+  } else if(class(polyz)[1] %in% 'data.frame'){
     if(is.null(polyz_x_coord) == TRUE & is.null(polyz_y_coord) == TRUE){stop("Please supply both a pointz_x_coord and pointz_y_coord.")}
     colnames(polyz)[which(colnames(polyz)== polyz_x_coord)] <- "x"
     colnames(polyz)[which(colnames(polyz)== polyz_y_coord)] <- "y"
@@ -154,7 +154,7 @@ point2poly_krige <- function(pointz,
   if(is.null(rasterz) == FALSE){
     finalrasterz2polyz <- NULL
     finalrasterz2pointz <- NULL
-    if(class(rasterz)=="list"){
+    if(inherits(rasterz,"list")){
       for(v0 in seq_along(rasterz)){
         if(stats::sd(raster::values(rasterz[[v0]]),na.rm=TRUE)==0){
           raster::values(rasterz[[v0]]) <- jitter(raster::values(rasterz[[v0]]))
@@ -276,14 +276,14 @@ point2poly_krige <- function(pointz,
         krige_agg <- as.data.frame(krige_agg_dt)
       }
     }
-    if(class(polyz)[1] == "sf"){
+    if(class(polyz)[1] %in% "sf"){
       krige_out <- merge(polyz_layer, krige_agg)
       krige_out$ID_kriggrid <- NULL
       if(!"geometry"%in%names(krige_out)){
         krige_out$geometry <- polyz$geometry
       }
       krige_out <- suppressWarnings(sf::st_as_sf(krige_out))
-    }else if(class(polyz)[1] == "data.frame"){
+    }else if(class(polyz)[1] %in% "data.frame"){
       krige_out <- merge(polyz_layer, krige_agg)
       krige_out$ID_kriggrid <- NULL
       krige_out <- sf::st_as_sf(krige_out)
@@ -306,10 +306,10 @@ point2poly_krige <- function(pointz,
       return(out)
     })
     # bind with polygons
-    if(class(polyz)[1] == "sf"){
+    if(class(polyz)[1] %in% "sf"){
       krige_out <- cbind(polyz_layer, krige_mat)
       krige_out <- sf::st_as_sf(krige_out)
-    }else if(class(polyz)[1] == "data.frame"){
+    }else if(class(polyz)[1] %in% "data.frame"){
       krige_out <- cbind(polyz_layer, krige_mat)
       krige_out <- sf::st_as_sf(krige_out)
     }else if(attr(class(polyz), 'package') == 'sp'){

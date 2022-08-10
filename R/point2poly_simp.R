@@ -76,13 +76,13 @@ point2poly_simp <- function(pointz,
   }
 
   #Part ii -
-  if(class(varz)=="character"){varz <- list(varz)}
+  if(inherits(varz,"character")){varz <- list(varz)}
 
   #Part iii -
-  if(class(funz)!="list"){funz <- list(funz)}
+  if(!inherits(funz,"list")){funz <- list(funz)}
   funz <- lapply(funz, function(sub_iter){
-    if(class(sub_iter)%in%"function" == FALSE && class(sub_iter)%in%'character'){
-      funzInt <- get(sub_iter, mode = 'function')
+    if({class(sub_iter)%in%"function"} == FALSE && {class(sub_iter)%in%"character"}){
+      funzInt <- get(sub_iter, mode = "function")
       return(funzInt)
     } else {
       return(sub_iter)
@@ -90,7 +90,7 @@ point2poly_simp <- function(pointz,
   })
 
   #Part iv -
-  if(class(na_val)=="logical"){na_val <- list(na_val)}
+  if(inherits(na_val,"logical")){na_val <- list(na_val)}
 
   ################################################
   #Part 2:

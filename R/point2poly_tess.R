@@ -126,8 +126,8 @@ point2poly_tess <- function(
 
 
   # Put variables and functions into list
-  if(class(varz)=="character"){varz <- list(varz)}
-  if(class(funz)=="function"){funz <- list(funz)}
+  if(inherits(varz,"character")){varz <- list(varz)}
+  if(inherits(funz,"function")){funz <- list(funz)}
 
   # Stop if no population raster
   if("pw"%in%methodz & length(pop_raster)==0){stop("No population raster provided.")}

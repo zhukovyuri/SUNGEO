@@ -101,10 +101,10 @@ sf2raster <- function (polyz_from = NULL,
   })
 
 
-  if (class(aggregate_function) != "list") {
+  if (!inherits(aggregate_function, "list")) {
     aggregate_function <- list(aggregate_function)
   }
-  if (class(reverse_function) != "list") {
+  if (!inherits(reverse_function, "list")) {
     reverse_function <- list(reverse_function)
   }
 
