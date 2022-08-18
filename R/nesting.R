@@ -16,6 +16,8 @@
 ##'  \item{Relative nesting, symmetric ("rn_sym"). }{Alternative measure of "rn", which ranges from -1 to 1. It calculates a difference between two components: the nesting of source units within destination units (i.e. "rn" from standpoint of source units), and the nesting of destination units within source units (i.e. "rn" from standpoint of destination units. Values of 1 indicate that source units are perfectly nested within destination units; -1 indicates that destination units are perfectly nested within source units.}
 ##'  \item{Relative scale, alternative ("rs_alt"). }{Alternative measure of "rs", rescaled as a proportion of destination unit area. This measure can take any value on the real line, with positive values indicating aggregation and negative values indicating disaggregation.}
 ##'  \item{Relative nesting, alternative ("rn_alt"). }{Alternative measure of "rn", which places more weight on areas of maximum overlap. The main difference between this measure and "rn" is its use of the maximum intersection area for each source polygon instead of averaging over the quadratic term. Two sets of polygons are considered nested if one set is completely contained within another, with as few splits as possible. If none or only a sliver of a source polygon area falls outside a single destination polygon, those polygons are "more nested" than a case where half of a source polygon falls in destination polygon A and half falls into another polygon B.}
+##'  \item{Relative scale, conditional ("rs_nn"). }{Alternative measure of "rs", calculated for the subset of source units that are not fully nested within destination units.}
+##'  \item{Relative nesting, conditional ("rn_nn"). }{Alternative measure of "rn", calculated for the subset of source units that are not fully nested within destination units.}
 ##'  \item{Proportion intact ("p_intact"). }{A nesting metric that requires no area calculations at all. This measure ranges from 0 to 1, where 1 indicates full nesting (i.e. every source unit is intact/no splits), and 0 indicates no nesting (i.e. no source unit is intact/all are split).}
 ##'  \item{Proportion fully nested ("full_nest"). }{A stricter version of "p_intact". This measure ranges from 0 to 1, where 1 indicates full nesting (i.e. every source unit is intact/no splits AND falls completely inside the destination layer), and 0 indicates no nesting (i.e. no source unit is both intact and falls inside destination layer).}
 ##'  \item{Relative overlap ("ro"). }{Assesses extent of spatial overlap between source and destination polygons. This measure is scaled between -1 and 1. Values of 0 indicate perfect overlap (there is no part of source units that fall outside of destination units, and vice versa). Values between 0 and 1 indicate a "source underlap" (some parts of source polygons fall outside of destination polygons; more precisely, a larger part of source polygon area falls outside destination polygons than the other way around). Values between -1 and 0 indicate a "destination underlap" (some parts of destination polygons fall outside of source polygons; a larger part of destination polygon area falls outside source polygons than the other way around). Values of -1 and 1 indicate no overlap (all source units fall outside destination units, and vice versa). This is a theoretical limit only; the function returns an error if there is no overlap.}
@@ -76,10 +78,10 @@ nesting <- function(
   }
 
   # Select scale and nesting metrics
-  if(metrix=="all"){
-    metrix <- c("rs","rn","rs_sym","rn_sym","rs_alt","rn_alt","p_intact","full_nest","ro","gmi")
+  if("all"%in%metrix){
+    metrix <- c("rs","rn","rs_sym","rn_sym","rs_alt","rn_alt","rs_nn","rn_nn","p_intact","full_nest","ro","gmi")
   }
-  metrix <- metrix[metrix%in%c("rs","rn","rs_sym","rn_sym","rs_alt","rn_alt","p_intact","full_nest","ro","gmi")]
+  metrix <- metrix[metrix%in%c("rs","rn","rs_sym","rn_sym","rs_alt","rn_alt","rs_nn","rn_nn","p_intact","full_nest","ro","gmi")]
 
   # Ensure layers have same CRS
   if(sf::st_crs(poly_from)!=sf::st_crs(poly_to)){
@@ -169,6 +171,30 @@ nesting <- function(
       if(by_unit==TRUE){
         rn_alt_byun <- data.table::as.data.table(o_sf)[as.numeric(get("area_in_"))>tol_,as.numeric(base::max(area_in_)),by="ID_1_"]
         nesting_dt[,rn_alt := rn_alt_byun[match(nesting_dt[,index],rn_alt_byun[,ID_1_]),V1]]
+      }
+    }
+
+    # Relative scale, conditional
+    if("rs_nn"%in%metrix){
+      full_nest_byun <- data.table::data.table(o_sf)[as.numeric(get("area_in_"))>tol_,1*(as.numeric(sum(area_ix_)/mean(area_1_))==1&.N==1),by=ID_1_]
+      nn <- full_nest_byun[data.table::data.table(o_sf)[,match(ID_1_,full_nest_byun[,ID_1_])],V1]!=1
+      rs_nn <- data.table::data.table(o_sf)[nn&as.numeric(get("area_in_"))>tol_,base::mean(1*(get("area_1_")<get("area_2_")),na.rm=TRUE)]
+      if(by_unit==TRUE){
+        rs_byun <- data.table::data.table(o_sf)[as.numeric(get("area_in_"))>tol_,base::mean(1*(get("area_1_")<get("area_2_")),na.rm=TRUE),by="ID_1_"]
+        nesting_dt[,rs_nn := rs_byun[match(nesting_dt[,index],rs_byun[,ID_1_]),V1]]
+        nesting_dt[index%in%full_nest_byun[V1==1,ID_1_], rs_nn := NA_real_]
+      }
+    }
+
+    # Relative nesting, conditional
+    if("rn_nn"%in%metrix){
+      full_nest_byun <- data.table::data.table(o_sf)[as.numeric(get("area_in_"))>tol_,1*(as.numeric(sum(area_ix_)/mean(area_1_))==1&.N==1),by=ID_1_]
+      nn <- full_nest_byun[data.table::data.table(o_sf)[,match(ID_1_,full_nest_byun[,ID_1_])],V1]!=1
+      rn_nn <- data.table::as.data.table(o_sf)[nn&as.numeric(get("area_in_"))>tol_,base::sum(as.numeric(get("area_ix_")/get("area_1_"))^2),by="ID_1_"][,base::mean(get("V1"),na.rm=TRUE)]
+      if(by_unit==TRUE){
+        rn_byun <- data.table::as.data.table(o_sf)[as.numeric(get("area_in_"))>tol_,base::sum(as.numeric(get("area_ix_")/get("area_1_"))^2),by="ID_1_"]
+        nesting_dt[,rn_nn := rn_byun[match(nesting_dt[,index],rn_byun[,ID_1_]),V1]]
+        nesting_dt[index%in%full_nest_byun[V1==1,ID_1_], rn_nn := NA_real_]
       }
     }
 
