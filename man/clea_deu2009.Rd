@@ -31,7 +31,7 @@ Constituency-Level Elections Archive (CLEA) \url{https://electiondataarchive.org
 clea_deu2009
 }
 \description{
-A simple feature collection containing the spatial geometries of electoral contituency
+A simple feature collection containing the spatial geometries of electoral constituency
 borders, and data on turnout levels, votes shares and other attributes of lower chamber
 legislative elections.
 }

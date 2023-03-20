@@ -22,7 +22,7 @@
 #'
 #' Unlike other available point-to-polygon interpolation techniques, this function currently only accepts numeric variables in \code{varz} and does not support interpolation of character strings.
 #' @import sf sp
-#' @importFrom raster extract crs values
+#' @importFrom terra extract crs values
 #' @importFrom automap autoKrige
 #' @importFrom stats as.formula aggregate sd
 #' @examples
@@ -78,20 +78,20 @@
 
 
 point2poly_krige <- function(pointz,
-                             polyz,
-                             rasterz=NULL,
-                             yvarz=NULL,
-                             xvarz=NULL,
-                             pycno_yvarz=NULL,
-                             funz=base::mean,
-                             use_grid=TRUE,
-                             nz_grid=100,
-                             blockz = 0,
-                             pointz_x_coord=NULL,
-                             pointz_y_coord=NULL,
-                             polyz_x_coord=NULL,
-                             polyz_y_coord=NULL,
-                             messagez=""){
+                              polyz,
+                              rasterz=NULL,
+                              yvarz=NULL,
+                              xvarz=NULL,
+                              pycno_yvarz=NULL,
+                              funz=base::mean,
+                              use_grid=TRUE,
+                              nz_grid=100,
+                              blockz = 0,
+                              pointz_x_coord=NULL,
+                              pointz_y_coord=NULL,
+                              polyz_x_coord=NULL,
+                              polyz_y_coord=NULL,
+                              messagez=""){
 
 
   # Turn off s2 processing
@@ -104,12 +104,12 @@ point2poly_krige <- function(pointz,
     krig_pointz <- as(pointz, "Spatial")
     if(!is.na(sf::st_crs(pointz)$input)){
       if(grepl("epsg",sf::st_crs(pointz)$input,ignore.case=TRUE)){
-        raster::crs(krig_pointz) <- paste0("+init=",tolower(sf::st_crs(pointz)$input))
+        terra::crs(krig_pointz) <- paste0("+init=",tolower(sf::st_crs(pointz)$input))
       }else{
-        raster::crs(krig_pointz) <- paste0(as.character(sf::st_crs(pointz)$input))
+        terra::crs(krig_pointz) <- paste0(as.character(sf::st_crs(pointz)$input))
       }
     }else{
-      raster::crs(krig_pointz) <- raster::crs(pointz)
+      terra::crs(krig_pointz) <- terra::crs(pointz)
     }
   } else if(class(pointz)[1] %in% 'data.frame'){
     if(is.null(pointz_x_coord) == TRUE & is.null(pointz_y_coord) == TRUE){stop("Please supply both a pointz_x_coord and pointz_y_coord.")}
@@ -117,7 +117,7 @@ point2poly_krige <- function(pointz,
     colnames(pointz)[which(colnames(pointz)== pointz_y_coord)] <- "y"
     sf.convert_pointz <- df2sf(pointz$x, pointz$y, pointz)
     krig_pointz <- as(sf.convert_pointz, "Spatial")
-    raster::crs(krig_pointz) <- "+init=epsg:4326"
+    terra::crs(krig_pointz) <- "+init=epsg:4326"
   } else if(attr(class(pointz), 'package')[1] == 'sp'){
     krig_pointz <- pointz
   } else{stop("Please supply either a data frame, sf, or sp object for pointz.")}
@@ -125,12 +125,12 @@ point2poly_krige <- function(pointz,
     krig_polyz <- as(polyz, "Spatial")
     if(!is.na(sf::st_crs(polyz)$input)){
       if(grepl("epsg",sf::st_crs(pointz)$input,ignore.case=TRUE)){
-        raster::crs(krig_polyz) <- paste0("+init=",tolower(sf::st_crs(polyz)$input))
+        terra::crs(krig_polyz) <- paste0("+init=",tolower(sf::st_crs(polyz)$input))
       }else{
-        raster::crs(krig_polyz) <- paste0(as.character(sf::st_crs(polyz)$input))
+        terra::crs(krig_polyz) <- paste0(as.character(sf::st_crs(polyz)$input))
       }
     }else{
-      raster::crs(krig_polyz) <- raster::crs(polyz)
+      terra::crs(krig_polyz) <- terra::crs(polyz)
     }
   } else if(class(polyz)[1] %in% 'data.frame'){
     if(is.null(polyz_x_coord) == TRUE & is.null(polyz_y_coord) == TRUE){stop("Please supply both a pointz_x_coord and pointz_y_coord.")}
@@ -138,7 +138,7 @@ point2poly_krige <- function(pointz,
     colnames(polyz)[which(colnames(polyz)== polyz_y_coord)] <- "y"
     sf.convert_polyz <- df2sf(polyz$x, polyz$y, polyz)
     krig_polyz <- as(sf.convert_polyz, "Spatial")
-    raster::crs(krig_polyz) <- "+init=epsg:4326"
+    terra::crs(krig_polyz) <- "+init=epsg:4326"
   } else if(attr(class(polyz), 'package') == 'sp'){
     krig_polyz <- polyz
   } else{stop("Please supply either a sf or sp object for polyz.")}
@@ -156,30 +156,30 @@ point2poly_krige <- function(pointz,
     finalrasterz2pointz <- NULL
     if(inherits(rasterz,"list")){
       for(v0 in seq_along(rasterz)){
-        if(stats::sd(raster::values(rasterz[[v0]]),na.rm=TRUE)==0){
-          raster::values(rasterz[[v0]]) <- jitter(raster::values(rasterz[[v0]]))
+        if(stats::sd(terra::values(rasterz[[v0]]),na.rm=TRUE)==0){
+          terra::values(rasterz[[v0]]) <- jitter(terra::values(rasterz[[v0]]))
         }
         krig_polyz_ <- sp::spTransform(krig_polyz, sp::proj4string(rasterz[[v0]]))
-        extractdata <- suppressWarnings(raster::extract(rasterz[[v0]], krig_polyz_))
+        extractdata <- suppressWarnings(terra::extract(rasterz[[v0]], krig_polyz_))
         rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) funz(x, na.rm=TRUE) else NA))
         finalrasterz2polyz <- cbind(finalrasterz2polyz, rastervarz)
         rm(krig_polyz_)
         krig_pointz_ <- sp::spTransform(krig_pointz, sp::proj4string(rasterz[[v0]]))
-        extractdata <- suppressWarnings(raster::extract(rasterz, krig_pointz_))
+        extractdata <- suppressWarnings(terra::extract(rasterz, krig_pointz_))
         rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) funz(x, na.rm=TRUE) else NA))
         finalrasterz2pointz <- cbind(finalrasterz2pointz, rastervarz)
         rm(krig_pointz_)
       }} else{
-        if(stats::sd(raster::values(rasterz),na.rm=TRUE)==0){
-          raster::values(rasterz) <- jitter(raster::values(rasterz))
+        if(stats::sd(terra::values(rasterz),na.rm=TRUE)==0){
+          terra::values(rasterz) <- jitter(terra::values(rasterz))
         }
         krig_polyz_ <- sp::spTransform(krig_polyz, sp::proj4string(rasterz))
-        extractdata <- suppressWarnings(raster::extract(rasterz, krig_polyz_))
+        extractdata <- suppressWarnings(terra::extract(rasterz, krig_polyz_))
         rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) funz(x, na.rm=TRUE) else NA))
         finalrasterz2polyz<- cbind(finalrasterz2polyz, rastervarz)
         rm(krig_polyz_)
         krig_pointz_ <- sp::spTransform(krig_pointz, sp::proj4string(rasterz))
-        extractdata <- suppressWarnings(raster::extract(rasterz, krig_pointz_))
+        extractdata <- suppressWarnings(terra::extract(rasterz, krig_pointz_))
         rastervarz <- unlist(lapply(extractdata, function(x) if (!is.null(x)) funz(x, na.rm=TRUE) else NA))
         finalrasterz2pointz <- cbind(finalrasterz2pointz, rastervarz)
         rm(krig_pointz_)
@@ -226,7 +226,7 @@ point2poly_krige <- function(pointz,
   # Find optimal planar projection for map
   suppressMessages({
     suppressWarnings({
-      if(grepl("longlat",as.character(raster::crs(krig_polyz)))){
+      if(grepl("longlat",as.character(terra::crs(krig_polyz)))){
         polyz_layer <- utm_select(krig_polyz)
         pointz_layer <- sp::spTransform(krig_pointz, sp::proj4string(polyz_layer))
         if(use_grid==TRUE){

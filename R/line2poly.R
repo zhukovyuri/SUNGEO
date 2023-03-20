@@ -30,7 +30,6 @@
 #' If \code{measurez = c("length","density","distance")} (default), contains all of the above.
 #' @import sf
 #' @importFrom stats as.dist
-#' @importFrom raster extract pointDistance raster projectRaster
 #' @importFrom measurements conv_unit
 #' @importFrom dplyr select everything
 #' @examples

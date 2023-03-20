@@ -14,7 +14,7 @@ sf2raster(
   return_field = NULL,
   aggregate_function = list(function(x) mean(x, na.rm = TRUE)),
   reverse_function = list(function(x) mean(x, na.rm = TRUE)),
-  grid_res = c(1000, 1000),
+  grid_dim = c(1000, 1000),
   cartogram = FALSE,
   carto_var = NULL,
   message_out = TRUE,
@@ -40,7 +40,7 @@ sf2raster(
 
 \item{reverse_function}{Aggregation function for reverse conversion. Must be specified if \code{reverse=TRUE}. Function or list of functions. Default is \code{mean}.}
 
-\item{grid_res}{Resolution of raster grid, in meters. Numerical vector of length 2 (number of rows, number of columns). Default is \code{c(1000,1000)}.}
+\item{grid_dim}{Dimensions of raster grid. Numerical vector of length 2 (number of rows, number of columns). Default is \code{c(1000,1000)}.}
 
 \item{cartogram}{Cartogram transformation. Logical. Default is \code{FALSE}.}
 
@@ -76,7 +76,7 @@ This function takes in an \code{sf} spatial object (polygon or point) and return
 data(clea_deu2009)
 out_1 <- sf2raster(polyz_from = utm_select(clea_deu2009),
                    input_variable = "to1")
-raster::plot(out_1)
+terra::plot(out_1)
 }
 # Rasterization of point layer
 \dontrun{
@@ -84,7 +84,7 @@ data(clea_deu2009_pt)
 out_2 <- sf2raster(pointz_from = utm_select(clea_deu2009_pt),
                    input_variable = "to1",
                    grid_res = c(25000,25000))
-raster::plot(out_2)
+terra::plot(out_2)
 }
 # Cartogram (vote turnout scaled by number of valid votes)
 \dontrun{
@@ -92,7 +92,7 @@ out_3 <- sf2raster(polyz_from = utm_select(clea_deu2009),
                    input_variable = "to1",
                    cartogram = TRUE,
                    carto_var = "vv1")
-raster::plot(out_3)
+terra::plot(out_3)
 }
 # Polygonization of cartogram raster
 \dontrun{
@@ -105,6 +105,6 @@ out_4 <- sf2raster(reverse = TRUE,
                    poly_to = out_4a$poly_to,
                    return_output = out_4a$return_output,
                    return_field = out_4a$return_field)
-raster::plot(out_4)
+terra::plot(out_4)
 }
 }

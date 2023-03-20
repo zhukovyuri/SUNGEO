@@ -4,6 +4,14 @@
 ## html_sessionSunGeo Function
 ## Function that replaces rvest::html_session()
 
+request_GET <- function(x, url, ...) {
+  x$response <- httr::GET(url, x$config, ..., handle = x$handle)
+  x$html <- new.env(parent = emptyenv(), hash = FALSE)
+  x$url <- x$response$url
+  httr::warn_for_status(x$response)
+  x
+}
+
 html_sessionSunGeo <- function(url, ...) {
   session <- structure(
     list(
@@ -27,15 +35,7 @@ print.session <- function(x, ...) {
   cat("  Size:   ", length(x$response$content), "\n", sep = "")
 }
 
-request_GET <- function(x, url, ...) {
-  x$response <- httr::GET(url, x$config, ..., handle = x$handle)
-  x$html <- new.env(parent = emptyenv(), hash = FALSE)
-  x$url <- x$response$url
 
-  httr::warn_for_status(x$response)
-
-  x
-}
 
 
 # ## udconvertSunGeo Function

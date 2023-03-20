@@ -1,7 +1,7 @@
 # `SUNGEO` / Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 R package for integrating spatially-misaligned GIS datasets.
 
-Version 0.2.292 (August 18, 2022)
+Version 0.1.01 (March 20, 2023)
 
 Jason Byers, Marty Davidson, Yuri M. Zhukov
 
@@ -15,16 +15,17 @@ Feedback, bug reports welcome: zhukov-at-umich-dot-edu
 * `fix_geom` / Fix polygon geometries
 * `geocode_osm` / Geocode addresses with OpenStreetMap
 * `geocode_osm_batch` / Batch geocode addresses with OpenStreetMap
+* `get_data` / Download data from SUNGEO server
+* `get_info` / Information on available SUNGEO data files
 * `hot_spot` / Automatically calculate Local G hot spot intensity
 * `line2poly` / Line-in-polygon analysis
 * `nesting` / Relative scale and nesting coefficients
+* `point2poly_krige` / Point-to-polygon interpolation, ordinary and universal Kriging method
 * `point2poly_simp` / Point-to-polygon interpolation, simple overlay method
 * `point2poly_tess` / Point-to-polygon interpolation, tessellation method
-* `point2poly_krige` / Point-to-polygon interpolation, ordinary and universal Kriging method
 * `poly2poly_ap` / Area and population weighted polygon-to-polygon interpolation
 * `sf2raster` / Convert simple features object into regularly spaced raster
 * `utm_select` / Automatically convert geographic (degree) to planar coordinates (meters)
-
 
 To install in R:
 
@@ -44,6 +45,7 @@ Read help files:
 ```
 ?poly2poly_ap
 ?utm_select
+?get_data
 ```
 
 Example: geocode an address with OpenStreetMap
@@ -259,14 +261,14 @@ Example: Rasterization of polygons
 out_11 <- sf2raster(polyz_from = utm_select(clea_deu2009),
                    input_variable = "to1")
 # Visualize raster
-raster::plot(out_11)
+terra::plot(out_11)
 
 # 25km-by-25km RasterLayer (requires planar CRS)
 out_12 <- sf2raster(polyz_from = utm_select(clea_deu2009),
                    input_variable = "to1",
-                   grid_res = c(25000, 25000))
+                   grid_dim = c(100, 100))
 # Visualize raster
-raster::plot(out_12)
+terra::plot(out_12)
 ```
 
 Example: Create cartogram
@@ -277,7 +279,7 @@ out_13 <- sf2raster(polyz_from = utm_select(clea_deu2009),
                   input_variable = "to1",
                   cartogram = TRUE,
                   carto_var = "vv1")
-raster::plot(out_13)
+terra::plot(out_13)
 ```
 
 Example: reverse rasterization
@@ -295,6 +297,55 @@ out_14 <- sf2raster(reverse = TRUE,
                    return_field = out_14a$return_field)
 plot(out_14["to1"])
 
+```
+
+Example: download data through SUNGEO API
+
+```
+# Single country, single topic
+out_15 <- get_data(country_name="Afghanistan",topics="Demographics:Population:GHS")
+out_15
+
+# Multiple countries, multiple topics
+out_16 <- get_data(
+	country_name=c("Albania","Moldova"),
+	topics=c("Demographics:Ethnicity:EPR","Demographics:Population:GHS"))
+out_16
+
+# Other boundary sets, spatial and time units
+out_17 <- get_data(
+	country_name="Albania",
+	topics="Weather:AirTemperatureAndPrecipitation:NOAA",
+	geoset="GAUL",geoset_yr=1990,space_unit="adm2",time_unit="month",
+	year_min=1990,year_max=1991)
+out_17
+```
+
+Example: get list of available data through SUNGEO API
+
+```
+# Get list of all available data
+out_18 <- get_info()
+out_18["summary"]
+out_18["topics"]
+out_18["geosets"]
+
+# Get list of available data for a single country
+out_19 <- get_info(country_names="Afghanistan")
+out_19["summary"]
+out_19["topics"]
+out_19["geosets"]
+
+# Get list of available data for a single topic
+out_20 <- get_info(topics="Elections:LowerHouse:CLEA")
+out_20["summary"]
+out_20["topics"]
+
+# Get list of available data for a multiple countries and topics
+out_21 <- get_info(
+           country_names=c("Afghanistan","Zambia"),
+           topics=c("Elections:LowerHouse:CLEA","Events:PoliticalViolence:GED"))
+out_21["summary"]
 ```
 
 Additional examples in help files of individual functions.

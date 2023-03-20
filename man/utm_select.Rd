@@ -7,7 +7,7 @@
 utm_select(x, max_zones = 5, return_list = FALSE)
 }
 \arguments{
-\item{x}{Layer to be reprojected. \code{sf}, \code{sp} or \code{RasterLayer} object.}
+\item{x}{Layer to be reprojected. \code{sf}, \code{sp}, \code{SpatRaster} or \code{RasterLayer} object.}
 
 \item{max_zones}{Maximum number of UTM zones for single layer. Default is 5. Numeric.}
 
@@ -32,6 +32,11 @@ Optimal map projection for the object \code{x} is defined by matching its horizo
 # Find a planar projection for an unprojected (WSG 1984) hexagonal grid of Germany
 \dontrun{
 data(hex_05_deu)
-hex_tr <- utm_select(hex_05_deu)
+out_1 <- utm_select(hex_05_deu)
+}
+# Find a planar projection for a raster
+\dontrun{
+data(gpw4_deu2010)
+out_2 <- utm_select(gpw4_deu2010)
 }
 }

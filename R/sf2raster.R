@@ -11,7 +11,7 @@
 #' @param return_output Return output for reverse conversion. Must be specified if \code{reverse=TRUE}.
 #' @param return_field Return field for reverse conversion. Must be specified if \code{reverse=TRUE}.
 #' @param reverse_function  Aggregation function for reverse conversion. Must be specified if \code{reverse=TRUE}. Function or list of functions. Default is \code{mean}.
-#' @param grid_res Resolution of raster grid, in meters. Numerical vector of length 2 (number of rows, number of columns). Default is \code{c(1000,1000)}.
+#' @param grid_dim Dimensions of raster grid. Numerical vector of length 2 (number of rows, number of columns). Default is \code{c(1000,1000)}.
 #' @param cartogram Cartogram transformation. Logical. Default is \code{FALSE}.
 #' @param carto_var Input variable for cartogram transformation. Must be specified if \code{cartogram=TRUE}. Character string.
 #' @param message_out Print informational messages. Logical. Default is \code{TRUE}.
@@ -32,11 +32,11 @@
 ##'  }
 ##' If \code{reverse=TRUE}, returns an \code{sf} polygon layer, with columns corresponding to \code{input_variable} and auto-generated numerical ID \code{Field}.
 #' @import packcircles cartogram Rcpp
-#' @importFrom raster brick extent as.data.frame nlayers res extract values mask projectRaster plot
+#' @importFrom terra rasterize ncell res ext vect as.data.frame res extract values mask plot
+#' @importFrom raster raster
 #' @importFrom cartogram cartogram_cont
 #' @importFrom sf st_collection_extract st_crs st_geometry st_centroid st_buffer st_transform st_convex_hull st_union
 #' @importFrom dplyr group_by summarize left_join
-#' @importFrom fasterize fasterize
 #' @importFrom purrr reduce
 #' @importFrom sp CRS
 #' @examples
@@ -45,7 +45,7 @@
 #' data(clea_deu2009)
 #' out_1 <- sf2raster(polyz_from = utm_select(clea_deu2009),
 #'                    input_variable = "to1")
-#' raster::plot(out_1)
+#' terra::plot(out_1)
 #' }
 #' # Rasterization of point layer
 #' \dontrun{
@@ -53,7 +53,7 @@
 #' out_2 <- sf2raster(pointz_from = utm_select(clea_deu2009_pt),
 #'                    input_variable = "to1",
 #'                    grid_res = c(25000,25000))
-#' raster::plot(out_2)
+#' terra::plot(out_2)
 #' }
 #' # Cartogram (vote turnout scaled by number of valid votes)
 #' \dontrun{
@@ -61,7 +61,7 @@
 #'                    input_variable = "to1",
 #'                    cartogram = TRUE,
 #'                    carto_var = "vv1")
-#' raster::plot(out_3)
+#' terra::plot(out_3)
 #' }
 #' # Polygonization of cartogram raster
 #' \dontrun{
@@ -74,12 +74,12 @@
 #'                    poly_to = out_4a$poly_to,
 #'                    return_output = out_4a$return_output,
 #'                    return_field = out_4a$return_field)
-#' raster::plot(out_4)
+#' terra::plot(out_4)
 #' }
 #' @export
 
 
-sf2raster <- function (polyz_from = NULL,
+sf2raster <- function(polyz_from = NULL,
                        pointz_from = NULL,
                        input_variable = NULL,
                        reverse = FALSE,
@@ -88,12 +88,11 @@ sf2raster <- function (polyz_from = NULL,
                        return_field = NULL,
                        aggregate_function = list(function(x) mean(x, na.rm = TRUE)),
                        reverse_function = list(function(x) mean(x, na.rm = TRUE)),
-                       grid_res = c(1000, 1000),
+                       grid_dim = c(1000, 1000),
                        cartogram = FALSE,
                        carto_var = NULL,
                        message_out = TRUE,
-                       return_list = FALSE)
-{
+                       return_list = FALSE){
 
   # Turn off s2 processing
   suppressMessages({
@@ -108,7 +107,10 @@ sf2raster <- function (polyz_from = NULL,
     reverse_function <- list(reverse_function)
   }
 
-  if (message_out && !reverse && !any(grepl("meter|metre",sf::st_crs(polyz_from),ignore.case = TRUE))) {
+  if (!is.null(polyz_from) & message_out && !reverse && !any(grepl("meter|metre",sf::st_crs(polyz_from),ignore.case = TRUE))) {
+    message("Note: Please project the SF object into a meter-based projection coordinate system prior to using this function. Default grid resolution is in meters.")
+  }
+  if (!is.null(pointz_from) & message_out && !reverse && !any(grepl("meter|metre",sf::st_crs(pointz_from),ignore.case = TRUE))) {
     message("Note: Please project the SF object into a meter-based projection coordinate system prior to using this function. Default grid resolution is in meters.")
   }
   if (!is.null(polyz_from) && !is.null(pointz_from) && !reverse) {
@@ -121,8 +123,7 @@ sf2raster <- function (polyz_from = NULL,
     else {
       pointz_from
     }
-  }
-  else {
+  } else {
     CheckObj <- poly_to
   }
   if (all(!("sf" %in% class(CheckObj)))) {
@@ -135,8 +136,8 @@ sf2raster <- function (polyz_from = NULL,
 
   if (!reverse) {
     if (message_out) {
-      message(paste("Converting SF object into a regularly spaced raster grid cell of resolution:",
-                    grid_res[1], "by", grid_res[2]))
+      message(paste("Converting SF object into a regularly spaced raster grid of dimensions:",
+                    grid_dim[1], "by", grid_dim[2]))
     }
     if (cartogram && !is.null(polyz_from)) {
       if (is.null(carto_var)) {
@@ -167,29 +168,25 @@ sf2raster <- function (polyz_from = NULL,
     }
     ProjectionObj <- if (!is.null(polyz_from)) {
       sf::st_crs(polyz_from)
-    }
-    else {
+    } else {
       sf::st_crs(pointz_from)
     }
     if (grepl("^EPSG", ProjectionObj$input) & !grepl("^\\+",
                                                      ProjectionObj$input)) {
       ProjectionObj$input <- tolower(paste0("+init=", ProjectionObj$input))
     }
-    Template_Raster <- raster::raster(ncol = 1000, nrow = 1000,
-                                      crs = ProjectionObj$input)
-    raster::extent(Template_Raster) <- if (!is.null(polyz_from)) {
-      raster::extent(polyz_from)
+    if (!is.null(polyz_from)){
+      Template_Raster <- terra::rast(ncol = grid_dim[2], nrow = grid_dim[1], crs = ProjectionObj$input, extent=terra::ext(polyz_from))
+    } else {
+      Template_Raster <- terra::rast(ncol = grid_dim[2], nrow = grid_dim[1], crs = ProjectionObj$input, extent=terra::ext(pointz_from))
     }
-    else {
-      raster::extent(pointz_from)
-    }
-    raster::res(Template_Raster) <- c(grid_res[1], grid_res[2])
-    raster::values(Template_Raster) <- 1:length(Template_Raster)
+    suppressWarnings({
+      terra::values(Template_Raster) <- 1:terra::ncell(Template_Raster)
+    })
     names(Template_Raster) <- "ID"
     impute_layer <- Template_Raster
     if (!is.null(pointz_from)) {
-      pointz_from$Field <- raster::extract(Template_Raster,
-                                           pointz_from)
+      pointz_from$Field <- unlist(terra::extract(x=Template_Raster,y=terra::vect(pointz_from),ID=FALSE))
       pointz_from_xy <- pointz_from
       sf::st_geometry(pointz_from_xy) <- NULL
       suppressMessages({
@@ -197,36 +194,48 @@ sf2raster <- function (polyz_from = NULL,
                                           Field)
         pointz_from_xy <- dplyr::summarize(pointz_from_xy,
                                            Var = aggregate_function[[1]](Var))
+        pointz_from_xy <- as.data.frame(pointz_from_xy)
       })
-      Template_Raster_xy <- raster::as.data.frame(Template_Raster)
+      Template_Raster_xy <- terra::as.data.frame(Template_Raster,na.rm=FALSE)
+      # head(Template_Raster_xy)
       Template_Raster_xy <- dplyr::left_join(Template_Raster_xy,
                                              pointz_from_xy, by = c(ID = "Field"))
       output_data <- Template_Raster
-      raster::values(output_data) <- Template_Raster_xy$Var
+      terra::values(output_data) <- Template_Raster_xy$Var
       names(output_data) <- input_variable
       ReturnList <- list(return_output = output_data, return_point = pointz_from_SP_keep)
     }
     if (!is.null(polyz_from)) {
-      polyz_from_layer <- fasterize::fasterize(polyz_from,
-                                               Template_Raster, field = "Field")
+      polyz_from_layer <- terra::rasterize(polyz_from,
+                                           Template_Raster, field = "Field")
+      # terra::res(polyz_from_layer) <- c(grid_res[1], grid_res[2])
+      # terra::plot(polyz_from_layer)
       field_layer <- polyz_from_layer
       names(field_layer) <- "Field"
-      polyz_from_xy <- raster::as.data.frame(polyz_from_layer)
+      polyz_from_xy <- terra::as.data.frame(polyz_from_layer,na.rm=FALSE)
       names(polyz_from_xy)[1] <- "Field"
       polyz_from_df <- polyz_from
       sf::st_geometry(polyz_from_df) <- NULL
+      dim(polyz_from_xy)
+      dim(polyz_from_df)
+      terra::ncell(polyz_from_layer)
+      terra::ncell(Template_Raster)
       polyz_from_xy <- dplyr::left_join(polyz_from_xy,
                                         polyz_from_df, by = "Field")
+      # polyz_from_xy <- base::merge(polyz_from_xy,polyz_from_df, by = "Field",all.x=TRUE,all.y=FALSE)
+
+      dim(polyz_from_xy)
       names(polyz_from_xy)[names(polyz_from_xy) %in% c(input_variable)] <- "Var"
-      raster::values(polyz_from_layer) <- polyz_from_xy$Var
+      terra::values(polyz_from_layer) <- polyz_from_xy$Var
       output_data <- polyz_from_layer
       names(output_data) <- input_variable
       suppressWarnings({
         centroid_polygon <- sf::st_centroid(polyz_from_SP_keep)
         centroid_polygon <- sf::st_buffer(centroid_polygon,
-                                          dist = grid_res[1])
+                                          dist = terra::res(Template_Raster)[1])
       })
-      centroid_layer <- raster::mask(output_data, centroid_polygon)
+      centroid_layer <- terra::mask(output_data, centroid_polygon)
+      # terra::plot(centroid_layer)
       ReturnList <- list(return_output = output_data, return_centroid = centroid_layer,
                          poly_to = polyz_from_SP_keep, return_field = field_layer)
     }
@@ -240,10 +249,10 @@ sf2raster <- function (polyz_from = NULL,
       message("Converting regularly spaced raster grid cell into SF polygon object")
     }
     namesOutput <- names(return_output)
-    Polygon_Frame <- raster::brick(return_field, return_output)
+    Polygon_Frame <- c(return_field, return_output)
     names(Polygon_Frame)[1] <- "Field"
     names(Polygon_Frame)[-1] <- namesOutput
-    Polygon_Frame <- raster::as.data.frame(Polygon_Frame)
+    Polygon_Frame <- terra::as.data.frame(Polygon_Frame)
     Polygon_Frame <- lapply(2:ncol(Polygon_Frame), function(col) {
       Selected_Matrix <- Polygon_Frame[, c(1, col)]
       names(Selected_Matrix)[2] <- "Var"

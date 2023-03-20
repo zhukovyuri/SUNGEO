@@ -16,7 +16,9 @@ poly2poly_ap(
   pycno_varz = NULL,
   char_varz = NULL,
   char_assign = "biggest_overlap",
-  funz = function(x, w) {     stats::weighted.mean(x, w, na.rm = TRUE) },
+  funz = function(x, w) {
+     stats::weighted.mean(x, w, na.rm = TRUE)
+ },
   seed = 1
 )
 }
@@ -33,7 +35,7 @@ poly2poly_ap(
 
 \item{char_methodz}{Interpolation method(s) for character strings. Could be either of "aw" (areal weighting, default) or "pw" (population weighting). See "details". Character string.}
 
-\item{pop_raster}{Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} object.}
+\item{pop_raster}{Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} or \code{SpatRaster} object.}
 
 \item{varz}{Names of numeric variable(s) to be interpolated from source polygon layer to destination polygons. Character string or vector of character strings.}
 

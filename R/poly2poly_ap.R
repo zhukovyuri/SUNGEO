@@ -8,7 +8,7 @@
 #' @param geo_vor Voronoi polygons object (used internally by \code{point2poly_tess}). \code{sf} object.
 #' @param methodz Area interpolation method(s). Could be either of "aw" (areal weighting, default) and/or "pw" (population weighting). See "details". Character string or vector of character strings.
 #' @param char_methodz Interpolation method(s) for character strings. Could be either of "aw" (areal weighting, default) or "pw" (population weighting). See "details". Character string.
-#' @param pop_raster Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} object.
+#' @param pop_raster Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} or \code{SpatRaster} object.
 #' @param varz Names of numeric variable(s) to be interpolated from source polygon layer to destination polygons. Character string or vector of character strings.
 #' @param funz Aggregation function to be applied to variables specified in \code{varz}. Must take as an input a numeric vector \code{x} and vector of weights \code{w}. Function or list of functions.
 #' @param pycno_varz  Names of spatially extensive numeric variables for which the pycnophylactic (mass-preserving) property should be preserved. Character string or vector of character strings.
@@ -36,7 +36,7 @@
 #' @import sf
 #' @importFrom stats as.dist weighted.mean
 #' @importFrom data.table data.table rbindlist as.data.table
-#' @importFrom raster extract pointDistance raster projectRaster
+#' @importFrom terra extract
 #' @importFrom methods as
 #' @importFrom dplyr full_join left_join
 #' @importFrom purrr reduce
@@ -94,19 +94,19 @@
 
 
 poly2poly_ap <- function(
-  poly_from,
-  poly_to,
-  poly_to_id,
-  geo_vor = NULL,
-  methodz="aw",
-  char_methodz = "aw",
-  pop_raster=NULL,
-  varz=NULL,
-  pycno_varz=NULL,
-  char_varz=NULL,
-  char_assign="biggest_overlap",
-  funz=function(x,w){stats::weighted.mean(x,w,na.rm=TRUE)},
-  seed = 1
+    poly_from,
+    poly_to,
+    poly_to_id,
+    geo_vor = NULL,
+    methodz="aw",
+    char_methodz = "aw",
+    pop_raster=NULL,
+    varz=NULL,
+    pycno_varz=NULL,
+    char_varz=NULL,
+    char_assign="biggest_overlap",
+    funz=function(x,w){stats::weighted.mean(x,w,na.rm=TRUE)},
+    seed = 1
 ){
 
   set.seed(seed)
@@ -155,7 +155,7 @@ poly2poly_ap <- function(
   # Population-weights (part 1)
   if("pw"%in%methodz){
     # Calculate polygon total
-    poly_from$POP_TOTAL <- raster::extract(pop_raster,methods::as(poly_from,"Spatial"),fun=sum,na.rm=TRUE)
+    poly_from$POP_TOTAL <- unlist(terra::extract(pop_raster,methods::as(poly_from,"Spatial"),fun=sum,na.rm=TRUE))
   }
 
   #
@@ -196,7 +196,7 @@ poly2poly_ap <- function(
   # Population-weights (part 2)
   if("pw"%in%methodz){
     # Calculate weights
-    int_1$POP_INT <- raster::extract(pop_raster,int_1,fun=sum,na.rm=TRUE)
+    int_1$POP_INT <- unlist(terra::extract(pop_raster,int_1,fun=sum,na.rm=TRUE))
     int_1$POP_W <- int_1$POP_INT/int_1$POP_TOTAL
   }
 
@@ -211,7 +211,6 @@ poly2poly_ap <- function(
 
   #
   #
-
   ################################################
   #Part v - Interpolate missing population values
   ################################################
@@ -222,16 +221,15 @@ poly2poly_ap <- function(
     if(sum(is.na(int_1_dt$POP_INT))==1){
       #Part a -
       suppressWarnings({
-        w <- suppressMessages(
-          as.matrix(stats::as.dist(raster::pointDistance(as.data.frame(sf::st_coordinates(sf::st_centroid(int_1))),lonlat=TRUE)))
-        )
+        w <- as.matrix(sf::st_distance(sf::st_centroid(int_1)))
       })
+
 
       #Part b -
       diag(w) <- NA
 
       #Part c -
-      int_1_dt$POP_INT[is.na(int_1_dt$POP_INT)] <- mean(int_1_dt$POP_INT[t(apply(w, 1, order)[1:min(10,nrow(int_1)), is.na(int_1$POP_INT)])],na.rm=TRUE)
+      int_1_dt$POP_INT[is.na(int_1_dt$POP_INT)] <- mean(int_1_dt$POP_INT[t(apply(w, 1, order)[1:min(10,nrow(int_1_dt)), is.na(int_1_dt$POP_INT)])],na.rm=TRUE)
 
       #Part d -
       int_1_dt$POP_W[is.na(int_1_dt$POP_W)] <- int_1_dt$POP_INT[is.na(int_1_dt$POP_W)]/int_1_dt$POP_TOTAL[is.na(int_1_dt$POP_W)]
@@ -245,16 +243,14 @@ poly2poly_ap <- function(
     if(sum(is.na(int_1_dt$POP_INT))>1){
       #Part a -
       suppressWarnings({
-        w <- suppressMessages(
-          as.matrix(stats::as.dist(raster::pointDistance(as.data.frame(sf::st_coordinates(sf::st_centroid(int_1))),lonlat=TRUE)))
-        )
+        w <- as.matrix(sf::st_distance(sf::st_centroid(int_1)))
       })
 
       #Part b -
       diag(w) <- NA
 
       #Part c -
-      int_1_dt$POP_INT[is.na(int_1_dt$POP_INT)] <- apply(t(apply(w, 1, order)[ 1:min(10,nrow(int_1)), is.na(int_1$POP_INT)]),1,function(x){mean(int_1$POP_INT[x],na.rm=TRUE)})
+      int_1_dt$POP_INT[is.na(int_1_dt$POP_INT)] <- apply(t(apply(w, 1, order)[ 1:min(10,nrow(int_1_dt)), is.na(int_1_dt$POP_INT)]),1,function(x){mean(int_1_dt$POP_INT[x],na.rm=TRUE)})
 
       #Part d -
       int_1_dt$POP_W[is.na(int_1_dt$POP_W)] <- int_1_dt$POP_INT[is.na(int_1_dt$POP_W)]/int_1_dt$POP_TOTAL[is.na(int_1_dt$POP_W)]
@@ -482,7 +478,7 @@ poly2poly_ap <- function(
     })
 
     #Part iiii -
-    Empty_Sets <- sapply(Character_Aggregation_Matrix, function(x) is.null(x) || grepl('Error', x))
+    Empty_Sets <- sapply(Character_Aggregation_Matrix, function(x) is.null(x[,2]) || grepl('Error', x[,2]))
     if(TRUE%in%Empty_Sets){
       Character_Aggregation_Matrix <- Character_Aggregation_Matrix[Empty_Sets == FALSE]
     }
@@ -570,7 +566,8 @@ poly2poly_ap <- function(
   })
 
   #Part iii -
-  Empty_Sets <- sapply(Numeric_Aggregation_Matrix, function(x) is.null(x) || grepl('Error', x))
+  Empty_Sets <- sapply(Numeric_Aggregation_Matrix, function(x){is.null(x[,2]) || grepl('Error', x[,2])})
+
   if(TRUE%in%Empty_Sets){
     Numeric_Aggregation_Matrix <- Numeric_Aggregation_Matrix[Empty_Sets == FALSE]
   }

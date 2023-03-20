@@ -1,6 +1,6 @@
 #' Constituency level results for lower chamber legislative elections, Germany 2009.
 #'
-#' A simple feature collection containing the spatial geometries of electoral contituency
+#' A simple feature collection containing the spatial geometries of electoral constituency
 #' borders, and data on turnout levels, votes shares and other attributes of lower chamber
 #' legislative elections.
 #'
@@ -82,14 +82,15 @@
 #' consistent with national censuses and population registers, for the year 2010.
 #'
 #' @format
-#' class       : RasterLayer.
-#' dimensions  : 186, 220, 40920  (nrow, ncol, ncell).
-#' resolution  : 0.04166667, 0.04166667  (x, y).
-#' extent      : 5.875, 15.04167, 47.29167, 55.04167  (xmin, xmax, ymin, ymax).
-#' coord. ref. : +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0.
-#' data source : in memory.
-#' names       : gpw_v4_population_count_rev11_2010_2pt5_min.
-#' values      : 0, 92915.66  (min, max).
+#' class       : SpatRaster
+#' dimensions  : 186, 220, 1  (nrow, ncol, nlyr)
+#' resolution  : 0.04166667, 0.04166667  (x, y)
+#' extent      : 5.875, 15.04167, 47.29167, 55.04167  (xmin, xmax, ymin, ymax)
+#' coord. ref. : lon/lat WGS 84 (EPSG:4326)
+#' source(s)   : memory
+#' name        : gpw_v4_population_count_rev11_2010_2pt5_min
+#' min value   :                                        0.00
+#' max value   :                                    92915.66
 #' @source Gridded Population of the World (GPW) v4: Population Count, v4.11 <doi:10.7927/H4JW8BX5>.
 "gpw4_deu2010"
 
@@ -115,8 +116,7 @@
 #'
 #' Roads thematic layer from Digital Chart of the World. Subset: divided multi-lane highways.
 #'
-#' @format
-#' Simple feature collection with 1741 features and 5 fields.
+#' @format Simple feature collection with 1741 features and 5 fields.
 #' geometry type:  MULTILINESTRING.
 #' dimension:      XY.
 #' bbox:           xmin: 5.750933 ymin: 47.58799 xmax: 14.75109 ymax: 54.80712
@@ -131,3 +131,81 @@
 #' }
 #' @source Defense Mapping Agency (DMA), 1992. Digital Chart of the World. Defense Mapping Agency, Fairfax, Virginia. (Four CD-ROMs). Available through DIVA-GIS: \url{http://www.diva-gis.org/gData} (accessed August 12, 2021).
 "highways_deu1992"
+
+#' Data availability through SUNGEO API
+#'
+#' Census of geospatial and processed data files available to download using \code{SUNGEO::get_data()}.
+#'
+#' @format List of 42 data.table objects
+#' Geoset:GADM :Classes ‘data.table’ and 'data.frame': 249 obs. of  4 variables
+#' Geoset:GAUL :Classes ‘data.table’ and 'data.frame': 242 obs. of  4 variables
+#' Geoset:geoBoundaries :Classes ‘data.table’ and 'data.frame': 197 obs. of  4 variables
+#' Geoset:GRED :Classes ‘data.table’ and 'data.frame': 74 obs. of  4 variables
+#' Geoset:HEXGRID :Classes ‘data.table’ and 'data.frame': 199 obs. of  4 variables
+#' Geoset:MPIDR :Classes ‘data.table’ and 'data.frame': 52 obs. of  4 variables
+#' Geoset:NHGIS :Classes ‘data.table’ and 'data.frame': 1 obs. of  4 variables
+#' Geoset:PRIOGRID :Classes ‘data.table’ and 'data.frame': 199 obs. of  4 variables
+#' Geoset:SHGIS :Classes ‘data.table’ and 'data.frame': 68 obs. of  4 variables
+#' \describe{
+#'   \item{country_iso3 }{Codes for available countries (ISO 3166-1 alpha-3). Character string.}
+#'   \item{country_name }{Names of available countries. Character string.}
+#'   \item{geoset_years }{Years of available historical boundary files. Character string.}
+#'   \item{space_units }{Available spatial units of analysis. Character string.}
+#' }
+#' Elections:LowerHouse:CLEA :Classes ‘data.table’ and 'data.frame': 168 obs. of  6 variables
+#' Demographics:Ethnicity:EPR :Classes ‘data.table’ and 'data.frame': 180 obs. of  6 variables
+#' Demographics:Ethnicity:GREG :Classes ‘data.table’ and 'data.frame': 234 obs. of  6 variables
+#' Demographics:Population:GHS :Classes ‘data.table’ and 'data.frame': 257 obs. of  6 variables
+#' Events:PoliticalViolence:ABADarfur :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:ACLED :Classes ‘data.table’ and 'data.frame': 100 obs. of  6 variables
+#' Events:PoliticalViolence:BeissingerProtest :Classes ‘data.table’ and 'data.frame': 15 obs. of  6 variables
+#' Events:PoliticalViolence:BeissingerRiot :Classes ‘data.table’ and 'data.frame': 15 obs. of  6 variables
+#' Events:PoliticalViolence:BeissingerUkraine :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:COCACW :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:ESOCAfghanistanWITS :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:ESOCIraqSIGACT :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:ESOCIraqWITS :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:ESOCMexicoDrugRelatedMurders :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:ESOCMexicoHomicide :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:ESOCPakistanBFRS :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:ESOCPakistanWITS :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:GED :Classes ‘data.table’ and 'data.frame': 121 obs. of  6 variables
+#' Events:PoliticalViolence:Lankina :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:NIRI :Classes ‘data.table’ and 'data.frame': 12 obs. of  6 variables
+#' Events:PoliticalViolence:NVMS :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:PITF :Classes ‘data.table’ and 'data.frame': 133 obs. of  6 variables
+#' Events:PoliticalViolence:SCAD :Classes ‘data.table’ and 'data.frame': 60 obs. of  6 variables
+#' Events:PoliticalViolence:yzCaucasus2000 :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:yzChechnya :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:yzLibya :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Events:PoliticalViolence:yzUkraine2014 :Classes ‘data.table’ and 'data.frame': 1 obs. of  6 variables
+#' Infrastructure:Roads:gRoads :Classes ‘data.table’ and 'data.frame': 240 obs. of  6 variables
+#' Infrastructure:NightLights:DMSP :Classes ‘data.table’ and 'data.frame': 257 obs. of  6 variables
+#' PublicHealth:Covid19:JHUCSSEC19 :Classes ‘data.table’ and 'data.frame': 207 obs. of  6 variables
+#' Terrain:Elevation:ETOPO1 :Classes ‘data.table’ and 'data.frame': 256 obs. of  6 variables
+#' Terrain:LandCover:GLCC :Classes ‘data.table’ and 'data.frame': 257 obs. of  6 variables
+#' Weather:AirTemperatureAndPrecipitation:NOAA :Classes ‘data.table’ and 'data.frame': 209 obs. of  6 variables
+#' \describe{
+#'   \item{country_iso3 }{Codes for available countries (ISO 3166-1 alpha-3). Character string.}
+#'   \item{country_name }{Names of available countries. Character string.}
+#'   \item{year_range }{Range of available years for data topic. Character string.}
+#'   \item{time_units }{Available time units. Character string.}
+#'   \item{space_units }{Available spatial units. Character string.}
+#'   \item{geosets }{Names of available geographic boundary data sources. Character string.}
+#' }
+#' @source Sub-National Geospatial Data Archive System: Geoprocessing Toolkit (updated March 17, 2023).
+"available_data"
+
+
+#' Country code dictionary
+#'
+#' Reference table of country names and ISO-3166 codes, adapted from \code{countrycode} package.
+#'
+#' @format data.table object, with	8626 obs. of  3 variables:
+#' \describe{
+#'   \item{country_name }{Country names. Character string.}
+#'   \item{country_name_alt }{Alternative spellings of country names, ASCII characters only. Character string.}
+#'   \item{country_iso3 }{Country codes (ISO 3166-1 alpha-3). Character string.}
+#' }
+#' @source Vincent Arel-Bundock. Package countrycode: Convert Country Names and Country Code, version 1.40. CRAN (October 12, 2022).
+"cc_dict"

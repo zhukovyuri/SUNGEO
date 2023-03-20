@@ -7,7 +7,7 @@
 #' @param poly_id Name of unique ID column for destination polygon layer. Character string.
 #' @param methodz Interpolation method(s) for numeric covariates. Could be either of "aw" (areal weighting, default) and/or "pw" (population weighting). See "details". Character string or vector of character strings.
 #' @param char_methodz Interpolation method(s) for character strings. Could be either of "aw" (areal weighting, default) or "pw" (population weighting). See "details". Character string.
-#' @param pop_raster Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} object.
+#' @param pop_raster Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} or \code{SpatRaster} object.
 #' @param varz Names of numeric variable(s) to be interpolated from source polygon layer to destination polygons. Character string or list of character strings.
 #' @param funz Aggregation function to be applied to variables specified in \code{varz}. Must take as an input a numeric vector \code{x} and vector of weights \code{w}. Function or list of functions.
 #' @param pycno_varz Names of spatially extensive numeric variables for which the pycnophylactic (mass-preserving) property should be preserved. Character string or vector of character strings.
@@ -47,7 +47,7 @@
 #' @import sf
 #' @importFrom stats as.dist weighted.mean
 #' @importFrom data.table data.table rbindlist as.data.table setnames
-#' @importFrom raster extract pointDistance raster projectRaster
+#' @importFrom terra extract
 #' @importFrom methods as
 #' @importFrom rmapshaper ms_dissolve
 #' @importFrom dplyr select bind_cols left_join
@@ -93,7 +93,7 @@
 #'                            ),
 #'                          char_varz = c("incumb_pty_n","win1_pty_n"),
 #'                          pop_raster = gpw4_deu2010)
-#' plot(out_3["pvs1_margin_pw"])
+#' plot(out_3["vv1_pw"])
 #' }
 #' @export
 

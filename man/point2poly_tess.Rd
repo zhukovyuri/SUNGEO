@@ -15,7 +15,9 @@ point2poly_tess(
   pycno_varz = NULL,
   char_varz = NULL,
   char_assign = "biggest_overlap",
-  funz = function(x, w) {     stats::weighted.mean(x, w, na.rm = TRUE) },
+  funz = function(x, w) {
+     stats::weighted.mean(x, w, na.rm = TRUE)
+ },
   return_tess = FALSE,
   seed = 1
 )
@@ -31,7 +33,7 @@ point2poly_tess(
 
 \item{methodz}{Interpolation method(s) for numeric covariates. Could be either of "aw" (areal weighting, default) and/or "pw" (population weighting). See "details". Character string or vector of character strings.}
 
-\item{pop_raster}{Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} object.}
+\item{pop_raster}{Population raster to be used for population weighting, Must be supplied if \code{methodz="pw"}. Must have identical CRS to \code{poly_from}. \code{raster} or \code{SpatRaster} object.}
 
 \item{varz}{Names of numeric variable(s) to be interpolated from source polygon layer to destination polygons. Character string or list of character strings.}
 
@@ -123,6 +125,6 @@ out_3 <- point2poly_tess(pointz = clea_deu2009_pt,
                            ),
                          char_varz = c("incumb_pty_n","win1_pty_n"),
                          pop_raster = gpw4_deu2010)
-plot(out_3["pvs1_margin_pw"])
+plot(out_3["vv1_pw"])
 }
 }

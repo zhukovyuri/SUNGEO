@@ -75,6 +75,6 @@ plot(out_4["LocalG"])
 data(gpw4_deu2010)
 out_5 <- hot_spot(insert=gpw4_deu2010)
 class(out_5)
-raster::plot(out_5)
+terra::plot(out_5$LocalG)
 }
 }

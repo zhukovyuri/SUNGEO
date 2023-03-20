@@ -12,7 +12,7 @@
 #' @return If \code{input} is \code{sf}, \code{SpatialPolygonsDataFrame} or \code{SpatialPointsDataFrame} object, returns \code{sf} object with same geometries and columns as \code{input}, appended with additional column containing Local G estimates (\code{LocalG}). If \code{input} is \code{RasterLayer} object, returns \code{RasterBrick} object containing original values (\code{Original}) and Local G estimates (\code{LocalG}).
 #' @import sp
 #' @importFrom sf st_as_sf st_is st_coordinates
-#' @importFrom raster raster brick values as.data.frame
+#' @importFrom terra values as.data.frame plot
 #' @importFrom spdep poly2nb nb2listw localG localmoran
 #' @importFrom RANN nn2
 #' @examples
@@ -55,16 +55,16 @@
 #' data(gpw4_deu2010)
 #' out_5 <- hot_spot(insert=gpw4_deu2010)
 #' class(out_5)
-#' raster::plot(out_5)
+#' terra::plot(out_5$LocalG)
 #' }
 #' @export
 hot_spot <- function(insert,
-                     variable = NULL,
-                     style = 'W',
-                     k = 9,
-                     remove_missing = TRUE,
-                     NA_Value = 0,
-                     include_Moran = FALSE){
+                      variable = NULL,
+                      style = 'W',
+                      k = 9,
+                      remove_missing = TRUE,
+                      NA_Value = 0,
+                      include_Moran = FALSE){
 
   # Turn off s2 processing
   suppressMessages({
@@ -78,7 +78,7 @@ hot_spot <- function(insert,
 
   #Section 2 -
   if(is.character(variable) && 'sf'%in%class(insert)){
-    insert_df <- raster::as.data.frame(insert)
+    insert_df <- terra::as.data.frame(insert)
 
     variable <- insert_df[,names(insert_df)%in%variable]
     rm(insert_df)
@@ -120,10 +120,10 @@ hot_spot <- function(insert,
   #Section 4 -
   if('RasterLayer'%in%class(insert)){
     #Part A -
-    variable <- raster::values(insert)
+    variable <- terra::values(insert)
 
     #Part B -
-    IDxy_Matrix <- raster::as.data.frame(insert, xy = TRUE)
+    IDxy_Matrix <- terra::as.data.frame(insert, xy = TRUE)
 
     #Part C -
     IDxy_Matrix <- IDxy_Matrix[,c(1:2)]
@@ -155,7 +155,7 @@ hot_spot <- function(insert,
   if('sf'%in%class(insert)){
     if(all(sf::st_is(insert, 'POINT'))){
       #Part A -
-      IDxy_Matrix <- raster::as.data.frame(sf::st_coordinates(insert), xy = TRUE)
+      IDxy_Matrix <- terra::as.data.frame(sf::st_coordinates(insert), xy = TRUE)
 
       #Part B -
       Location_Missing <- which(is.na(variable))
@@ -220,7 +220,7 @@ hot_spot <- function(insert,
   #Section 8 -
   if('RasterLayer'%in%class(insert)){
     #Part A -
-    IDxy_Matrix <- raster::as.data.frame(insert, xy = TRUE)
+    IDxy_Matrix <- terra::as.data.frame(insert, xy = TRUE)
 
     ##########################
     #Part B -
@@ -238,7 +238,7 @@ hot_spot <- function(insert,
     TemporaryRaster <- insert
 
     #Part E -
-    raster::values(TemporaryRaster) <- IDxy_Matrix$LocalG
+    terra::values(TemporaryRaster) <- IDxy_Matrix$LocalG
 
     ##########################
     #Part C -
@@ -258,20 +258,20 @@ hot_spot <- function(insert,
       TemporaryRaster_Moran <- insert
 
       #Part E -
-      raster::values(TemporaryRaster_Moran) <- IDxy_Matrix$LocalM
+      terra::values(TemporaryRaster_Moran) <- IDxy_Matrix$LocalM
 
 
     }
 
     if(include_Moran%in%FALSE){
       #Part F -
-      returnBrick <- raster::brick(insert, TemporaryRaster)
+      returnBrick <- c(insert, TemporaryRaster)
 
       #Part G -
       names(returnBrick) <- c('Original', 'LocalG')
     } else {
       #Part F -
-      returnBrick <- raster::brick(insert, TemporaryRaster, TemporaryRaster_Moran)
+      returnBrick <- c(insert, TemporaryRaster, TemporaryRaster_Moran)
 
       #Part G -
       names(returnBrick) <- c('Original', 'LocalG', 'Moran')

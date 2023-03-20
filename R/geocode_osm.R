@@ -29,6 +29,8 @@
 #' @importFrom dplyr mutate_all slice mutate select starts_with
 #' @importFrom jsonlite fromJSON
 #' @importFrom utils URLencode
+#' @importFrom httr handle config status_code headers GET warn_for_status
+#' @importFrom rlang abort
 #' @examples
 #' # Geocode an address (top match only)
 #' \dontrun{
@@ -51,6 +53,38 @@ geocode_osm <- function(
   details = FALSE,
   user_agent = NULL
 ){
+
+  # Internal functions
+  request_GET <- function(x, url, ...) {
+    x$response <- httr::GET(url, x$config, ..., handle = x$handle)
+    x$html <- new.env(parent = emptyenv(), hash = FALSE)
+    x$url <- x$response$url
+    httr::warn_for_status(x$response)
+    x
+  }
+
+  html_sessionSunGeo <- function(url, ...) {
+    session <- structure(
+      list(
+        handle   = httr::handle(url),
+        config   = c(..., httr::config(autoreferer = 1L)),
+        url      = NULL,
+        back     = character(),
+        forward  = character(),
+        response = NULL,
+        html     = new.env(parent = emptyenv(), hash = FALSE)
+      ),
+      class = "session"
+    )
+    request_GET(session, url)
+  }
+
+  print.session <- function(x, ...) {
+    cat("<session> ", x$url, "\n", sep = "")
+    cat("  Status: ", httr::status_code(x$response), "\n", sep = "")
+    cat("  Type:   ", httr::headers(x)$`Content-Type`, "\n", sep = "")
+    cat("  Size:   ", length(x$response$content), "\n", sep = "")
+  }
 
   # Batch geocoding warning
   if(length(query)>1){query <- query[1]; warning("Returning first result only. Please use geocode_osm_batch() to geocode multiple addresses.")}

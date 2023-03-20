@@ -9,7 +9,9 @@ point2poly_simp(
   polyz,
   varz,
   char_varz = NULL,
-  funz = list(function(x) {     sum(x, na.rm = TRUE) }),
+  funz = list(function(x) {
+     sum(x, na.rm = TRUE)
+ }),
   na_val = NA,
   drop_na_cols = FALSE
 )
