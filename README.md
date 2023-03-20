@@ -1,7 +1,7 @@
 # `SUNGEO` / Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 R package for integrating spatially-misaligned GIS datasets.
 
-Version 1.1.01 (March 20, 2023)
+Version 1.1.1 (March 20, 2023)
 
 Jason Byers, Marty Davidson, Yuri M. Zhukov
 
