@@ -38,7 +38,6 @@
 #' @importFrom sf st_collection_extract st_crs st_geometry st_centroid st_buffer st_transform st_convex_hull st_union
 #' @importFrom dplyr group_by summarize left_join
 #' @importFrom purrr reduce
-#' @importFrom sp CRS
 #' @examples
 #' # Rasterization of polygon layer.
 #' \dontrun{
@@ -52,7 +51,7 @@
 #' data(clea_deu2009_pt)
 #' out_2 <- sf2raster(pointz_from = utm_select(clea_deu2009_pt),
 #'                    input_variable = "to1",
-#'                    grid_res = c(25000,25000))
+#'                    grid_dim = c(25,25))
 #' terra::plot(out_2)
 #' }
 #' # Cartogram (vote turnout scaled by number of valid votes)

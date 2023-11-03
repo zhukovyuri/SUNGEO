@@ -10,7 +10,6 @@
 #' @param NA_Value Substitute for missing values. Default value is 0. Numeric.
 #' @param include_Moran Calculate local Moran's I statistics. Default is \code{FALSE}. Logical.
 #' @return If \code{input} is \code{sf}, \code{SpatialPolygonsDataFrame} or \code{SpatialPointsDataFrame} object, returns \code{sf} object with same geometries and columns as \code{input}, appended with additional column containing Local G estimates (\code{LocalG}). If \code{input} is \code{RasterLayer} object, returns \code{RasterBrick} object containing original values (\code{Original}) and Local G estimates (\code{LocalG}).
-#' @import sp
 #' @importFrom sf st_as_sf st_is st_coordinates
 #' @importFrom terra values as.data.frame plot
 #' @importFrom spdep poly2nb nb2listw localG localmoran

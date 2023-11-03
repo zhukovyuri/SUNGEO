@@ -12,8 +12,8 @@ point2poly_krige(
   xvarz = NULL,
   pycno_yvarz = NULL,
   funz = base::mean,
-  use_grid = TRUE,
-  nz_grid = 100,
+  use_grid = FALSE,
+  nz_grid = 25,
   blockz = 0,
   pointz_x_coord = NULL,
   pointz_y_coord = NULL,
@@ -37,9 +37,9 @@ point2poly_krige(
 
 \item{funz}{Aggregation function to be applied to values in \code{rasterz} and to interpolated values. Must take as an input a vector \code{x}. Default is mean.  Function.}
 
-\item{use_grid}{Use regular grid as destination layer for interpolation, before aggregating to polygons? Default is TRUE.}
+\item{use_grid}{Use regular grid as destination layer for interpolation, before aggregating to polygons? Default is FALSE.}
 
-\item{nz_grid}{Number of grid cells in x and y direction (columns, rows). Integer of length 1 or 2. Default is 100. Ignored if use_grid=FALSE.}
+\item{nz_grid}{Number of grid cells in x and y direction (columns, rows). Integer of length 1 or 2. Default is 25. Ignored if use_grid=FALSE.}
 
 \item{blockz}{Size of blocks used for Block Kriging, in meters. Integer of length 1 or 2. Default is 0.}
 
@@ -54,7 +54,7 @@ point2poly_krige(
 \item{messagez}{Optional message to be printed during Kriging estimation. Character string.}
 }
 \value{
-\code{sp} polygon object, with variables from \code{pointz} interpolated to the geometries of \code{polyz}.
+\code{sf} polygon object, with variables from \code{pointz} interpolated to the geometries of \code{polyz}.
 }
 \description{
 Function for interpolating values from a source points layer to an overlapping destination polygon layer, using ordinary and universal kriging with automatic variogram fitting

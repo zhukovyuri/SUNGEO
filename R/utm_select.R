@@ -14,7 +14,6 @@
 ##'  }
 #' @details Optimal map projection for the object \code{x} is defined by matching its horizontal extent with that of the 60 UTM zones. If object spans multiple UTM zones, uses either the median zone (if number of zones is equal to or less than \code{max_zones}) or Albers Equal Area projection with median longitude as projection center (if number of zones is greater than \code{max_zones}).
 #' @importFrom sf st_bbox st_transform st_coordinates
-#' @importFrom sp bbox coordinates spTransform CRS
 #' @importFrom terra ext project crds
 #' @importFrom stats median
 #' @examples
@@ -52,9 +51,8 @@ utm_select <- function(x, max_zones=5, return_list=FALSE){
 
   # Extract bounding box & median x coordinate
   if(any(grepl("sp", attr(class(x), 'package')))){
-    bb <- sp::bbox(x)
-    bb <- as.vector(bb)
-    median_x <- median(sp::coordinates(x)[,1],na.rm=T)
+    bb <- sf::st_bbox(x)
+    median_x <- median(sf::st_coordinates(sf::st_as_sf(x))[,1],na.rm=T)
   }
   if(any(grepl("sf", class(x)))){
     bb <- sf::st_bbox(x)
@@ -64,8 +62,7 @@ utm_select <- function(x, max_zones=5, return_list=FALSE){
     x <- as(x,"SpatRaster")
   }
   if(any(grepl("terra", attr(class(x), 'package')))) {
-    bb <- terra::ext(x)
-    bb <- as.vector(bb)
+    bb <- as.vector(terra::ext(x))[c("xmin","ymin","xmax","ymax")]
     median_x <- median(terra::crds(x)[,"x"],na.rm=TRUE)
   }
 
@@ -80,8 +77,7 @@ utm_select <- function(x, max_zones=5, return_list=FALSE){
   Location_UTM_Begin <- which(bb[3] >= UTM_Converter_Table$Begin)
   Location_UTM_End <- which(bb[1] <= UTM_Converter_Table$End)
   Location_UTM <- base::intersect(Location_UTM_Begin, Location_UTM_End)
-  proj_out <- ifelse(length(Location_UTM) <= max_zones, as.character(UTM_Converter_Table$CRS[median(Location_UTM)]),
-                     paste0("+proj=aea +lon_0=", median_x))
+  proj_out <- ifelse(length(Location_UTM) <= max_zones, as.character(UTM_Converter_Table$CRS[median(Location_UTM)]),paste0("+proj=aea +lon_0=", median_x," +lat_1=", bb[2]," +lat_2=",bb[4]))
   # Re-project
   if(any(grepl("sf", class(x)))){
     x_out <- sf::st_transform(x, proj_out)
@@ -92,7 +88,7 @@ utm_select <- function(x, max_zones=5, return_list=FALSE){
   if(any(grepl("sp", attr(class(x), 'package')))){
     suppressMessages({
       suppressWarnings({
-        x_out <- sp::spTransform(x, sp::CRS(proj_out))
+        x_out <- as(sf::st_transform(sf::st_as_sf(x), proj_out),"Spatial")
       })
     })
   }

@@ -83,7 +83,7 @@ terra::plot(out_1)
 data(clea_deu2009_pt)
 out_2 <- sf2raster(pointz_from = utm_select(clea_deu2009_pt),
                    input_variable = "to1",
-                   grid_res = c(25000,25000))
+                   grid_dim = c(25,25))
 terra::plot(out_2)
 }
 # Cartogram (vote turnout scaled by number of valid votes)
