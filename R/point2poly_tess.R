@@ -19,16 +19,16 @@
 #'
 #' If \code{return_tess=TRUE}, returns a list, containing
 #' \itemize{
-##'  \item{"result". }{The destination polygon layer. \code{sf} object.}
-##'  \item{"tess". }{The (intermediate) Voronoi tessellation polygon layer. \code{sf} object.}
+##'  \item "result". The destination polygon layer. \code{sf} object.
+##'  \item "tess". The (intermediate) Voronoi tessellation polygon layer. \code{sf} object.
 ##'  }
 #' @details
 #' This function interpolates point data to polygons with a two-step process. In the first step (tessellation), each point is assigned a Voronoi cell, drawn such that (a) the distance from its borders to the focal point is less than or equal to the distance to any other point, and (b) no gaps between cells remain. The second step (interpolation) performs a polygon-in-polygon interpolation, using the Voronoi cells as source polygons.
 #'
 #' Currently supported integration methods in the second step (\code{methodz}) include:
 #' \itemize{
-##'  \item{Areal weighting ("aw"). }{Values from \code{poly_from} weighted in proportion to relative area of spatial overlap between source features and geometries of \code{poly_to}.}
-##'  \item{Population weighting ("pw"). }{Values from \code{poly_from} weighted in proportion to relative population sizes in areas of spatial overlap between source features and geometries of \code{poly_to}. This routine uses a third layer (supplied in \code{pop_raster}) to calculate the weights.}
+##'  \item Areal weighting ("aw"). Values from \code{poly_from} weighted in proportion to relative area of spatial overlap between source features and geometries of \code{poly_to}.
+##'  \item Population weighting ("pw"). Values from \code{poly_from} weighted in proportion to relative population sizes in areas of spatial overlap between source features and geometries of \code{poly_to}. This routine uses a third layer (supplied in \code{pop_raster}) to calculate the weights.
 ##' }
 #' When a list of variables are supplied and one methods argument specified, then the chosen method will be applied to all variables.
 #'
@@ -40,8 +40,8 @@
 #'
 #' Currently supported assignment rules for character strings (\code{char_assign}) include:
 #' \itemize{
-##'  \item{"biggest_overlap". }{For each variable in \code{char_varz}, the features in \code{poly_to} are assigned a single value from overlapping \code{poly_from} features, corresponding to the intersection with largest area and/or population weight.}
-##'  \item{"all_overlap". }{For each variable in \code{char_varz}, the features in \code{poly_to} are assigned all values from overlapping \code{poly_from} features, ranked by area and/or population weights (largest-to-smallest) of intersections.}
+##'  \item "biggest_overlap". For each variable in \code{char_varz}, the features in \code{poly_to} are assigned a single value from overlapping \code{poly_from} features, corresponding to the intersection with largest area and/or population weight.
+##'  \item "all_overlap". For each variable in \code{char_varz}, the features in \code{poly_to} are assigned all values from overlapping \code{poly_from} features, ranked by area and/or population weights (largest-to-smallest) of intersections.
 ##' }
 #' It is possible to pass multiple arguments to \code{char_assign} (e.g. \code{char_assign=c("biggest_overlap","all_overlap")}), in which case the function will calculate both, and append the resulting columns to the output.
 #' @import sf

@@ -15,17 +15,17 @@
 #'
 #' If \code{measurez = "lengths"}, contains fields with suffixes
 #' \itemize{
-##'  \item{"\code{_length}". }{Sum of line lengths within each polygon, in km or other units supplied in \code{unitz}.}
+##'  \item "\code{_length}". Sum of line lengths within each polygon, in km or other units supplied in \code{unitz}.
 ##'  }
 #' If \code{measurez = "density"}, contains fields with suffixes
 #' \itemize{
-##'  \item{"\code{_length}". }{Sum of line lengths within each polygon, in km or other units supplied in \code{unitz}.}
-##'  \item{"\code{_area}". }{Area of each polygon, in km^2 or the square of linear units supplied in \code{unitz}.}
-##'  \item{"\code{_density}". }{Sum of line lengths divided by area of each polygon, in km/km^2 or other units supplied in \code{unitz}.}
+##'  \item "\code{_length}". Sum of line lengths within each polygon, in km or other units supplied in \code{unitz}.
+##'  \item "\code{_area}". Area of each polygon, in km^2 or the square of linear units supplied in \code{unitz}.
+##'  \item "\code{_density}". Sum of line lengths divided by area of each polygon, in km/km^2 or other units supplied in \code{unitz}.
 ##'  }
 #' If \code{measurez = "distance"}, contains fields with suffixes
 #' \itemize{
-##'  \item{"\code{_distance}". }{Distance from each polygon to nearest line feature, in km or other units supplied in \code{unitz}.}
+##'  \item "\code{_distance}". Distance from each polygon to nearest line feature, in km or other units supplied in \code{unitz}.
 ##'  }
 #' If \code{measurez = c("length","density","distance")} (default), contains all of the above.
 #' @import sf

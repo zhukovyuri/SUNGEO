@@ -11,20 +11,20 @@
 #' @param verbose Print status messages and progress? Default is \code{FALSE}. Logical.
 #' @return A \code{data.frame} object. If \code{details=FALSE}, contains fields
 #' \itemize{
-##'  \item{"query". }{User-supplied address query(ies). Character string.}
-##'  \item{"osm_id". }{OpenStreetMap ID. Character string.}
-##'  \item{"address". }{OpenStreetMap address. Character string.}
-##'  \item{"longitude". }{Horizontal coordinate. Numeric.}
-##'  \item{"latitude". }{Vertical coordinate. Numeric.}
+##'  \item "query". User-supplied address query(ies). Character string.
+##'  \item "osm_id". OpenStreetMap ID. Character string.
+##'  \item "address". OpenStreetMap address. Character string.
+##'  \item "longitude". Horizontal coordinate. Numeric.
+##'  \item "latitude". Vertical coordinate. Numeric.
 ##'  }
 ##' If \code{details=TRUE}, contains additional fields
 #' \itemize{
-##'  \item{"osm_type". }{OpenStreetMap ID. Character string.}
-##'  \item{"importance". }{Relevance of Nominatum match to query, from 0 (worst) to 1 (best). Numeric.}
-##'  \item{"bbox_ymin". }{Minimum vertical coordinate of bounding box. Numeric.}
-##'  \item{"bbox_ymax". }{Maximum vertical coordinate of bounding box. Numeric.}
-##'  \item{"bbox_xmin". }{Minimum horizontal coordinate of bounding box. Numeric.}
-##'  \item{"bbox_xmax". }{Maximum horizontal coordinate of bounding box. Numeric.}
+##'  \item "osm_type". OpenStreetMap ID. Character string.
+##'  \item "importance". Relevance of Nominatum match to query, from 0 (worst) to 1 (best). Numeric.
+##'  \item "bbox_ymin". Minimum vertical coordinate of bounding box. Numeric.
+##'  \item "bbox_ymax". Maximum vertical coordinate of bounding box. Numeric.
+##'  \item "bbox_xmin". Minimum horizontal coordinate of bounding box. Numeric.
+##'  \item "bbox_xmax". Maximum horizontal coordinate of bounding box. Numeric.
 ##'  }
 #' @details Wrapper function for \code{\link[SUNGEO]{geocode_osm}}. Because Nominatim Usage Policy stipulates an absolute maximum of 1 request per second, this function facilitates batch geocoding by adding a small delay between queries (\url{https://operations.osmfoundation.org/policies/nominatim/}).
 #' @importFrom dplyr bind_rows

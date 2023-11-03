@@ -26,20 +26,20 @@ geocode_osm(
 \value{
 A \code{data.frame} object. If \code{details=FALSE}, contains fields
 \itemize{
- \item{"query". }{User-supplied address query(ies). Character string.}
- \item{"osm_id". }{OpenStreetMap ID. Character string.}
- \item{"address". }{OpenStreetMap address. Character string.}
- \item{"longitude". }{Horizontal coordinate. Numeric.}
- \item{"latitude". }{Vertical coordinate. Numeric.}
+ \item "query". User-supplied address query(ies). Character string.
+ \item "osm_id". OpenStreetMap ID. Character string.
+ \item "address". OpenStreetMap address. Character string.
+ \item "longitude". Horizontal coordinate. Numeric.
+ \item "latitude". Vertical coordinate. Numeric.
  }
 If \code{details=TRUE}, contains additional fields
 \itemize{
- \item{"osm_type". }{OpenStreetMap ID. Character string.}
- \item{"importance". }{Relevance of Nominatum match to query, from 0 (worst) to 1 (best). Numeric.}
- \item{"bbox_ymin". }{Minimum vertical coordinate of bounding box. Numeric.}
- \item{"bbox_ymax". }{Maximum vertical coordinate of bounding box. Numeric.}
- \item{"bbox_xmin". }{Minimum horizontal coordinate of bounding box. Numeric.}
- \item{"bbox_xmax". }{Maximum horizontal coordinate of bounding box. Numeric.}
+ \item "osm_type". OpenStreetMap ID. Character string.
+ \item "importance". Relevance of Nominatum match to query, from 0 (worst) to 1 (best). Numeric.
+ \item "bbox_ymin". Minimum vertical coordinate of bounding box. Numeric.
+ \item "bbox_ymax". Maximum vertical coordinate of bounding box. Numeric.
+ \item "bbox_xmin". Minimum horizontal coordinate of bounding box. Numeric.
+ \item "bbox_xmax". Maximum horizontal coordinate of bounding box. Numeric.
  }
 }
 \description{

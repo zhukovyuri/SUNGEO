@@ -18,8 +18,8 @@ Re-projected layer. \code{sf} or \code{RasterLayer} object, depending on input.
 
 If \code{return_list=TRUE}, returns a list object containing
 \itemize{
- \item{"x_out". }{The re-projected layer. \code{sf} or \code{RasterLayer} object, depending on input.}
- \item{"proj4_best". }{proj4string of the projection. Character string.}
+ \item "x_out". The re-projected layer. \code{sf} or \code{RasterLayer} object, depending on input.
+ \item "proj4_best".proj4string of the projection. Character string.
  }
 }
 \description{

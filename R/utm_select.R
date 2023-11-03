@@ -9,8 +9,8 @@
 #'
 #' If \code{return_list=TRUE}, returns a list object containing
 #' \itemize{
-##'  \item{"x_out". }{The re-projected layer. \code{sf} or \code{RasterLayer} object, depending on input.}
-##'  \item{"proj4_best". }{proj4string of the projection. Character string.}
+##'  \item "x_out". The re-projected layer. \code{sf} or \code{RasterLayer} object, depending on input.
+##'  \item "proj4_best".proj4string of the projection. Character string.
 ##'  }
 #' @details Optimal map projection for the object \code{x} is defined by matching its horizontal extent with that of the 60 UTM zones. If object spans multiple UTM zones, uses either the median zone (if number of zones is equal to or less than \code{max_zones}) or Albers Equal Area projection with median longitude as projection center (if number of zones is greater than \code{max_zones}).
 #' @importFrom sf st_bbox st_transform st_coordinates

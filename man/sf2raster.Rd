@@ -55,15 +55,15 @@ If \code{return_list=FALSE} (default) and \code{reverse=FALSE} (default), return
 
 If \code{return_list=TRUE} and input layer is polygon, returns a list containing
 \itemize{
- \item{"return_output". }{Output raster, with values corresponding to \code{input_variable}. \code{RasterLayer} object.}
- \item{"return_centroid". }{Raster of centroids, with values corresponding to \code{input_variable}. \code{RasterLayer} object.}
- \item{"poly_to". }{Source polygons, with columns corresponding to \code{input_variable} and auto-generated numerical ID \code{Field}. \code{sf} object.}
- \item{"return_field". }{Output raster, with values corresponding to auto-generated numerical ID \code{Field}. \code{RasterLayer} object.}
- }
+ \item "return_output". Output raster, with values corresponding to \code{input_variable}. \code{RasterLayer} object.
+ \item "return_centroid". Raster of centroids, with values corresponding to \code{input_variable}. \code{RasterLayer} object.
+ \item "poly_to". Source polygons, with columns corresponding to \code{input_variable} and auto-generated numerical ID \code{Field}. \code{sf} object.
+ \item "return_field". Output raster, with values corresponding to auto-generated numerical ID \code{Field}. \code{RasterLayer} object.}
+
 If \code{return_list=TRUE} and  input layer is points, returns a list containing
 \itemize{
- \item{"return_output". }{Output raster, with values corresponding to \code{input_variable}. \code{RasterLayer} object.}
- \item{"return_point". }{Source points, with column corresponding to \code{input_variable}.}
+ \item "return_output". Output raster, with values corresponding to \code{input_variable}. \code{RasterLayer} object.
+ \item "return_point". Source points, with column corresponding to \code{input_variable}.
  }
 If \code{reverse=TRUE}, returns an \code{sf} polygon layer, with columns corresponding to \code{input_variable} and auto-generated numerical ID \code{Field}.
 }
