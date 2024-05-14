@@ -4,8 +4,8 @@
 #'
 #' @param country_names Country name(s). Character string (single country) or vector of character strings (multiple countries).
 #' @param country_iso3 Country code (ISO 3166-1 alpha-3). Character string (single country) or vector of character strings (multiple countries).
-#' @param geoset Name of geographic boundary set. Can be one of \code{"GADM"} (Database of Global Administrative Areas), \code{"GAUL"} (Global Administrative Unit Layers), \code{"geoBoundaries"}, \code{"GRED"} (GeoReferenced Electoral Districts Datasets), \code{"HEXGRID"} (SUNGEO Hexagonal Grid), \code{"MPIDR"} (Max Planck Institute for Demographic Research Population History GIS Collection), \code{"NHGIS"} (National Historical Geographic Information System), \code{"PRIOGRID"} (PRIO-GRID 2.0), \code{"SHGIS"} (SUNGEO Historical GIS). Default is \code{"geoBoundaries"}. Character string.
-#' @param geoset_yr Year of geographic boundaries. See \code{get_info()['geosets']} for availability. Default is \code{2020}. Integer.
+#' @param geoset Name of geographic boundary set. Can be one of \code{"GADM"} (Database of Global Administrative Areas), \code{"GAUL"} (Global Administrative Unit Layers), \code{"geoBoundaries"}, \code{"GRED"} (GeoReferenced Electoral Districts Datasets), \code{"HEXGRID"} (SUNGEO Hexagonal Grid), \code{"MPIDR"} (Max Planck Institute for Demographic Research Population History GIS Collection), \code{"NHGIS"} (National Historical Geographic Information System), \code{"PRIOGRID"} (PRIO-GRID 2.0), \code{"SHGIS"} (SUNGEO Historical GIS). Default is \code{"GADM"}. Character string.
+#' @param geoset_yr Year of geographic boundaries. See \code{get_info()['geosets']} for availability. Default is \code{2018}. Integer.
 #' @param space_unit Geographic level of analysis. Can be one of \code{"adm0"} (country), \code{"adm1"} (province), \code{"adm2"} (district), \code{"cst"} (GRED electoral constituency), \code{"hex05"} (SUNGEO Hexagonal Grid cell), \code{"prio"} (PRIO-GRID cell). See \code{get_info()['geosets']} for availability by geoset, country and topic. Default is \code{"adm1"}. Character string.
 #' @param time_unit Temporal level of analysis. Can be one of \code{"year"}, \code{"month"}, \code{"week"}. See \code{get_info()['topics']} for availability by topic. Default is \code{"year"}. Character string.
 #' @param topics Data topics. See \code{get_info()['summary']} for full list. Character string (single topic) or vector of character strings (multiple topics).
@@ -53,8 +53,8 @@
 get_data <- function(
     country_names=NULL,
     country_iso3=NULL,
-    geoset="geoBoundaries",
-    geoset_yr=2020,
+    geoset="GADM",
+    geoset_yr=2018,
     space_unit="adm1",
     time_unit="year",
     topics=NULL,
@@ -88,36 +88,6 @@ get_data <- function(
   # Bindings
   .SD <- .N <- DATE <- MID <-TID <- WID <- YEAR <- YRMO <- YRWK <- error <- topic <- country_name_alt <- NULL
 
-  # Time matrix
-  make_ticker <- function(
-    date_min=15000101,
-    date_max=as.numeric(gsub("-","",as.Date(Sys.Date())))
-  ){
-    date_max_ <- paste0(substr(date_max,1,4),"-",substr(date_max,5,6),"-",substr(date_max,7,8))
-    ticker <- data.table::data.table(DATE =  gsub("-","",seq(as.Date("1900-01-01"), as.Date(date_max_), by="days")))[,TID:=1:.N][,WID:=rep(1:.N,each=7)[1:.N]][,YRMO:=substr(gsub("-","",DATE),1,6)][,MID:=as.numeric(as.factor(YRMO))][,YEAR:=substr(gsub("-","",DATE),1,4)]
-    ticker2 <- data.table::data.table(DATE =  gsub("-","",seq(as.Date("1500-01-01"), as.Date("1899-12-31"), by="days")))[,TID:=1-(.N:1)][,WID:=1-rev(rep(1:.N,each=7)[1:.N])][,YRMO:=substr(gsub("-","",DATE),1,6)][,MID:=1-as.numeric(factor(YRMO,levels=rev(unique(YRMO))))][,YEAR:=substr(gsub("-","",DATE),1,4)]
-    ticker <- data.table::as.data.table(rbind(ticker2,ticker))[,lapply(.SD,as.numeric)]
-    ticker <- ticker[DATE>=date_min&DATE<=date_max]
-    rm(ticker2)
-    ticker <- merge(ticker,data.table::setnames(ticker[,unique(YEAR),by=WID],"V1","YEAR")[!duplicated(WID,fromLast=TRUE)][, YRWK := match(WID, unique(WID)) + (YEAR*1e3), by=YEAR][,YEAR := NULL],by="WID")
-    return(ticker)
-  }
-
-  # Merge list items on common variables
-  merge_list <- function(lst){
-    while(length(lst) > 1) {
-      idxlst <- seq(from=1, to=length(lst), by=2)
-      lst <- lapply(idxlst, function(i) {
-        if(i==length(lst)) { return(lst[[i]]) }
-        cmnvar <- intersect(names(lst[[i]]),names(lst[[i+1]]))
-        out <- data.table::as.data.table(merge(lst[[i]], lst[[i+1]],by=cmnvar,all=TRUE,allow.cartesian=TRUE))
-        out <- out[,.SD,.SDcols=unique(names(out))]
-        return(out)
-      })
-    }
-    lst[[1]]
-  }
-
 
   ####
   # Download and integrate data
@@ -131,7 +101,7 @@ get_data <- function(
 
   if(by_topic==FALSE){
     # Create query
-    url_string <- paste0("https://api-sungeo-org-sungeo-api.apps.gnosis.lsa.umich.edu/data/",paste0(country_iso3,collapse=","),"/",geoset,"/",geoset_yr,"/",space_unit,"/",time_unit,"?include=",paste0(topics,collapse=","),"&date=",year_min,"-",year_max,"&cacheEnabled=",cache_param)
+    url_string <- paste0("https://api-sungeo-org-sungeo-api.apps.gnosis.lsa.umich.edu/data/",paste0(country_iso3,collapse=","),"/",geoset,"/",geoset_yr,"/",toupper(space_unit),"/",toupper(time_unit),"?include=",paste0(topics,collapse=","),"&date=",year_min,"-",year_max,"&cacheEnabled=",cache_param)
     if(print_url==TRUE){
       print(paste0("Fetching: ",gsub("https://api-sungeo-org-sungeo-api.apps.gnosis.lsa.umich.edu/data/","",url_string,fixed=TRUE)))
     }
@@ -160,13 +130,13 @@ get_data <- function(
     data_list <- lapply(country_iso3,function(is0){
       topic_list <- lapply(topics,function(tp0){
         # Adjust time precision
-        if(!grepl(topic_time[topic%in%tp0,time_unit],time_unit)){
+        if(!grepl(topic_time[topic%in%tp0,time_unit],time_unit,ignore.case=TRUE)){
           time_unit_ <- topic_time[topic%in%tp0,sapply(stringr::str_split(time_unit,"\\|"),dplyr::last)]
         } else {time_unit_ <- time_unit}
         if(tp0%in%time_invariant){
-          url_string <- paste0("https://api-sungeo-org-sungeo-api.apps.gnosis.lsa.umich.edu/data/",is0,"/",geoset,"/",geoset_yr,"/",space_unit,"/",time_unit_,"?include=",tp0,"&cacheEnabled=",cache_param)
+          url_string <- paste0("https://api-sungeo-org-sungeo-api.apps.gnosis.lsa.umich.edu/data/",is0,"/",geoset,"/",geoset_yr,"/",toupper(space_unit),"/",toupper(time_unit_),"?include=",tp0,"&cacheEnabled=",cache_param)
         } else {
-          url_string <- paste0("https://api-sungeo-org-sungeo-api.apps.gnosis.lsa.umich.edu/data/",is0,"/",geoset,"/",geoset_yr,"/",space_unit,"/",time_unit_,"?include=",tp0,"&date=",year_min,"-",year_max,"&cacheEnabled=",cache_param)
+          url_string <- paste0("https://api-sungeo-org-sungeo-api.apps.gnosis.lsa.umich.edu/data/",is0,"/",geoset,"/",geoset_yr,"/",toupper(space_unit),"/",toupper(time_unit_),"?include=",tp0,"&date=",year_min,"-",year_max,"&cacheEnabled=",cache_param)
         }
         if(print_url==TRUE){
           print(paste0("Fetching: ",gsub("https://api-sungeo-org-sungeo-api.apps.gnosis.lsa.umich.edu/data/","",url_string,fixed=TRUE)))
@@ -226,13 +196,16 @@ get_data <- function(
             }
             if(length(common_var)>1){
               if(grepl("YEAR",time_unit,ignore.case=TRUE)){
-                ticker <- ticker[!duplicated(YEAR)&get(common_var)%in%sungeo.data[,get(common_var)]]
+                common_var <- intersect(c("YEAR"),common_var)
+                ticker <- ticker[!duplicated(YEAR)&YEAR%in%sungeo.data[,YEAR]][,.SD,.SD=common_var]
               }
               if(grepl("MONTH",time_unit,ignore.case=TRUE)){
-                ticker <- ticker[!duplicated(YRMO)&YRMO%in%sungeo.data[,YRMO]]
+                common_var <- intersect(c("YEAR","YRMO","MID"),common_var)
+                ticker <- ticker[!duplicated(YRMO)&YRMO%in%sungeo.data[,YRMO]][,.SD,.SD=common_var]
               }
               if(grepl("WEEK",time_unit,ignore.case=TRUE)){
-                ticker <- ticker[!duplicated(YRWK)&WID%in%sungeo.data[,WID]]
+                common_var <- intersect(c("YEAR","YRMO","MID","YRWK","WID"),common_var)
+                ticker <- ticker[!duplicated(YRWK)&WID%in%sungeo.data[,WID]][,.SD,.SD=common_var]
               }
               sungeo.data <- merge(data.table::copy(ticker)[,eval(common_var):=lapply(.SD,as.character),.SDcols=common_var],data.table::copy(sungeo.data)[,eval(common_var):=lapply(.SD,as.character),.SDcols=common_var],by=common_var,all=TRUE,allow.cartesian=TRUE)
             }
@@ -274,13 +247,13 @@ get_data <- function(
     # Remove redundancies
     suppressWarnings({
       if(grepl("YEAR",time_unit,ignore.case=TRUE)){
-        sungeo.data[,c("YRMO","MID","YRWK","WID","DATE","TID") := NULL]
+        sungeo.data[,c("YRMO","MID","YRWK","WID","DATE","DATE_ALT","TID") := NULL]
       }
       if(grepl("MONTH",time_unit,ignore.case=TRUE)){
-        sungeo.data[,c("YRWK","WID","DATE","TID") := NULL]
+        sungeo.data[,c("YRWK","WID","DATE","DATE_ALT","TID") := NULL]
       }
       if(grepl("WEEK",time_unit,ignore.case=TRUE)){
-        sungeo.data[,c("DATE","TID") := NULL]
+        sungeo.data[,c("DATE","DATE_ALT","TID") := NULL]
       }
     })
     # Remove duplicates

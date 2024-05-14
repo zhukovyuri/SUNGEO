@@ -7,8 +7,8 @@
 get_data(
   country_names = NULL,
   country_iso3 = NULL,
-  geoset = "geoBoundaries",
-  geoset_yr = 2020,
+  geoset = "GADM",
+  geoset_yr = 2018,
   space_unit = "adm1",
   time_unit = "year",
   topics = NULL,
@@ -28,9 +28,9 @@ get_data(
 
 \item{country_iso3}{Country code (ISO 3166-1 alpha-3). Character string (single country) or vector of character strings (multiple countries).}
 
-\item{geoset}{Name of geographic boundary set. Can be one of \code{"GADM"} (Database of Global Administrative Areas), \code{"GAUL"} (Global Administrative Unit Layers), \code{"geoBoundaries"}, \code{"GRED"} (GeoReferenced Electoral Districts Datasets), \code{"HEXGRID"} (SUNGEO Hexagonal Grid), \code{"MPIDR"} (Max Planck Institute for Demographic Research Population History GIS Collection), \code{"NHGIS"} (National Historical Geographic Information System), \code{"PRIOGRID"} (PRIO-GRID 2.0), \code{"SHGIS"} (SUNGEO Historical GIS). Default is \code{"geoBoundaries"}. Character string.}
+\item{geoset}{Name of geographic boundary set. Can be one of \code{"GADM"} (Database of Global Administrative Areas), \code{"GAUL"} (Global Administrative Unit Layers), \code{"geoBoundaries"}, \code{"GRED"} (GeoReferenced Electoral Districts Datasets), \code{"HEXGRID"} (SUNGEO Hexagonal Grid), \code{"MPIDR"} (Max Planck Institute for Demographic Research Population History GIS Collection), \code{"NHGIS"} (National Historical Geographic Information System), \code{"PRIOGRID"} (PRIO-GRID 2.0), \code{"SHGIS"} (SUNGEO Historical GIS). Default is \code{"GADM"}. Character string.}
 
-\item{geoset_yr}{Year of geographic boundaries. See \code{get_info()['geosets']} for availability. Default is \code{2020}. Integer.}
+\item{geoset_yr}{Year of geographic boundaries. See \code{get_info()['geosets']} for availability. Default is \code{2018}. Integer.}
 
 \item{space_unit}{Geographic level of analysis. Can be one of \code{"adm0"} (country), \code{"adm1"} (province), \code{"adm2"} (district), \code{"cst"} (GRED electoral constituency), \code{"hex05"} (SUNGEO Hexagonal Grid cell), \code{"prio"} (PRIO-GRID cell). See \code{get_info()['geosets']} for availability by geoset, country and topic. Default is \code{"adm1"}. Character string.}
 

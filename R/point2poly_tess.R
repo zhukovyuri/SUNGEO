@@ -121,7 +121,7 @@ point2poly_tess <- function(
   })
 
   ###########################################################
-  #Section A - Preparing the Gemetries for Tessalation Prcess
+  #Section A - Preparing the Gemetries for Tessalation Process
   ###########################################################
 
 
@@ -132,13 +132,8 @@ point2poly_tess <- function(
   # Stop if no population raster
   if("pw"%in%methodz & length(pop_raster)==0){stop("No population raster provided.")}
 
-  #
-  #
-  #
-  #
-
   ###########################################################
-  #Section B - Preparing the Gemetries for Tessalation Prcess
+  #Section B - Preparing the Gemetries for Tessalation Process
   ###########################################################
   ############################
   #Part 1 - Create union layer
@@ -226,9 +221,9 @@ point2poly_tess <- function(
   #Part 7 - Crop the Geometries
   #############################
   suppressWarnings({
-    geo_vor <-  suppressMessages(
-      fix_geom(sf::st_intersection(geo_vor,polyz_u))
-    )
+    suppressMessages({
+      geo_vor <-  fix_geom(sf::st_intersection(geo_vor,polyz_u))
+    })
   })
 
   #
@@ -242,9 +237,9 @@ point2poly_tess <- function(
   sf::st_geometry(pointz_crop_dt) <- NULL
 
   suppressWarnings({
-    geo_vor <- suppressMessages(
-      dplyr::left_join(geo_vor, pointz_crop_dt, by = 'Unique_ID')
-    )
+    suppressMessages({
+      geo_vor <- dplyr::left_join(geo_vor, pointz_crop_dt, by = 'Unique_ID')
+    })
   })
 
   #
@@ -281,5 +276,3 @@ point2poly_tess <- function(
   #Equal Area Projection as a Default
 
 }
-
-

@@ -3,11 +3,11 @@
 \docType{package}
 \name{SUNGEO}
 \alias{SUNGEO}
-\title{\code{SUNGEO} package}
+\title{\code{SUNGEO}}
 \description{
 Sub-National Geospatial Data Archive System: Geoprocessing Toolkit
 }
 \details{
 See the README on
-\href{https://github.com/zhukovyuri/SUNGEO#readme}{GitHub}
+[GitHub](https://github.com/zhukovyuri/SUNGEO#readme)
 }

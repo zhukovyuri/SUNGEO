@@ -106,8 +106,7 @@ poly2poly_ap <- function(
     char_varz=NULL,
     char_assign="biggest_overlap",
     funz=function(x,w){stats::weighted.mean(x,w,na.rm=TRUE)},
-    seed = 1
-){
+    seed = 1){
 
   set.seed(seed)
 
@@ -149,13 +148,15 @@ poly2poly_ap <- function(
   # Area-weights (part 1)
   if("aw"%in%methodz|"aw"%in%char_methodz){
     # Calculate polygon areas
-    poly_from$AREA_TOTAL <- as.numeric(sf::st_area(poly_from))
+    poly_from$AREA_TOTAL_FROM <- as.numeric(sf::st_area(poly_from))
+    poly_to$AREA_TOTAL_TO <- as.numeric(sf::st_area(poly_to))
   }
 
   # Population-weights (part 1)
   if("pw"%in%methodz){
     # Calculate polygon total
-    poly_from$POP_TOTAL <- unlist(terra::extract(pop_raster,methods::as(poly_from,"Spatial"),fun=sum,na.rm=TRUE))
+    poly_from$POP_TOTAL_FROM <- unlist(terra::extract(pop_raster,methods::as(poly_from,"Spatial"),fun=sum,na.rm=TRUE))
+    poly_to$POP_TOTAL_TO <- unlist(terra::extract(pop_raster,methods::as(poly_to,"Spatial"),fun=sum,na.rm=TRUE))
   }
 
   #
@@ -171,9 +172,9 @@ poly2poly_ap <- function(
 
   #Part ii - Intersection
   suppressWarnings({
-    int_1 <- suppressMessages(
-      sf::st_buffer(sf::st_intersection(sf::st_buffer(poly_from,dist=0),sf::st_buffer(poly_to,dist=0)),dist=0)
-    )
+    suppressMessages({
+      int_1 <- sf::st_buffer(sf::st_intersection(sf::st_buffer(poly_from,dist=0),sf::st_buffer(poly_to,dist=0)),dist=0)
+    })
   })
 
   # Drop empty geometries
@@ -190,14 +191,16 @@ poly2poly_ap <- function(
   if("aw"%in%methodz|"aw"%in%char_methodz){
     # Calculate weights
     int_1$AREA_INT <- as.numeric(sf::st_area(int_1))
-    int_1$AREA_W <- int_1$AREA_INT/int_1$AREA_TOTAL
+    int_1$AREA_W_EXV <- int_1$AREA_INT/int_1$AREA_TOTAL_FROM
+    int_1$AREA_W_INV <- int_1$AREA_INT/int_1$AREA_TOTAL_TO
   }
 
   # Population-weights (part 2)
   if("pw"%in%methodz){
     # Calculate weights
     int_1$POP_INT <- unlist(terra::extract(pop_raster,int_1,fun=sum,na.rm=TRUE))
-    int_1$POP_W <- int_1$POP_INT/int_1$POP_TOTAL
+    int_1$POP_W_EXV <- int_1$POP_INT/int_1$POP_TOTAL_FROM
+    int_1$POP_W_INV <- int_1$POP_INT/int_1$POP_TOTAL_TO
   }
 
   #
@@ -229,10 +232,11 @@ poly2poly_ap <- function(
       diag(w) <- NA
 
       #Part c -
-      int_1_dt$POP_INT[is.na(int_1_dt$POP_INT)] <- mean(int_1_dt$POP_INT[t(apply(w, 1, order)[1:min(10,nrow(int_1_dt)), is.na(int_1_dt$POP_INT)])],na.rm=TRUE)
+      int_1_dt$POP_INT[is.na(int_1_dt$POP_INT)] <- median(int_1_dt$POP_INT[t(apply(w, 1, order)[1:min(10,nrow(int_1_dt)), is.na(int_1_dt$POP_INT)])],na.rm=TRUE)
 
       #Part d -
-      int_1_dt$POP_W[is.na(int_1_dt$POP_W)] <- int_1_dt$POP_INT[is.na(int_1_dt$POP_W)]/int_1_dt$POP_TOTAL[is.na(int_1_dt$POP_W)]
+      int_1_dt$POP_W_EXV[is.na(int_1_dt$POP_W_EXV)] <- min(1,int_1_dt$POP_INT[is.na(int_1_dt$POP_W_EXV)]/int_1_dt$POP_TOTAL_FROM[is.na(int_1_dt$POP_W_EXV)])
+      int_1_dt$POP_W_INV[is.na(int_1_dt$POP_W_INV)] <- min(1,int_1_dt$POP_INT[is.na(int_1_dt$POP_W_INV)]/int_1_dt$POP_TOTAL_TO[is.na(int_1_dt$POP_W_INV)])
 
     }
 
@@ -253,7 +257,8 @@ poly2poly_ap <- function(
       int_1_dt$POP_INT[is.na(int_1_dt$POP_INT)] <- apply(t(apply(w, 1, order)[ 1:min(10,nrow(int_1_dt)), is.na(int_1_dt$POP_INT)]),1,function(x){mean(int_1_dt$POP_INT[x],na.rm=TRUE)})
 
       #Part d -
-      int_1_dt$POP_W[is.na(int_1_dt$POP_W)] <- int_1_dt$POP_INT[is.na(int_1_dt$POP_W)]/int_1_dt$POP_TOTAL[is.na(int_1_dt$POP_W)]
+      int_1_dt$POP_W_EXV[is.na(int_1_dt$POP_W_EXV)] <- min(1,int_1_dt$POP_INT[is.na(int_1_dt$POP_W_EXV)]/int_1_dt$POP_TOTAL_FROM[is.na(int_1_dt$POP_W_EXV)])
+      int_1_dt$POP_W_INV[is.na(int_1_dt$POP_W_INV)] <- min(1,int_1_dt$POP_INT[is.na(int_1_dt$POP_W_INV)]/int_1_dt$POP_TOTAL_TO[is.na(int_1_dt$POP_W_INV)])
     }
   }
 
@@ -352,12 +357,6 @@ poly2poly_ap <- function(
   ClassTypes_Variables$Character[ClassTypes_Variables$Varz%in%char_varz] <- TRUE
 
   #
-  #
-  #
-  #
-  #
-  #
-  #
 
   ###########################################################
   #Section C - Character string variables
@@ -374,16 +373,16 @@ poly2poly_ap <- function(
         #########################
         if("aw"%in%Character_Subset$methodz[sub_iter]){
           #Part i - Locate Variables
-          locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'AREA_W', Character_Subset$Varz[sub_iter]))
+          locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'AREA_W_INV', Character_Subset$Varz[sub_iter]))
 
           #Part ii - Subset Columns
           Internal_Matrix <- Aggregation_Matrix[,locVar, with = FALSE]
 
           #Part iii - Rename Value Column
-          names(Internal_Matrix)[!names(Internal_Matrix)%in%c('Return_ID', 'AREA_W')] <- 'var_'
+          names(Internal_Matrix)[!names(Internal_Matrix)%in%c('Return_ID', 'AREA_W_INV')] <- 'var_'
 
           #Part iv - Collapse Data Frame
-          Internal_Matrix <- by(data=Internal_Matrix,INDICES=Internal_Matrix$Return_ID,FUN=function(x){paste0(unique(x$var_[x$AREA_W%in%max(x$AREA_W, na.rm = TRUE)]),collapse="|")},simplify=TRUE)
+          Internal_Matrix <- by(data=Internal_Matrix,INDICES=Internal_Matrix$Return_ID,FUN=function(x){paste0(unique(x$var_[x$AREA_W_INV%in%max(x$AREA_W_INV, na.rm = TRUE)]),collapse="|")},simplify=TRUE)
           Internal_Matrix <- data.table::data.table(Return_ID=as.numeric(names(Internal_Matrix)),V1=c(Internal_Matrix))
 
           #Part v -
@@ -397,16 +396,16 @@ poly2poly_ap <- function(
         ##############################
         if("pw"%in%Character_Subset$methodz[sub_iter]){
           #Part i - Locate Variables
-          locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'POP_W', Character_Subset$Varz[sub_iter]))
+          locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'POP_W_INV', Character_Subset$Varz[sub_iter]))
 
           #Part ii - Subset Columns
           Internal_Matrix <- Aggregation_Matrix[,locVar, with = FALSE]
 
           #Part iii - Rename Value Column
-          names(Internal_Matrix)[names(Internal_Matrix)%in%c('Return_ID', 'POP_W') == FALSE] <- 'var_'
+          names(Internal_Matrix)[names(Internal_Matrix)%in%c('Return_ID', 'POP_W_INV') == FALSE] <- 'var_'
 
           #Part iv - Collapse Data Frame
-          Internal_Matrix <- Internal_Matrix[,list(paste(unique(var_[POP_W%in%max(POP_W, na.rm = TRUE)]), collapse = '|')), by = list(Return_ID)]
+          Internal_Matrix <- Internal_Matrix[,list(paste(unique(var_[POP_W_INV%in%max(POP_W_INV, na.rm = TRUE)]), collapse = '|')), by = list(Return_ID)]
 
           #Part v -
           names(Internal_Matrix)[2] <- Character_Subset$Varz[sub_iter]
@@ -425,13 +424,13 @@ poly2poly_ap <- function(
         #########################
         if("aw"%in%Character_Subset$methodz[sub_iter]){
           #Part i - Locate Variables
-          locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'AREA_W', Character_Subset$Varz[sub_iter]))
+          locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'AREA_W_INV', Character_Subset$Varz[sub_iter]))
 
           #Part ii - Subset Columns
           Internal_Matrix <- Aggregation_Matrix[,locVar, with = FALSE]
 
           #Part iii - Rename Value Column
-          names(Internal_Matrix)[names(Internal_Matrix)%in%c('Return_ID', 'AREA_W') == FALSE] <- 'var_'
+          names(Internal_Matrix)[names(Internal_Matrix)%in%c('Return_ID', 'AREA_W_INV') == FALSE] <- 'var_'
 
           #Part iv - Collapse Data Frame
           Internal_Matrix <- Internal_Matrix[,list(paste(unique(var_), collapse = '|')), by = list(Return_ID)]
@@ -447,13 +446,13 @@ poly2poly_ap <- function(
         ##############################
         if("pw"%in%Character_Subset$methodz[sub_iter]){
           #Part i - Locate Variables
-          locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'POP_W', Character_Subset$Varz[sub_iter]))
+          locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'POP_W_INV', Character_Subset$Varz[sub_iter]))
 
           #Part ii - Subset Columns
           Internal_Matrix <- Aggregation_Matrix[,locVar, with = FALSE]
 
           #Part iii - Rename Value Column
-          names(Internal_Matrix)[names(Internal_Matrix)%in%c('Return_ID', 'POP_W') == FALSE] <- 'var_'
+          names(Internal_Matrix)[names(Internal_Matrix)%in%c('Return_ID', 'POP_W_INV') == FALSE] <- 'var_'
 
           #Part iv - Collapse Data Frame
           Internal_Matrix <- Internal_Matrix[,list(paste(unique(var_), collapse = '|')), by = list(Return_ID)]
@@ -498,7 +497,7 @@ poly2poly_ap <- function(
   #
 
   ###########################################################
-  #Section D - Numeric Variables
+  #Section D - Numeric Variables (intensive as default)
   ###########################################################
   #Part i -
   Numeric_Subset <- ClassTypes_Variables[ClassTypes_Variables$Character%in%FALSE,]
@@ -507,12 +506,12 @@ poly2poly_ap <- function(
   Numeric_Aggregation_Matrix <- lapply(1:nrow(Numeric_Subset), function(sub_iter){
     #Part a - Locate Variables
     if("aw"%in%Numeric_Subset$methodz[sub_iter]){
-      locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'AREA_W', Numeric_Subset$Varz[sub_iter]))
+      locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'AREA_W_INV', Numeric_Subset$Varz[sub_iter]))
     }
 
     #Part a - Locate Variables
     if("pw"%in%Numeric_Subset$methodz[sub_iter]){
-      locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'POP_W', Numeric_Subset$Varz[sub_iter]))
+      locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'POP_W_INV', Numeric_Subset$Varz[sub_iter]))
     }
 
     #Part b - Subset Columns
@@ -520,11 +519,11 @@ poly2poly_ap <- function(
 
     #Part c - Rename Value Column
     if("aw"%in%Numeric_Subset$methodz[sub_iter]){
-      names(Internal_Matrix)[!names(Internal_Matrix)%in%c('Return_ID', 'AREA_W')] <- 'var_'
+      names(Internal_Matrix)[!names(Internal_Matrix)%in%c('Return_ID', 'AREA_W_INV')] <- 'var_'
     }
 
     if("pw"%in%Numeric_Subset$methodz[sub_iter]){
-      names(Internal_Matrix)[!names(Internal_Matrix)%in%c('Return_ID', 'POP_W')] <- 'var_'
+      names(Internal_Matrix)[!names(Internal_Matrix)%in%c('Return_ID', 'POP_W_INV')] <- 'var_'
     }
 
     #Part c -
@@ -535,12 +534,12 @@ poly2poly_ap <- function(
 
     if(grepl(paste(searchWeight, collapse = '|'), paste(as.character(attributes(IntermediateFunction)$srcref),collapse=""))){
       if("aw"%in%Numeric_Subset$methodz[sub_iter]){
-        Output <- by(data=Internal_Matrix,INDICES=Internal_Matrix$Return_ID,FUN=function(x){IntermediateFunction(x$var_, w = x$AREA_W)},simplify=TRUE)
+        Output <- by(data=Internal_Matrix,INDICES=Internal_Matrix$Return_ID,FUN=function(x){IntermediateFunction(x$var_, w = x$AREA_W_INV)},simplify=TRUE)
         Output <- data.table::data.table(Return_ID=as.numeric(names(Output)),V1=c(Output))
       }
 
       if("pw"%in%Numeric_Subset$methodz[sub_iter]){
-        Output <- by(data=Internal_Matrix,INDICES=Internal_Matrix$Return_ID,FUN=function(x){IntermediateFunction(x$var_, w = x$POP_W)},simplify=TRUE)
+        Output <- by(data=Internal_Matrix,INDICES=Internal_Matrix$Return_ID,FUN=function(x){IntermediateFunction(x$var_, w = x$POP_W_INV)},simplify=TRUE)
         Output <- data.table::data.table(Return_ID=as.numeric(names(Output)),V1=c(Output))
       }
 
@@ -590,12 +589,82 @@ poly2poly_ap <- function(
     for(p0 in 1:length(pycno_varz)){
       # Find sum of original variable
       sum_from <- data.table::as.data.table(poly_from)[,sum(get(pycno_varz[p0]),na.rm=TRUE)]
+
       # Find matching processed variables in target geometry
       pycno_varz_to <- grep(paste0("^",pycno_varz[p0]),Numeric_Subset[,paste0(Numeric_Subset$Varz,"_",Numeric_Subset$methodz)],value=TRUE)
+
+      #Part i -
+      Extensive_Subset <- ClassTypes_Variables[ClassTypes_Variables$Character%in%FALSE&Varz%in%pycno_varz[p0],]
+
+      #Part ii -
+      Extensive_Aggregation_Matrix <- lapply(1:nrow(Extensive_Subset), function(sub_iter){
+      
+        #Part a - Locate Variables
+        if("aw"%in%Extensive_Subset$methodz[sub_iter]){
+          locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'AREA_W_EXV', Extensive_Subset$Varz[sub_iter]))
+        }
+
+        #Part a - Locate Variables
+        if("pw"%in%Extensive_Subset$methodz[sub_iter]){
+          locVar <- which(names(Aggregation_Matrix)%in%c('Return_ID', 'POP_W_EXV', Extensive_Subset$Varz[sub_iter]))
+        }
+
+        #Part b - Subset Columns
+        Internal_Matrix <- data.table::as.data.table(Aggregation_Matrix[,locVar, with = FALSE])
+
+        #Part c - Rename Value Column
+        if("aw"%in%Extensive_Subset$methodz[sub_iter]){
+          names(Internal_Matrix)[!names(Internal_Matrix)%in%c('Return_ID', 'AREA_W_EXV')] <- 'var_'
+        }
+
+        if("pw"%in%Extensive_Subset$methodz[sub_iter]){
+          names(Internal_Matrix)[!names(Internal_Matrix)%in%c('Return_ID', 'POP_W_EXV')] <- 'var_'
+        }
+
+        #Part c & d - weighted sum
+        if("aw"%in%Extensive_Subset$methodz[sub_iter]){
+          Output <- by(data=Internal_Matrix,INDICES=Internal_Matrix$Return_ID,FUN=function(x){sum(x$var_*x$AREA_W_EXV)},simplify=TRUE)
+          Output <- data.table::data.table(Return_ID=as.numeric(names(Output)),V1=c(Output))
+        }
+        if("pw"%in%Extensive_Subset$methodz[sub_iter]){
+          Output <- by(data=Internal_Matrix,INDICES=Internal_Matrix$Return_ID,FUN=function(x){sum(x$var_*x$POP_W_EXV)},simplify=TRUE)
+          Output <- data.table::data.table(Return_ID=as.numeric(names(Output)),V1=c(Output))
+        }
+
+        #Part e -
+        if("pw"%in%Extensive_Subset$methodz[sub_iter]){
+          names(Output)[2] <- paste0(Extensive_Subset$Varz[sub_iter], '_pw')
+        }
+
+        if("aw"%in%Extensive_Subset$methodz[sub_iter]){
+          names(Output)[2] <- paste0(Extensive_Subset$Varz[sub_iter], '_aw')
+        }
+
+        #RETURN
+        return(Output)
+      })
+
+      #Part iii -
+      Empty_Sets <- sapply(Extensive_Aggregation_Matrix, function(x){is.null(x[,2]) || grepl('Error', x[,2])})
+
+      if(TRUE%in%Empty_Sets){
+        Extensive_Aggregation_Matrix <- Extensive_Aggregation_Matrix[Empty_Sets == FALSE]
+      }
+
+      #Part iv -
+      Extensive_Aggregation_Matrix <-  purrr::reduce(Extensive_Aggregation_Matrix,dplyr::full_join, by = 'Return_ID')
+
       # Rescale variables in target geometry
       for(p00 in 1:length(pycno_varz_to)){
-        Numeric_Aggregation_Matrix[,eval(pycno_varz_to[p00]) := get(pycno_varz_to[p00])*sum_from/sum(get(pycno_varz_to[p00]),na.rm = TRUE)]
+        Extensive_Aggregation_Matrix[,eval(pycno_varz_to[p00]) := get(pycno_varz_to[p00])*sum_from/sum(get(pycno_varz_to[p00]),na.rm = TRUE)]
+        # Copy to intensive matrix
+        Numeric_Aggregation_Matrix[,eval(pycno_varz_to[p00]):=Extensive_Aggregation_Matrix[,get(pycno_varz_to[p00])]]
       }
+
+      # # Check if numbers align
+      # Numeric_Aggregation_Matrix[,sum(get(pycno_varz_to[1]))]
+      # Extensive_Aggregation_Matrix[,sum(get(pycno_varz_to[1]))]
+      # sum_from
     }
   }
 

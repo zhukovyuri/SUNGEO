@@ -1,7 +1,7 @@
 # `SUNGEO` / Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 R package for integrating spatially-misaligned GIS datasets.
 
-Version 1.2.1 (November 3, 2023)
+Version 1.3.0 (May 14, 2024)
 
 Jason Byers, Marty Davidson, Yuri M. Zhukov
 
@@ -9,7 +9,7 @@ Center for Political Studies, Institute for Social Research
 
 University of Michigan
 
-Feedback, bug reports welcome: zhukov-at-umich-dot-edu
+Feedback, bug reports welcome: zhukov-at-umich-dot-edu or ymz2-at-georgetown-dot-edu
 
 * `df2sf` / Convert data.frame object into simple features object
 * `fix_geom` / Fix polygon geometries
@@ -19,13 +19,18 @@ Feedback, bug reports welcome: zhukov-at-umich-dot-edu
 * `get_info` / Information on available SUNGEO data files
 * `hot_spot` / Automatically calculate Local G hot spot intensity
 * `line2poly` / Line-in-polygon analysis
+* `make_ticker` / Make date ticker
+* `merge_list` / Merge list of tables on common variable(s)
 * `nesting` / Relative scale and nesting coefficients
 * `point2poly_krige` / Point-to-polygon interpolation, ordinary and universal Kriging method
 * `point2poly_simp` / Point-to-polygon interpolation, simple overlay method
 * `point2poly_tess` / Point-to-polygon interpolation, tessellation method
 * `poly2poly_ap` / Area and population weighted polygon-to-polygon interpolation
 * `sf2raster` / Convert simple features object into regularly spaced raster
+* `smart_round` / Smart numerical rounding function
 * `utm_select` / Automatically convert geographic (degree) to planar coordinates (meters)
+* `update_bbox` / Update bounding box of sf object
+
 
 To install in R:
 
