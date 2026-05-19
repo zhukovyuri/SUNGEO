@@ -28,6 +28,8 @@ html_sessionSunGeo <- function(url, ...) {
   request_GET(session, url)
 }
 
+
+#' @exportS3Method print session
 print.session <- function(x, ...) {
   cat("<session> ", x$url, "\n", sep = "")
   cat("  Status: ", httr::status_code(x$response), "\n", sep = "")

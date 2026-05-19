@@ -16,10 +16,10 @@ min value   :                                        0.00
 max value   :                                    92915.66
 }
 \source{
-Gridded Population of the World (GPW) v4: Population Count, v4.11 <doi:10.7927/H4JW8BX5>.
+Gridded Population of the World (GPW) v4: Population Count, v4.11 \doi{10.7927/H4JW8BX5}.
 }
 \usage{
-gpw4_deu2010
+data(gpw4_deu2010)
 }
 \description{
 2.5 arc-minute resolution raster of estimates of human population (number of persons per pixel),

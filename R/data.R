@@ -91,7 +91,7 @@
 #' name        : gpw_v4_population_count_rev11_2010_2pt5_min
 #' min value   :                                        0.00
 #' max value   :                                    92915.66
-#' @source Gridded Population of the World (GPW) v4: Population Count, v4.11 <doi:10.7927/H4JW8BX5>.
+#' @source Gridded Population of the World (GPW) v4: Population Count, v4.11 \doi{10.7927/H4JW8BX5}.
 "gpw4_deu2010"
 
 #' Hexagonal grid for Germany.

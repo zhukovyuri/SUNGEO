@@ -189,9 +189,9 @@ point2poly_simp <- function(pointz,
   })
 
   #Part iv -
-  Empty_Sets <- sapply(Aggregation_Matrix, function(x) is.null(x) || grepl('Error', x))
-  if(TRUE%in%Empty_Sets){
-      Aggregation_Matrix <- Aggregation_Matrix[Empty_Sets == FALSE]
+  Empty_Sets <- sapply(Aggregation_Matrix, function(x) is.null(x) || !inherits(x, "data.table") || nrow(x) == 0)
+  if(TRUE %in% Empty_Sets){
+    Aggregation_Matrix <- Aggregation_Matrix[Empty_Sets == FALSE]
   }
 
   #Part v -

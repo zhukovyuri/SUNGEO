@@ -21,7 +21,7 @@ proj4string:    +proj=longlat +datum=WGS84 +no_defs.
 SUNGEO
 }
 \usage{
-hex_05_deu
+data(hex_05_deu)
 }
 \description{
 Regular hexagonal grid of 0.5 degree diameter cells, covering territory of Germany (2020 borders).

@@ -25,6 +25,7 @@
 #' # Find a planar projection for a raster
 #' \dontrun{
 #' data(gpw4_deu2010)
+#' gpw4_deu2010 <- terra::rast(gpw4_deu2010) # unwrap PackedSpatRaster
 #' out_2 <- utm_select(gpw4_deu2010)
 #' }
 #' @export

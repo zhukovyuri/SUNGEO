@@ -1,8 +1,8 @@
 #' Automatically calculate Local G hot spot intensity
 #'
-#' Function automatically calculates the Local G hot spot intensity measure for spatial points, spatial polygons, and single raster layers. Uses RANN for efficient nearest neighbor calculation (spatial points and single raster layers only); users can specify the number of neighbors (k). Users can specify the neighborhood style (see spdep::nb2listw) with default being standardized weight matrix (W).
+#' Function automatically calculates the Local G hot spot intensity measure for spatial points or spatial polygons. Uses RANN for efficient nearest neighbor calculation (spatial points only); users can specify the number of neighbors (k). Users can specify the neighborhood style (see spdep::nb2listw) with default being standardized weight matrix (W).
 #'
-#' @param insert Spatial point, spatial polygon, or single raster layer object. Acceptable formats include \code{sf}, \code{SpatialPolygonsDataFrame}, \code{SpatialPointsDataFrame}, and \code{RasterLayer}.
+#' @param insert Spatial point or spatial polygon object. Acceptable formats include \code{sf}, \code{SpatialPolygonsDataFrame}, \code{SpatialPointsDataFrame}.
 #' @param variable Column name or numeric vector containing the variable from which the local G statistic will be calculated. Must possess a natural scale that orders small and large observations (i.e. number, percentage, ratio and not model residuals).
 #' @param style Style can take values \code{'W'}, \code{'B'}, \code{'C'}, \code{'U'}, \code{'mimax'}, \code{'S'} (see  \code{\link[spdep]{nb2listw}}). Character string.
 #' @param k Number of neighbors. Default is 9. Numeric.
@@ -49,13 +49,6 @@
 #' plot(out_4["LocalG"])
 #' }
 #'
-#' # Calculate Local G for RasterLayer
-#' \dontrun{
-#' data(gpw4_deu2010)
-#' out_5 <- hot_spot(insert=gpw4_deu2010)
-#' class(out_5)
-#' terra::plot(out_5$LocalG)
-#' }
 #' @export
 hot_spot <- function(insert,
                       variable = NULL,

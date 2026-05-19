@@ -33,7 +33,6 @@
 ##' If \code{reverse=TRUE}, returns an \code{sf} polygon layer, with columns corresponding to \code{input_variable} and auto-generated numerical ID \code{Field}.
 #' @import packcircles cartogram Rcpp
 #' @importFrom terra rasterize ncell res ext vect as.data.frame res extract values mask plot
-#' @importFrom raster raster
 #' @importFrom cartogram cartogram_cont
 #' @importFrom sf st_collection_extract st_crs st_geometry st_centroid st_buffer st_transform st_convex_hull st_union
 #' @importFrom dplyr group_by summarize left_join

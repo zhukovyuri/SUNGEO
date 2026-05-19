@@ -78,6 +78,7 @@
 #' # Interpolation of multiple variables, with area and population weights
 #' \dontrun{
 #' data(gpw4_deu2010)
+#' gpw4_deu2010 <- terra::rast(gpw4_deu2010) # unwrap PackedSpatRaster
 #' out_3 <- point2poly_tess(pointz = clea_deu2009_pt,
 #'                          polyz = hex_05_deu,
 #'                          poly_id = "HEX_ID",

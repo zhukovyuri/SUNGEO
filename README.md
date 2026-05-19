@@ -1,15 +1,11 @@
 # `SUNGEO` / Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 R package for integrating spatially-misaligned GIS datasets.
 
-Version 1.3.0 (May 14, 2024)
+Version 1.4.0 (May 19, 2026)
 
 Jason Byers, Marty Davidson, Yuri M. Zhukov
 
-Center for Political Studies, Institute for Social Research
-
-University of Michigan
-
-Feedback, bug reports welcome: zhukov-at-umich-dot-edu or ymz2-at-georgetown-dot-edu
+Feedback, bug reports welcome: ymz2-at-georgetown-dot-edu
 
 * `df2sf` / Convert data.frame object into simple features object
 * `fix_geom` / Fix polygon geometries
@@ -22,7 +18,6 @@ Feedback, bug reports welcome: zhukov-at-umich-dot-edu or ymz2-at-georgetown-dot
 * `make_ticker` / Make date ticker
 * `merge_list` / Merge list of tables on common variable(s)
 * `nesting` / Relative scale and nesting coefficients
-* `point2poly_krige` / Point-to-polygon interpolation, ordinary and universal Kriging method
 * `point2poly_simp` / Point-to-polygon interpolation, simple overlay method
 * `point2poly_tess` / Point-to-polygon interpolation, tessellation method
 * `poly2poly_ap` / Area and population weighted polygon-to-polygon interpolation
@@ -58,13 +53,12 @@ Example: geocode an address with OpenStreetMap
 ```
 # Get geographic coordinates for the Big House (top match only)
 geocode_osm("Michigan Stadium")
-geocode_osm("Big House")
 
 # Return detailed results for top match
 geocode_osm("Michigan Stadium", details=TRUE)
 
-# Return detailed results for all matches
-geocode_osm("Michigan Stadium", details=TRUE, return_all = TRUE)
+# Find all the Buddy's Pizza locations (the original is on Conant St.)
+geocode_osm("Buddy's Pizza", details=TRUE, return_all = TRUE)
 
 ```
 
@@ -94,7 +88,7 @@ data(clea_deu2009)
 data(hex_05_deu)
 
 # Preview
-plot(clea_deu2009["geometry"])
+plot(clea_deu2009["geometry"],reset=FALSE)
 plot(hex_05_deu["geometry"],add=TRUE,border="grey")
 
 # Calculate all scale and nesting metrics at once
@@ -142,6 +136,9 @@ Example: population-weighted polygon-to-polygon interpolation
 # Load population raster (from GPW v4)
 data(gpw4_deu2010)
 
+# Unwrap PackedSpatRaster
+gpw4_deu2010 <- terra::rast(gpw4_deu2010) 
+
 # Interpolate
 out_2 <- poly2poly_ap(poly_from = clea_deu2009,
                       poly_to = hex_05_deu,
@@ -170,45 +167,6 @@ out_4 <- point2poly_tess(pointz = clea_deu2009_pt,
 plot(out_4["to1_aw"])
 ```
 
-Example: point-to-polygon interpolation using ordinary Kriging
-
-```
-# Ordinary Kriging with one outcome variable
-out_5 <- point2poly_krige(pointz = clea_deu2009_pt,
-                          polyz = clea_deu2009,
-                          yvarz = "to1")
-
-# Compare observed values to predictions
-par(mfrow=c(1,2))
-plot(clea_deu2009["to1"], key.pos = NULL, reset = FALSE)
-plot(out_5["to1.pred"], key.pos = NULL, reset = FALSE)
-
-# Ordinary Kriging with multiple outcome variables
-out_6 <- point2poly_krige(pointz = clea_deu2009_pt,
-                          polyz = clea_deu2009,
-                          yvarz = c("to1","pvs1_margin"))
-
-# Compare observed values to predictions
-par(mfrow=c(1,2))
-plot(clea_deu2009["pvs1_margin"], key.pos = NULL, reset = FALSE)
-plot(out_6["pvs1_margin.pred"], key.pos = NULL, reset = FALSE)
-```
-
-Example: point-to-polygon interpolation using universal Kriging
-
-```
-# Universal Kriging with one outcome variable and one covariate
-out_7 <- point2poly_krige(pointz = clea_deu2009_pt,
-                        polyz = clea_deu2009,
-                        yvarz = "to1",
-                        rasterz = gpw4_deu2010)
-
-# Compare observed values to predictions
-par(mfrow=c(1,2))
-plot(clea_deu2009["to1"], key.pos = NULL, reset = FALSE)
-plot(out_7["to1.pred"], key.pos = NULL, reset = FALSE)
-```
-
 Example: line-in-polygon analysis
 
 ```
@@ -216,7 +174,7 @@ Example: line-in-polygon analysis
 data(highways_deu1992)
 
 # Basic map overlay
-plot(hex_05_deu["geometry"])
+plot(hex_05_deu["geometry"], reset=TRUE)
 plot(highways_deu1992$geometry, add=TRUE, col = "blue", lwd=2)
 
 # Calculate road lengths, densities and distances from each polygon to nearest highway

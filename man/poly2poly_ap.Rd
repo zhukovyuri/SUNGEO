@@ -106,6 +106,7 @@ out_2 <- poly2poly_ap(
 # Interpolation of a single variable, with population weights
 \dontrun{
 data(gpw4_deu2010)
+gpw4_deu2010 <- terra::rast(gpw4_deu2010) # unwrap PackedSpatRaster
 out_3 <- poly2poly_ap(poly_from = clea_deu2009,
                          poly_to = hex_05_deu,
                          poly_to_id = "HEX_ID",

@@ -28,7 +28,7 @@ proj4string:    +proj=longlat +datum=WGS84 +no_defs.
 Constituency-Level Elections Archive (CLEA) \url{https://electiondataarchive.org/}
 }
 \usage{
-clea_deu2009
+data(clea_deu2009)
 }
 \description{
 A simple feature collection containing the spatial geometries of electoral constituency

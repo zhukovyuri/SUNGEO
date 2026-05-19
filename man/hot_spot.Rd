@@ -15,7 +15,7 @@ hot_spot(
 )
 }
 \arguments{
-\item{insert}{Spatial point, spatial polygon, or single raster layer object. Acceptable formats include \code{sf}, \code{SpatialPolygonsDataFrame}, \code{SpatialPointsDataFrame}, and \code{RasterLayer}.}
+\item{insert}{Spatial point or spatial polygon object. Acceptable formats include \code{sf}, \code{SpatialPolygonsDataFrame}, \code{SpatialPointsDataFrame}.}
 
 \item{variable}{Column name or numeric vector containing the variable from which the local G statistic will be calculated. Must possess a natural scale that orders small and large observations (i.e. number, percentage, ratio and not model residuals).}
 
@@ -33,7 +33,7 @@ hot_spot(
 If \code{input} is \code{sf}, \code{SpatialPolygonsDataFrame} or \code{SpatialPointsDataFrame} object, returns \code{sf} object with same geometries and columns as \code{input}, appended with additional column containing Local G estimates (\code{LocalG}). If \code{input} is \code{RasterLayer} object, returns \code{RasterBrick} object containing original values (\code{Original}) and Local G estimates (\code{LocalG}).
 }
 \description{
-Function automatically calculates the Local G hot spot intensity measure for spatial points, spatial polygons, and single raster layers. Uses RANN for efficient nearest neighbor calculation (spatial points and single raster layers only); users can specify the number of neighbors (k). Users can specify the neighborhood style (see spdep::nb2listw) with default being standardized weight matrix (W).
+Function automatically calculates the Local G hot spot intensity measure for spatial points or spatial polygons. Uses RANN for efficient nearest neighbor calculation (spatial points only); users can specify the number of neighbors (k). Users can specify the neighborhood style (see spdep::nb2listw) with default being standardized weight matrix (W).
 }
 \examples{
 # Calculate Local G for sf point layer
@@ -70,11 +70,4 @@ summary(out_4$LocalG)
 plot(out_4["LocalG"])
 }
 
-# Calculate Local G for RasterLayer
-\dontrun{
-data(gpw4_deu2010)
-out_5 <- hot_spot(insert=gpw4_deu2010)
-class(out_5)
-terra::plot(out_5$LocalG)
-}
 }

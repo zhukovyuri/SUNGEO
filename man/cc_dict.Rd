@@ -16,7 +16,7 @@ data.table object, with	8626 obs. of  3 variables:
 Vincent Arel-Bundock. Package countrycode: Convert Country Names and Country Code, version 1.40. CRAN (October 12, 2022).
 }
 \usage{
-cc_dict
+data(cc_dict)
 }
 \description{
 Reference table of country names and ISO-3166 codes, adapted from \code{countrycode} package.

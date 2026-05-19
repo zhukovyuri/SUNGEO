@@ -25,7 +25,7 @@ data.frame with 16 observations and 12 variables.
 Constituency-Level Elections Archive (CLEA) \url{https://electiondataarchive.org/}
 }
 \usage{
-clea_deu2009_df
+data(clea_deu2009_df)
 }
 \description{
 A data.frame object containing the geographic centroids of electoral

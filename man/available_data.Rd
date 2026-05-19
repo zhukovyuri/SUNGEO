@@ -67,7 +67,7 @@ Weather:AirTemperatureAndPrecipitation:NOAA :Classes ‘data.table’ and 'data.
 Sub-National Geospatial Data Archive System: Geoprocessing Toolkit (updated March 17, 2023).
 }
 \usage{
-available_data
+data(available_data)
 }
 \description{
 Census of geospatial and processed data files available to download using \code{SUNGEO::get_data()}.
