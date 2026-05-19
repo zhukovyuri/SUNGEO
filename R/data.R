@@ -129,7 +129,7 @@
 #'   \item{ISO }{ISO 3166-1 alpha-3 country code. Character string.}
 #'   \item{ISOCOUNTRY }{Country name. Character string.}
 #' }
-#' @source Defense Mapping Agency (DMA), 1992. Digital Chart of the World. Defense Mapping Agency, Fairfax, Virginia. (Four CD-ROMs). Available through DIVA-GIS: \url{http://www.diva-gis.org/gData} (accessed August 12, 2021).
+#' @source Defense Mapping Agency (DMA), 1992. Digital Chart of the World. Defense Mapping Agency, Fairfax, Virginia. (Four CD-ROMs). Available through DIVA-GIS: \url{https://diva-gis.org/data.html} (accessed May 19, 2026).
 "highways_deu1992"
 
 #' Data availability through SUNGEO API

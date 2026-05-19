@@ -21,7 +21,7 @@
 #' @return data.table object, with requested data from SUNGEO API.
 #' @importFrom data.table data.table as.data.table setnames rbindlist copy
 #' @importFrom jsonlite fromJSON
-#' @importFrom RCurl getURL
+#' @importFrom httr GET content
 #' @importFrom stringr str_split str_extract_all
 #' @importFrom dplyr last
 #' @seealso \code{\link{get_info}}
@@ -107,7 +107,7 @@ get_data <- function(
     }
     # Download, parse JSON, convert to dt
     t1 <- Sys.time()
-    json_return <- jsonlite::fromJSON(gsub("\\}\\{","},{",RCurl::getURL(url_string)))
+    json_return <- jsonlite::fromJSON(gsub("\\}\\{","},{", httr::content(httr::GET(url_string), as = "text", encoding = "UTF-8")))
     if("error"%in%names(json_return)&error_stop==TRUE){
       stop(paste0("ERROR ",json_return$error$code,". ",json_return$error$message," (",gsub("https://api-sungeo-org-sungeo-api.apps.gnosis.lsa.umich.edu/data/","",url_string,fixed=TRUE),")"))
     } else if("error"%in%names(json_return)&error_stop==FALSE){
@@ -143,9 +143,7 @@ get_data <- function(
         }
         # Download, parse JSON, convert to dt
         tryCatch({
-          # csv_return_ <- data.table::fread(RCurl::getURL(paste0(url_string,"&csv=true")))
-          # names(csv_return_)[1]<-"POLYGON_ID"
-          json_return_ <- RCurl::getURL(url_string)
+          json_return_ <- httr::content(httr::GET(url_string), as = "text", encoding = "UTF-8")
           if(grepl("Fatal error",json_return_)){
             json_return <- list()
             json_return$error <- data.table::data.table(code=500,message=gsub("<.*?>|\\n", "", json_return_))

@@ -25,7 +25,6 @@
 ##'  \item "bbox_xmax". Maximum horizontal coordinate of bounding box. Numeric.
 ##'  }
 #' @details Note that Nominatim Usage Policy stipulates an absolute maximum of 1 request per second (\url{https://operations.osmfoundation.org/policies/nominatim/}). For batch geocoding of multiple addresses, please use \code{\link[SUNGEO]{geocode_osm_batch}}.
-#' @import RCurl
 #' @importFrom dplyr mutate_all slice mutate select starts_with
 #' @importFrom jsonlite fromJSON
 #' @importFrom utils URLencode
@@ -102,7 +101,11 @@ geocode_osm <- function(
   # Send query to OSM Nominatum API
   root_url <- "https://nominatim.openstreetmap.org/search?q="
   sufx_url <- "&format=json&polygon=1&addressdetails=1"
-  doc <- RCurl::getURL(utils::URLencode(paste0(root_url, query, sufx_url)),httpheader = c('User-Agent' = user_agent))
+  response <- httr::GET(
+    utils::URLencode(paste0(root_url, query, sufx_url), repeated = TRUE),
+    httr::add_headers('User-Agent' = user_agent)
+  )
+  doc <- httr::content(response, as = "text", encoding = "UTF-8")
 
   }, warning = function(w) {
     downloadFail <<- TRUE

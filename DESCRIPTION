@@ -3,13 +3,22 @@ Type: Package
 Title: Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 Version: 1.4.0
 Date: 2026-05-19
-Author: Yuri M. Zhukov, Jason Byers, Marty Davidson
-Maintainer: Yuri M. Zhukov <ymz2@georgetown.edu>
-Description: Tools for integrating spatially-misaligned GIS datasets. Part of the Sub-National Geospatial Data Archive System.
+Authors@R: c(person(given = c("Yuri", "M."),
+                    family = "Zhukov",
+                    role = c("aut", "cre"),
+                    email = "ymz2@georgetown.edu"),
+             person(given = "Jason",
+                    family = "Byers",
+                    role = "aut"),
+             person(given = "Marty",
+                    family = "Davidson",
+                    role = "aut"))
+Description: Tools for integrating spatially-misaligned GIS datasets.
+    Part of the Sub-National Geospatial Data Archive System.
 URL: https://www.sungeo.org/, https://github.com/zhukovyuri/SUNGEO
 License: GPL-2
 Encoding: UTF-8
 LazyData: TRUE
 Depends: R (>= 2.10)
-Imports: sf,data.table,dplyr,RCurl,jsonlite,terra,stringr,stats,methods,purrr,measurements,RANN,cartogram,packcircles,rmapshaper,spdep,Rcpp,httr,rlang
+Imports: sf,data.table,dplyr,jsonlite,terra,stringr,stats,methods,purrr,measurements,RANN,cartogram,packcircles,rmapshaper,spdep,Rcpp,httr,rlang
 Config/roxygen2/version: 8.0.0

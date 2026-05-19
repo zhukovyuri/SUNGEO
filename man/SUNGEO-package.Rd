@@ -15,4 +15,15 @@ Useful links:
 }
 
 }
+\author{
+\strong{Maintainer}: Yuri M. Zhukov \email{ymz2@georgetown.edu}
+
+Authors:
+\itemize{
+  \item Yuri M. Zhukov \email{ymz2@georgetown.edu}
+  \item Jason Byers
+  \item Marty Davidson
+}
+
+}
 \keyword{internal}
