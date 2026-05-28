@@ -8,17 +8,17 @@
 #' @importFrom data.table data.table as.data.table
 #' @examples
 #' # Update bbox for subset of sf object
-#' \dontrun{
+#' \donttest{
 #' data(clea_deu2009)
 #' out_1 <- update_bbox(clea_deu2009[clea_deu2009$cst_n%in%c("Berlin"),])
 #' out_1
-#' 
+#'
 #' # Bounding box of full dataset
 #' data.table::as.data.table(clea_deu2009)[,sf::st_bbox(geometry)]
-#' 
+#'
 #' # Bounding box of subset (incorrect)
 #' data.table::as.data.table(clea_deu2009)[cst_n%in%c("Berlin"),sf::st_bbox(geometry)]
-#' 
+#'
 #' # Corrected bounding box
 #' data.table::as.data.table(out_1)[,sf::st_bbox(geometry)]
 #' }

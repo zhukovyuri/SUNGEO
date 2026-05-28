@@ -39,14 +39,14 @@
 #' @importFrom purrr reduce
 #' @examples
 #' # Rasterization of polygon layer.
-#' \dontrun{
+#' \donttest{
 #' data(clea_deu2009)
 #' out_1 <- sf2raster(polyz_from = utm_select(clea_deu2009),
 #'                    input_variable = "to1")
 #' terra::plot(out_1)
 #' }
 #' # Rasterization of point layer
-#' \dontrun{
+#' \donttest{
 #' data(clea_deu2009_pt)
 #' out_2 <- sf2raster(pointz_from = utm_select(clea_deu2009_pt),
 #'                    input_variable = "to1",
@@ -54,7 +54,7 @@
 #' terra::plot(out_2)
 #' }
 #' # Cartogram (vote turnout scaled by number of valid votes)
-#' \dontrun{
+#' \donttest{
 #' out_3 <- sf2raster(polyz_from = utm_select(clea_deu2009),
 #'                    input_variable = "to1",
 #'                    cartogram = TRUE,
@@ -62,7 +62,7 @@
 #' terra::plot(out_3)
 #' }
 #' # Polygonization of cartogram raster
-#' \dontrun{
+#' \donttest{
 #' out_4a <- sf2raster(polyz_from = utm_select(clea_deu2009),
 #'                     input_variable = "to1",
 #'                     cartogram = TRUE,

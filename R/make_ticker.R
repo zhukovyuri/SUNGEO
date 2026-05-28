@@ -18,19 +18,19 @@
 #' @importFrom data.table data.table as.data.table
 #' @examples
 #' # All dates from January 1, 1900 to today
-#' \dontrun{
+#' \donttest{
 #' out_1 <- make_ticker()
 #' out_1
 #' }
-#' 
+#'
 #' # All dates from January 1, 1200 to today
-#' \dontrun{
+#' \donttest{
 #' out_2 <- make_ticker(date_min=12000101)
 #' out_2
 #' }
-#'  
+#'
 #' # All dates from January 1, 1500 to December 31, 1899
-#' \dontrun{
+#' \donttest{
 #' out_3 <- make_ticker(date_min=15000101, date_max=18991231)
 #' out_3
 #' }

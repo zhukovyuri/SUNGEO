@@ -18,12 +18,12 @@
 #' @importFrom stats median
 #' @examples
 #' # Find a planar projection for an unprojected (WSG 1984) hexagonal grid of Germany
-#' \dontrun{
+#' \donttest{
 #' data(hex_05_deu)
 #' out_1 <- utm_select(hex_05_deu)
 #' }
 #' # Find a planar projection for a raster
-#' \dontrun{
+#' \donttest{
 #' data(gpw4_deu2010)
 #' gpw4_deu2010 <- terra::rast(gpw4_deu2010) # unwrap PackedSpatRaster
 #' out_2 <- utm_select(gpw4_deu2010)

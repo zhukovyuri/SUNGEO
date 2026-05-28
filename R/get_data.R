@@ -27,13 +27,13 @@
 #' @seealso \code{\link{get_info}}
 #' @examples
 #' # Single country, single topic
-#' \dontrun{
+#' \donttest{
 #' out_1 <- get_data(country_name="Afghanistan",topics="Demographics:Population:GHS")
 #' out_1
 #' }
 #'
 #  # Multiple countries, multiple topics
-#' \dontrun{
+#' \donttest{
 #' out_2 <- get_data(
 #' 	country_name=c("Afghanistan","Moldova"),
 #' 	topics=c("Demographics:Ethnicity:EPR","Demographics:Population:GHS"))
@@ -41,7 +41,7 @@
 #' }
 #'
 #' # Other boundary sets, spatial and time units
-#' \dontrun{
+#' \donttest{
 #' out_3 <- get_data(
 #' 	country_name="Albania",
 #' 	topics="Weather:AirTemperatureAndPrecipitation:NOAA",

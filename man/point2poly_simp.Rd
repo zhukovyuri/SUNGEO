@@ -42,26 +42,22 @@ Assignment procedures are the same for numeric and character string variables. A
 }
 \examples{
 # Assignment of a single variable (sums)
-\dontrun{
 data(hex_05_deu)
 data(clea_deu2009_pt)
 out_1 <- point2poly_simp(pointz=clea_deu2009_pt,
                          polyz=hex_05_deu,
                          varz="vv1")
 plot(out_1["vv1"])
-}
 
 # Replace NA's with 0's
-\dontrun{
 out_2 <- point2poly_simp(pointz = clea_deu2009_pt,
                          polyz = hex_05_deu,
                          varz = "vv1",
                          na_val = 0)
 plot(out_2["vv1"])
-}
 
 # Multiple variables, with different assignment functions
-\dontrun{
+\donttest{
 out_3 <- point2poly_simp(pointz = clea_deu2009_pt,
                          polyz = hex_05_deu,
                          varz = list(

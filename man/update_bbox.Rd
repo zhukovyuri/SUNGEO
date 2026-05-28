@@ -17,7 +17,7 @@ Function to update the coordinates of the bounding box of sf vector data objects
 }
 \examples{
 # Update bbox for subset of sf object
-\dontrun{
+\donttest{
 data(clea_deu2009)
 out_1 <- update_bbox(clea_deu2009[clea_deu2009$cst_n\%in\%c("Berlin"),])
 out_1

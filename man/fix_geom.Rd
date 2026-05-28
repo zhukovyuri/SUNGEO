@@ -19,7 +19,7 @@ Function to check validity and fix broken geometries in simple features polygon 
 }
 \examples{
 # Assignment of a single variable (sums)
-\dontrun{
+\donttest{
 data(clea_deu2009)
 out_1 <- fix_geom(clea_deu2009)
 }

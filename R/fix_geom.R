@@ -8,7 +8,7 @@
 #' @importFrom sf st_make_valid st_is_valid st_buffer st_cast
 #' @examples
 #' # Assignment of a single variable (sums)
-#' \dontrun{
+#' \donttest{
 #' data(clea_deu2009)
 #' out_1 <- fix_geom(clea_deu2009)
 #' }

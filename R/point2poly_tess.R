@@ -54,7 +54,7 @@
 #' @importFrom purrr reduce
 #' @examples
 #' # Interpolation of a single variable, with area weights
-#' \dontrun{
+#' \donttest{
 #' data(hex_05_deu)
 #' data(clea_deu2009_pt)
 #' out_1 <- point2poly_tess(pointz = clea_deu2009_pt,
@@ -65,7 +65,7 @@
 #' }
 #'
 #' # Extract and inspect tessellation polygons
-#' \dontrun{
+#' \donttest{
 #' out_2 <- point2poly_tess(pointz = clea_deu2009_pt,
 #'                              polyz = hex_05_deu,
 #'                              poly_id = "HEX_ID",
@@ -76,7 +76,7 @@
 #' }
 #'
 #' # Interpolation of multiple variables, with area and population weights
-#' \dontrun{
+#' \donttest{
 #' data(gpw4_deu2010)
 #' gpw4_deu2010 <- terra::rast(gpw4_deu2010) # unwrap PackedSpatRaster
 #' out_3 <- point2poly_tess(pointz = clea_deu2009_pt,

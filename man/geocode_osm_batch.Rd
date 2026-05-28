@@ -2,70 +2,123 @@
 % Please edit documentation in R/geocode_osm_batch.R
 \name{geocode_osm_batch}
 \alias{geocode_osm_batch}
-\title{Batch geocode addresses with OpenStreetMap}
+\title{Batch geocode addresses and coordinates with OpenStreetMap}
 \usage{
 geocode_osm_batch(
-  query,
+  query = NULL,
   delay = 1,
   return_all = FALSE,
   match_num = 1,
   details = FALSE,
+  reverse = FALSE,
+  lon = NULL,
+  lat = NULL,
+  zoom = 10,
   user_agent = NULL,
   verbose = FALSE
 )
 }
 \arguments{
-\item{query}{Addresses or place names to be geocoded. Character string.}
+\item{query}{Addresses or place names to be geocoded. Character string.
+Ignored if \code{reverse=TRUE}.}
 
-\item{delay}{Delay between requests. Default is 1 second. Numeric.}
+\item{delay}{Delay between requests, in seconds. Default is 1. Numeric.}
 
-\item{return_all}{Should all matches be returned? Overrides \code{match_num} if \code{TRUE}. Default is \code{FALSE}. Logical.}
+\item{return_all}{Should all matches be returned? Overrides \code{match_num}
+if \code{TRUE}. Default is \code{FALSE}. Logical.}
 
-\item{match_num}{If query matches multiple locations, which match to return? Default is 1 (highest-ranking match, by relevance). Numeric.}
+\item{match_num}{If query matches multiple locations, which match to return?
+Default is 1 (highest-ranking match, by relevance). Numeric.}
 
-\item{details}{Should detailed results be returned? Default is \code{FALSE}. Logical.}
+\item{details}{Should detailed results be returned? Default is \code{FALSE}.
+Logical. Ignored if \code{reverse=TRUE}.}
 
-\item{user_agent}{Valid User-Agent identifying the application for OSM-Nominatum. If none supplied, function will attempt to auto-detect. Character string.}
+\item{reverse}{Should reverse geocoding be performed (coordinates to
+address)? Default is \code{FALSE}. Logical.}
 
-\item{verbose}{Print status messages and progress? Default is \code{FALSE}. Logical.}
+\item{lon}{Longitudes of points to reverse geocode. Required if
+\code{reverse=TRUE}. Must be the same length as \code{lat}. Numeric vector.}
+
+\item{lat}{Latitudes of points to reverse geocode. Required if
+\code{reverse=TRUE}. Must be the same length as \code{lon}. Numeric vector.}
+
+\item{zoom}{Zoom level for reverse geocoding, controlling the level of detail
+returned (0 = country, 10 = city, 18 = building). Default is 10. Numeric.}
+
+\item{user_agent}{Valid User-Agent identifying the application for
+OSM Nominatim. If none supplied, function will attempt to auto-detect.
+Character string.}
+
+\item{verbose}{Print status messages and progress? Default is \code{FALSE}.
+Logical.}
 }
 \value{
-A \code{data.frame} object. If \code{details=FALSE}, contains fields
-\itemize{
- \item "query". User-supplied address query(ies). Character string.
- \item "osm_id". OpenStreetMap ID. Character string.
- \item "address". OpenStreetMap address. Character string.
- \item "longitude". Horizontal coordinate. Numeric.
- \item "latitude". Vertical coordinate. Numeric.
- }
-If \code{details=TRUE}, contains additional fields
-\itemize{
- \item "osm_type". OpenStreetMap ID. Character string.
- \item "importance". Relevance of Nominatum match to query, from 0 (worst) to 1 (best). Numeric.
- \item "bbox_ymin". Minimum vertical coordinate of bounding box. Numeric.
- \item "bbox_ymax". Maximum vertical coordinate of bounding box. Numeric.
- \item "bbox_xmin". Minimum horizontal coordinate of bounding box. Numeric.
- \item "bbox_xmax". Maximum horizontal coordinate of bounding box. Numeric.
- }
+A \code{data.frame} object.
+
+  For forward geocoding (\code{reverse=FALSE}):
+  \itemize{
+  \item \code{query}. User-supplied address query. Character string.
+  \item \code{osm_id}. OpenStreetMap ID. Character string.
+  \item \code{address}. OpenStreetMap address. Character string.
+  \item \code{longitude}. Horizontal coordinate. Numeric.
+  \item \code{latitude}. Vertical coordinate. Numeric.
+  }
+  If \code{details=TRUE}, also contains:
+  \itemize{
+  \item \code{osm_type}. OpenStreetMap feature type. Character string.
+  \item \code{importance}. Relevance of Nominatim match to query, from 0
+    (worst) to 1 (best). Numeric.
+  \item \code{bbox_ymin}. Minimum vertical coordinate of bounding box. Numeric.
+  \item \code{bbox_ymax}. Maximum vertical coordinate of bounding box. Numeric.
+  \item \code{bbox_xmin}. Minimum horizontal coordinate of bounding box. Numeric.
+  \item \code{bbox_xmax}. Maximum horizontal coordinate of bounding box. Numeric.
+  }
+
+  For reverse geocoding (\code{reverse=TRUE}):
+  \itemize{
+  \item \code{osm_name}. Full display name from OpenStreetMap. Character string.
+  \item \code{osm_adm0_code}. ISO country code. Character string.
+  \item \code{osm_adm0}. Country name. Character string.
+  \item \code{osm_adm1}. State or first-level administrative division. Character string.
+  \item \code{osm_adm2}. District or county. Character string.
+  \item \code{osm_adm3}. Municipality. Character string.
+  \item \code{osm_adm4}. Borough or village. Character string.
+  }
 }
 \description{
-Function to find geographic coordinates of multiple addresses and place names, using OpenStreetMap's Nominatum API.
+Finds geographic coordinates of multiple addresses and place names (forward
+geocoding), or converts multiple longitude/latitude coordinate pairs to place
+names and administrative units (reverse geocoding), using OpenStreetMap's
+Nominatim API.
 }
 \details{
-Wrapper function for \code{\link[SUNGEO]{geocode_osm}}. Because Nominatim Usage Policy stipulates an absolute maximum of 1 request per second, this function facilitates batch geocoding by adding a small delay between queries (\url{https://operations.osmfoundation.org/policies/nominatim/}).
+Wrapper function for \code{\link[SUNGEO]{geocode_osm}}. Because the
+  Nominatim Usage Policy stipulates an absolute maximum of 1 request per
+  second, this function facilitates batch geocoding by adding a small delay
+  between queries
+  (\url{https://operations.osmfoundation.org/policies/nominatim/}).
 }
 \examples{
 # Geocode multiple addresses (top matches only)
-\dontrun{
-geocode_osm_batch(c("Ann Arbor","East Lansing","Columbus"))
+\donttest{
+geocode_osm_batch(c("Ann Arbor", "East Lansing", "Columbus"))
 }
 # With progress reports
-\dontrun{
-geocode_osm_batch(c("Ann Arbor","East Lansing","Columbus"), verbose = TRUE)
+\donttest{
+geocode_osm_batch(c("Ann Arbor", "East Lansing", "Columbus"), verbose = TRUE)
 }
 # Return detailed results for all matches
-\dontrun{
-geocode_osm_batch(c("Ann Arbor","East Lansing","Columbus"),
-                  details = TRUE, return_all = TRUE)
+\donttest{
+geocode_osm_batch(c("Ann Arbor", "East Lansing", "Columbus"),
+  details = TRUE, return_all = TRUE)
+}
+# Reverse geocode multiple coordinates (city level)
+\donttest{
+geocode_osm_batch(
+  reverse = TRUE,
+  lon = c(-83.743, -84.556, -82.999),
+  lat = c(42.278,  42.701,  39.961),
+  zoom = 10
+)
 }
 }

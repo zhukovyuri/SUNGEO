@@ -76,7 +76,7 @@ It is possible to pass multiple arguments to \code{char_assign} (e.g. \code{char
 }
 \examples{
 # Interpolation of a single variable, with area weights
-\dontrun{
+\donttest{
 data(clea_deu2009)
 data(hex_05_deu)
 out_1 <- poly2poly_ap(poly_from = clea_deu2009,
@@ -87,7 +87,7 @@ out_1 <- poly2poly_ap(poly_from = clea_deu2009,
 }
 
 # Interpolation of multiple variables, with area weights
-\dontrun{
+\donttest{
 out_2 <- poly2poly_ap(
               poly_from = clea_deu2009,
               poly_to = hex_05_deu,
@@ -104,7 +104,7 @@ out_2 <- poly2poly_ap(
 }
 
 # Interpolation of a single variable, with population weights
-\dontrun{
+\donttest{
 data(gpw4_deu2010)
 gpw4_deu2010 <- terra::rast(gpw4_deu2010) # unwrap PackedSpatRaster
 out_3 <- poly2poly_ap(poly_from = clea_deu2009,
@@ -116,7 +116,7 @@ out_3 <- poly2poly_ap(poly_from = clea_deu2009,
 }
 
 # Interpolation of a single variable, with area and population weights
-\dontrun{
+\donttest{
 out_4 <- poly2poly_ap(poly_from = clea_deu2009,
                          poly_to = hex_05_deu,
                          poly_to_id = "HEX_ID",

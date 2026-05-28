@@ -17,7 +17,7 @@
 #' @examples
 #' # Calculate Local G for sf point layer
 #'
-#' \dontrun{
+#' \donttest{
 #' data(clea_deu2009_pt)
 #' out_1 <- hot_spot(insert=clea_deu2009_pt, variable = clea_deu2009_pt$to1)
 #' class(out_1)
@@ -26,7 +26,7 @@
 #'
 #' # Calculate Local G for sf polygon layer (variable as numeric vector)
 #'
-#' \dontrun{
+#' \donttest{
 #' data(clea_deu2009)
 #' out_2 <- hot_spot(insert=clea_deu2009, variable = clea_deu2009$to1)
 #' summary(out_2$LocalG)
@@ -35,7 +35,7 @@
 #'
 #' # Calculate Local G for sf polygon layer (variable as column name)
 #'
-#' \dontrun{
+#' \donttest{
 #' out_3 <- hot_spot(insert=clea_deu2009, variable = "to1")
 #' summary(out_3$LocalG)
 #' plot(out_3["LocalG"])
@@ -43,7 +43,7 @@
 #'
 #' # Calculate Local G for sf polygon SpatialPolygonsDataFrame (variable as column name)
 #'
-#' \dontrun{
+#' \donttest{
 #' out_4 <- hot_spot(insert=as(clea_deu2009,"Spatial"), variable = "to1")
 #' summary(out_4$LocalG)
 #' plot(out_4["LocalG"])

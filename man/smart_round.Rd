@@ -23,15 +23,11 @@ Function to round numerical values with minimal information loss (e.g. to avoid 
 Rounds the values in its first argument to the specified number of decimal places (default 0). If brute-force rounding produces zero values (e.g. "0.00"), the number of decimal places is expanded to include the first significant digit.
 }
 \examples{
-# Round a vector of numbers, character string output (best for tables) 
-\dontrun{
+# Round a vector of numbers, character string output (best for tables)
 out_1 <- smart_round(c(.0013,2.3,-1,pi),rnd=2)
 out_1
-}
 
-# Round a vector of numbers, numerical output 
-\dontrun{
+# Round a vector of numbers, numerical output
 out_2 <- smart_round(c(.0013,2.3,-1,pi),rnd=2,return_char=FALSE)
 out_2
-}
 }

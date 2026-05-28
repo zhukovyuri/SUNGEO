@@ -43,19 +43,19 @@ Function takes in x-, y-coordinates, and a data.frame of variables (optional) an
 }
 \examples{
 # Coordinates supplied as vectors
-\dontrun{
+\donttest{
 data(clea_deu2009_df)
 out_1 <- df2sf(x_coord=clea_deu2009_df$longitude,y_coord = clea_deu2009_df$latitude)
 class(out_1)
 plot(out_1$geometry)
 }
 # Coordinates supplied as column mames
-\dontrun{
+\donttest{
 out_2 <- df2sf(x_coord="longitude",y_coord ="latitude", input_data = clea_deu2009_df)
 plot(out_2["geometry"])
 }
 # Load from external file
-\dontrun{
+\donttest{
 tmp <- tempfile()
 write.csv(clea_deu2009_df,file=tmp)
 out_3 <- df2sf(x_coord="longitude",y_coord ="latitude", file=tmp)

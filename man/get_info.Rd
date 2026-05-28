@@ -21,7 +21,7 @@ This function reports the availability of data files on the SUNGEO server, searc
 }
 \examples{
 # Get list of all available data
-\dontrun{
+\donttest{
 out_1 <- get_info()
 out_1["summary"]
 out_1["topics"]
@@ -29,19 +29,19 @@ out_1["geosets"]
 }
 
 # Get list of available data for a single country
-\dontrun{
+\donttest{
 out_2 <- get_info(country_names="Afghanistan")
 out_2
 }
 
 # Get list of available data for a single topic
-\dontrun{
+\donttest{
 out_3 <- get_info(topics="Elections:LowerHouse:CLEA")
 out_3
 }
 
 # Get list of available data for a multiple countries and topics
-\dontrun{
+\donttest{
 out_4 <- get_info(
                  country_names=c("Afghanistan","Zambia"),
                  topics=c("Elections:LowerHouse:CLEA","Events:PoliticalViolence:GED"))

@@ -1,7 +1,7 @@
 # `SUNGEO` / Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 R package for integrating spatially-misaligned GIS datasets.
 
-Version 1.4.0 (May 19, 2026)
+Version 1.4.0 (May 28, 2026)
 
 Jason Byers, Marty Davidson, Yuri M. Zhukov
 
@@ -59,6 +59,9 @@ geocode_osm("Michigan Stadium", details=TRUE)
 
 # Find all the Buddy's Pizza locations (the original is on Conant St.)
 geocode_osm("Buddy's Pizza", details=TRUE, return_all = TRUE)
+
+# Reverse geocode a coordinate pair
+geocode_osm(reverse = TRUE, lon = -83.74868, lat = 42.26587, zoom = 18)
 
 ```
 

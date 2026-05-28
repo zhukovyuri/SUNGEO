@@ -42,7 +42,7 @@
 #' @importFrom purrr reduce
 #' @examples
 #' # Interpolation of a single variable, with area weights
-#' \dontrun{
+#' \donttest{
 #' data(clea_deu2009)
 #' data(hex_05_deu)
 #' out_1 <- poly2poly_ap(poly_from = clea_deu2009,
@@ -53,7 +53,7 @@
 #' }
 #'
 #' # Interpolation of multiple variables, with area weights
-#' \dontrun{
+#' \donttest{
 #' out_2 <- poly2poly_ap(
 #'               poly_from = clea_deu2009,
 #'               poly_to = hex_05_deu,
@@ -70,7 +70,7 @@
 #' }
 #'
 #' # Interpolation of a single variable, with population weights
-#' \dontrun{
+#' \donttest{
 #' data(gpw4_deu2010)
 #' gpw4_deu2010 <- terra::rast(gpw4_deu2010) # unwrap PackedSpatRaster
 #' out_3 <- poly2poly_ap(poly_from = clea_deu2009,
@@ -82,7 +82,7 @@
 #' }
 #'
 #' # Interpolation of a single variable, with area and population weights
-#' \dontrun{
+#' \donttest{
 #' out_4 <- poly2poly_ap(poly_from = clea_deu2009,
 #'                          poly_to = hex_05_deu,
 #'                          poly_to_id = "HEX_ID",
@@ -531,9 +531,7 @@ poly2poly_ap <- function(
     IntermediateFunction <- Numeric_Subset$Funz[sub_iter][[1]]
 
     #Part d -
-    searchWeight <- c('weighted', 'w')
-
-    if(grepl(paste(searchWeight, collapse = '|'), paste(as.character(attributes(IntermediateFunction)$srcref),collapse=""))){
+    if("w" %in% names(formals(IntermediateFunction))){
       if("aw"%in%Numeric_Subset$methodz[sub_iter]){
         Output <- by(data=Internal_Matrix,INDICES=Internal_Matrix$Return_ID,FUN=function(x){IntermediateFunction(x$var_, w = x$AREA_W_INV)},simplify=TRUE)
         Output <- data.table::data.table(Return_ID=as.numeric(names(Output)),V1=c(Output))
@@ -549,7 +547,6 @@ poly2poly_ap <- function(
         Output <- by(data=Internal_Matrix,INDICES=Internal_Matrix$Return_ID,FUN=function(x){IntermediateFunction(x$var_)},simplify=TRUE)
         Output <- data.table::data.table(Return_ID=as.numeric(names(Output)),V1=c(Output))
       })
-
     }
 
     #Part e -

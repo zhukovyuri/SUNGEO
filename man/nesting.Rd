@@ -53,7 +53,6 @@ Values of \code{tol_} can be adjusted to increase or decrease the sensitivity of
 }
 \examples{
 # Calculate all scale and nesting metrics for two sets of polygons
-\dontrun{
 data(clea_deu2009)
 data(hex_05_deu)
 nest_1 <- nesting(
@@ -61,15 +60,12 @@ nest_1 <- nesting(
               poly_to = hex_05_deu
               )
 nest_1
-}
 
 # Calculate just Relative Nesting, in the opposite direction
-\dontrun{
 nest_2 <- nesting(
               poly_from = hex_05_deu,
               poly_to = clea_deu2009,
               metrix = "rn"
               )
 nest_2
-}
 }

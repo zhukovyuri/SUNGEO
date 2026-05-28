@@ -2,7 +2,7 @@ Package: SUNGEO
 Type: Package
 Title: Sub-National Geospatial Data Archive: Geoprocessing Toolkit
 Version: 1.4.0
-Date: 2026-05-19
+Date: 2026-05-28
 Authors@R: c(person(given = c("Yuri", "M."),
                     family = "Zhukov",
                     role = c("aut", "cre"),
@@ -13,12 +13,17 @@ Authors@R: c(person(given = c("Yuri", "M."),
              person(given = "Marty",
                     family = "Davidson",
                     role = "aut"))
-Description: Tools for integrating spatially-misaligned GIS datasets.
-    Part of the Sub-National Geospatial Data Archive System.
+Description: Integrates spatially-misaligned GIS datasets across incompatible
+    geographic units. Part of the Sub-National Geospatial Data Archive System.
+    For the underlying methods, see Zhukov, Byers, Davidson, and Kollman (2024)
+    "Integrating Data Across Misaligned Spatial Units," Political Analysis,
+    Volume 32, Number 1, pp. 17-33 
+    <doi:10.1017/pan.2023.5>.
 URL: https://www.sungeo.org/, https://github.com/zhukovyuri/SUNGEO
 License: GPL-2
 Encoding: UTF-8
 LazyData: TRUE
-Depends: R (>= 2.10)
-Imports: sf,data.table,dplyr,jsonlite,terra,stringr,stats,methods,purrr,measurements,RANN,cartogram,packcircles,rmapshaper,spdep,Rcpp,httr,rlang
+Depends: R (>= 3.5.0)
+Imports: sf,data.table,dplyr,jsonlite,terra,stringr,stats,methods,purrr,measurements,RANN,cartogram,packcircles,rmapshaper,spdep,Rcpp,httr,rlang,curl
+Suggests: lwgeom
 Config/roxygen2/version: 8.0.0
