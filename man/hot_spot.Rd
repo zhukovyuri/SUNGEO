@@ -37,34 +37,26 @@ Function automatically calculates the Local G hot spot intensity measure for spa
 }
 \examples{
 # Calculate Local G for sf point layer
-
-\donttest{
 data(clea_deu2009_pt)
 out_1 <- hot_spot(insert=clea_deu2009_pt, variable = clea_deu2009_pt$to1)
 class(out_1)
 plot(out_1["LocalG"])
-}
 
 # Calculate Local G for sf polygon layer (variable as numeric vector)
-
-\donttest{
 data(clea_deu2009)
 out_2 <- hot_spot(insert=clea_deu2009, variable = clea_deu2009$to1)
 summary(out_2$LocalG)
 plot(out_2["LocalG"])
-}
-
-# Calculate Local G for sf polygon layer (variable as column name)
 
 \donttest{
+# Calculate Local G for sf polygon layer (variable as column name)
 out_3 <- hot_spot(insert=clea_deu2009, variable = "to1")
 summary(out_3$LocalG)
 plot(out_3["LocalG"])
 }
 
-# Calculate Local G for sf polygon SpatialPolygonsDataFrame (variable as column name)
-
 \donttest{
+# Calculate Local G for a SpatialPolygonsDataFrame object (variable as column name)
 out_4 <- hot_spot(insert=as(clea_deu2009,"Spatial"), variable = "to1")
 summary(out_4$LocalG)
 plot(out_4["LocalG"])

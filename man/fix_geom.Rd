@@ -18,9 +18,8 @@ Returns a \code{sf} polygon object, with self-intersections and other geometry p
 Function to check validity and fix broken geometries in simple features polygon objects
 }
 \examples{
-# Assignment of a single variable (sums)
-\donttest{
+# Fix geometries for a single dataset
 data(clea_deu2009)
 out_1 <- fix_geom(clea_deu2009)
-}
+all(sf::st_is_valid(out_1))
 }

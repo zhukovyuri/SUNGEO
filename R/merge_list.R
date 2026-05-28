@@ -7,14 +7,12 @@
 #' @importFrom data.table data.table as.data.table
 #' @examples
 #' # Merge list of three tables with different common variables
-#' \donttest{
 #' A <- data.table::data.table(month=month.name,year=rep(1991:1992,each=12),A=rnorm(24))
 #' B <- data.table::data.table(year=c(1991,1992),B=rbeta(2,1,1))
 #' C <- data.table::data.table(month=month.name,C=runif(12))
 #'
 #' out_1 <- merge_list(list(A,B,C))
 #' out_1
-#' }
 #'
 #' @export
 

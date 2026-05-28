@@ -7,11 +7,10 @@
 #' @return Returns a \code{sf} polygon object, with self-intersections and other geometry problems fixed.
 #' @importFrom sf st_make_valid st_is_valid st_buffer st_cast
 #' @examples
-#' # Assignment of a single variable (sums)
-#' \donttest{
+#' # Fix geometries for a single dataset
 #' data(clea_deu2009)
 #' out_1 <- fix_geom(clea_deu2009)
-#' }
+#' all(sf::st_is_valid(out_1))
 #' @export
 
 fix_geom <- function(x, n_it = 10){

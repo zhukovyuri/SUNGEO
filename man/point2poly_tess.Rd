@@ -86,7 +86,6 @@ It is possible to pass multiple arguments to \code{char_assign} (e.g. \code{char
 }
 \examples{
 # Interpolation of a single variable, with area weights
-\donttest{
 data(hex_05_deu)
 data(clea_deu2009_pt)
 out_1 <- point2poly_tess(pointz = clea_deu2009_pt,
@@ -94,10 +93,8 @@ out_1 <- point2poly_tess(pointz = clea_deu2009_pt,
                              poly_id = "HEX_ID",
                              varz = "to1")
 plot(out_1["to1_aw"])
-}
 
 # Extract and inspect tessellation polygons
-\donttest{
 out_2 <- point2poly_tess(pointz = clea_deu2009_pt,
                              polyz = hex_05_deu,
                              poly_id = "HEX_ID",
@@ -105,10 +102,9 @@ out_2 <- point2poly_tess(pointz = clea_deu2009_pt,
                              return_tess = TRUE)
 plot(out_2$tess["to1"])
 plot(out_2$result["to1_aw"])
-}
 
-# Interpolation of multiple variables, with area and population weights
 \donttest{
+# Interpolation of multiple variables, with area and population weights
 data(gpw4_deu2010)
 gpw4_deu2010 <- terra::rast(gpw4_deu2010) # unwrap PackedSpatRaster
 out_3 <- point2poly_tess(pointz = clea_deu2009_pt,

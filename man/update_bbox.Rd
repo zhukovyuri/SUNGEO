@@ -17,7 +17,6 @@ Function to update the coordinates of the bounding box of sf vector data objects
 }
 \examples{
 # Update bbox for subset of sf object
-\donttest{
 data(clea_deu2009)
 out_1 <- update_bbox(clea_deu2009[clea_deu2009$cst_n\%in\%c("Berlin"),])
 out_1
@@ -30,5 +29,5 @@ data.table::as.data.table(clea_deu2009)[cst_n\%in\%c("Berlin"),sf::st_bbox(geome
 
 # Corrected bounding box
 data.table::as.data.table(out_1)[,sf::st_bbox(geometry)]
-}
+
 }

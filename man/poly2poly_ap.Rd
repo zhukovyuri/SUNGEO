@@ -76,7 +76,6 @@ It is possible to pass multiple arguments to \code{char_assign} (e.g. \code{char
 }
 \examples{
 # Interpolation of a single variable, with area weights
-\donttest{
 data(clea_deu2009)
 data(hex_05_deu)
 out_1 <- poly2poly_ap(poly_from = clea_deu2009,
@@ -84,10 +83,10 @@ out_1 <- poly2poly_ap(poly_from = clea_deu2009,
               poly_to_id = "HEX_ID",
               varz = "to1"
              )
-}
+plot(out_1["to1_aw"])
 
-# Interpolation of multiple variables, with area weights
 \donttest{
+# Interpolation of multiple variables, with area weights
 out_2 <- poly2poly_ap(
               poly_from = clea_deu2009,
               poly_to = hex_05_deu,
@@ -101,10 +100,11 @@ out_2 <- poly2poly_ap(
                 function(x,w){sum(x*w)} ),
               char_varz = c("incumb_pty_n","win1_pty_n")
              )
+plot(out_2["vv1_aw"])
 }
 
-# Interpolation of a single variable, with population weights
 \donttest{
+# Interpolation of a single variable, with population weights
 data(gpw4_deu2010)
 gpw4_deu2010 <- terra::rast(gpw4_deu2010) # unwrap PackedSpatRaster
 out_3 <- poly2poly_ap(poly_from = clea_deu2009,
@@ -113,15 +113,17 @@ out_3 <- poly2poly_ap(poly_from = clea_deu2009,
                          varz = "to1",
                          methodz = "pw",
                          pop_raster = gpw4_deu2010)
+plot(out_3["to1_pw"])
 }
 
-# Interpolation of a single variable, with area and population weights
 \donttest{
+# Interpolation of a single variable, with area and population weights
 out_4 <- poly2poly_ap(poly_from = clea_deu2009,
                          poly_to = hex_05_deu,
                          poly_to_id = "HEX_ID",
                          varz = "to1",
                          methodz = c("aw","pw"),
                          pop_raster = gpw4_deu2010)
+plot(out_4["to1_aw"])
 }
 }

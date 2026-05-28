@@ -59,7 +59,6 @@ Function for basic geometry calculations on polyline features, within an overlap
 }
 \examples{
 # Road lengths, densities and distance from polygon to nearest highway
-\dontrun{
 data(hex_05_deu)
 data(highways_deu1992)
 out_1 <- line2poly(linez = highways_deu1992,
@@ -68,10 +67,9 @@ out_1 <- line2poly(linez = highways_deu1992,
 plot(out_1["line_length"])
 plot(out_1["line_density"])
 plot(out_1["line_distance"])
-}
 
+\donttest{
 # Replace missing road lengths and densities with 0's, rename variables
-\dontrun{
 out_2 <- line2poly(linez = highways_deu1992,
                    polyz = hex_05_deu,
                    poly_id = "HEX_ID",

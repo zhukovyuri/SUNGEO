@@ -99,21 +99,21 @@ Wrapper function for \code{\link[SUNGEO]{geocode_osm}}. Because the
   (\url{https://operations.osmfoundation.org/policies/nominatim/}).
 }
 \examples{
-# Geocode multiple addresses (top matches only)
 \donttest{
+# Geocode multiple addresses (top matches only)
 geocode_osm_batch(c("Ann Arbor", "East Lansing", "Columbus"))
 }
-# With progress reports
 \donttest{
+# With progress reports
 geocode_osm_batch(c("Ann Arbor", "East Lansing", "Columbus"), verbose = TRUE)
 }
-# Return detailed results for all matches
 \donttest{
+# Return detailed results for all matches
 geocode_osm_batch(c("Ann Arbor", "East Lansing", "Columbus"),
   details = TRUE, return_all = TRUE)
 }
-# Reverse geocode multiple coordinates (city level)
 \donttest{
+# Reverse geocode multiple coordinates (city level)
 geocode_osm_batch(
   reverse = TRUE,
   lon = c(-83.743, -84.556, -82.999),

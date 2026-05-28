@@ -26,22 +26,22 @@
 #' @importFrom dplyr last
 #' @seealso \code{\link{get_info}}
 #' @examples
-#' # Single country, single topic
 #' \donttest{
+#' # Single country, single topic
 #' out_1 <- get_data(country_name="Afghanistan",topics="Demographics:Population:GHS")
 #' out_1
 #' }
 #'
-#  # Multiple countries, multiple topics
 #' \donttest{
+#  # Multiple countries, multiple topics
 #' out_2 <- get_data(
 #' 	country_name=c("Afghanistan","Moldova"),
 #' 	topics=c("Demographics:Ethnicity:EPR","Demographics:Population:GHS"))
 #' out_2
 #' }
 #'
-#' # Other boundary sets, spatial and time units
 #' \donttest{
+#' # Other boundary sets, spatial and time units
 #' out_3 <- get_data(
 #' 	country_name="Albania",
 #' 	topics="Weather:AirTemperatureAndPrecipitation:NOAA",

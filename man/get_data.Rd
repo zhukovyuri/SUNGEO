@@ -63,8 +63,8 @@ data.table object, with requested data from SUNGEO API.
 Function to download data files through the SUNGEO API. Function produces a data.table object, corresponding to the user's choice of countries, topics, sources, and spatial and temporal units.
 }
 \examples{
-# Single country, single topic
 \donttest{
+# Single country, single topic
 out_1 <- get_data(country_name="Afghanistan",topics="Demographics:Population:GHS")
 out_1
 }
@@ -76,8 +76,8 @@ out_2 <- get_data(
 out_2
 }
 
-# Other boundary sets, spatial and time units
 \donttest{
+# Other boundary sets, spatial and time units
 out_3 <- get_data(
 	country_name="Albania",
 	topics="Weather:AirTemperatureAndPrecipitation:NOAA",

@@ -16,34 +16,26 @@
 #' @importFrom RANN nn2
 #' @examples
 #' # Calculate Local G for sf point layer
-#'
-#' \donttest{
 #' data(clea_deu2009_pt)
 #' out_1 <- hot_spot(insert=clea_deu2009_pt, variable = clea_deu2009_pt$to1)
 #' class(out_1)
 #' plot(out_1["LocalG"])
-#' }
 #'
 #' # Calculate Local G for sf polygon layer (variable as numeric vector)
-#'
-#' \donttest{
 #' data(clea_deu2009)
 #' out_2 <- hot_spot(insert=clea_deu2009, variable = clea_deu2009$to1)
 #' summary(out_2$LocalG)
 #' plot(out_2["LocalG"])
-#' }
-#'
-#' # Calculate Local G for sf polygon layer (variable as column name)
 #'
 #' \donttest{
+#' # Calculate Local G for sf polygon layer (variable as column name)
 #' out_3 <- hot_spot(insert=clea_deu2009, variable = "to1")
 #' summary(out_3$LocalG)
 #' plot(out_3["LocalG"])
 #' }
 #'
-#' # Calculate Local G for sf polygon SpatialPolygonsDataFrame (variable as column name)
-#'
 #' \donttest{
+#' # Calculate Local G for a SpatialPolygonsDataFrame object (variable as column name)
 #' out_4 <- hot_spot(insert=as(clea_deu2009,"Spatial"), variable = "to1")
 #' summary(out_4$LocalG)
 #' plot(out_4["LocalG"])
@@ -82,16 +74,24 @@ hot_spot <- function(insert,
   if('sf'%in%class(insert)){
     if(all(sf::st_is(insert, 'POLYGON')) | all(sf::st_is(insert, 'MULTIPOLYGON'))){
       #Part A -
-      NNobj <- spdep::poly2nb(insert)
+      suppressMessages({suppressWarnings({
+        NNobj <- spdep::poly2nb(insert)
+      })})
 
       #Part B -
-      NNobj <- spdep::nb2listw(NNobj, style = style)
+      suppressMessages({suppressWarnings({
+        NNobj <- spdep::nb2listw(NNobj, style = style)
+      })})
 
       #Part C -
-      LocalG_Output <- spdep::localG(variable, NNobj)
+      suppressMessages({suppressWarnings({
+        LocalG_Output <- spdep::localG(variable, NNobj)
+      })})
 
       if(include_Moran%in%TRUE){
-        LocalM_Output <- spdep::localmoran(variable, NNobj)[,1]
+        suppressMessages({suppressWarnings({
+          LocalM_Output <- spdep::localmoran(variable, NNobj)[,1]
+        })})
       }
 
       #Part D -
@@ -180,13 +180,19 @@ hot_spot <- function(insert,
     class(KNN) <- 'nb'
 
     #Part D -
-    NNobj <- spdep::nb2listw(KNN, style = style)
+    suppressMessages({suppressWarnings({
+      NNobj <- spdep::nb2listw(KNN, style = style)
+    })})
 
     #Part E -
-    LocalG_Output <- spdep::localG(variable, NNobj)
+    suppressMessages({suppressWarnings({
+      LocalG_Output <- spdep::localG(variable, NNobj)
+    })})
 
     if(include_Moran%in%TRUE){
-      LocalM_Output <- spdep::localmoran(variable, NNobj)[,1]
+      suppressMessages({suppressWarnings({
+        LocalM_Output <- spdep::localmoran(variable, NNobj)[,1]
+      })})
     }
   }
 

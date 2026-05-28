@@ -32,20 +32,15 @@ Function to create a table of consecutive dates, in SUNGEO-compliant format.
 }
 \examples{
 # All dates from January 1, 1900 to today
-\donttest{
 out_1 <- make_ticker()
 out_1
-}
 
 # All dates from January 1, 1200 to today
-\donttest{
 out_2 <- make_ticker(date_min=12000101)
 out_2
-}
 
 # All dates from January 1, 1500 to December 31, 1899
-\donttest{
 out_3 <- make_ticker(date_min=15000101, date_max=18991231)
 out_3
-}
+
 }

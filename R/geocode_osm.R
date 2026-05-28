@@ -69,12 +69,16 @@
 #' @examples
 #' # Geocode an address (top match only)
 #' geocode_osm("Michigan Stadium")
+#'
 #' # Return detailed results for top match
 #' geocode_osm("Michigan Stadium", details = TRUE)
+#'
 #' # Return detailed results for all matches
 #' geocode_osm("Michigan Stadium", details = TRUE, return_all = TRUE)
+#'
 #' # Reverse geocode a coordinate pair
 #' geocode_osm(reverse = TRUE, lon = -83.74868, lat = 42.26587, zoom = 18)
+#'
 #' @export
 
 geocode_osm <- function(

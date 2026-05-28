@@ -56,8 +56,8 @@ out_2 <- point2poly_simp(pointz = clea_deu2009_pt,
                          na_val = 0)
 plot(out_2["vv1"])
 
-# Multiple variables, with different assignment functions
 \donttest{
+# Multiple variables, with different assignment functions
 out_3 <- point2poly_simp(pointz = clea_deu2009_pt,
                          polyz = hex_05_deu,
                          varz = list(
@@ -69,5 +69,7 @@ out_3 <- point2poly_simp(pointz = clea_deu2009_pt,
                            function(x){sum(x,na.rm=TRUE)},
                            function(x){paste0(unique(na.omit(x)),collapse=" | ") }),
                          na_val = list(NA_real_,0,NA_character_))
+plot(out_3["pvs1_margin"])
 }
+
 }
